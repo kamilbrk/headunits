@@ -6,7 +6,7 @@ export const DOMAIN = 'https://kamilbrk.github.io';
  * If required, set this to `/xyz`
  * If not, make sure it's set to `undefined`
  */
-export const BASE = undefined; //
+export const BASE = '/ksw'; //
 
 /** Root URL user for home page links */
 export const ROOT = BASE || '/';
