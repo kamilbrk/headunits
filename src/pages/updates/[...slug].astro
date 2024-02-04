@@ -1,0 +1,63 @@
+---
+import Layout from "../../shared/layout/base-layout.astro";
+import DateTime from '../../shared/date-time.component.astro'
+import FileSignatures from "../../modules/updates/file-signatures.component.astro";
+import { getUpdatesByPlatform } from "../../modules/updates/updates";
+
+export async function getStaticPaths() {
+    const platforms = await getUpdatesByPlatform();
+    const result = [];
+
+    for (const platform of platforms) {
+        for (const entry of platform.data.entries) {
+            result.push({
+                params: { slug: entry.slug },
+                props: { entry, platform }
+            })
+        }
+    }
+
+    return result;
+}
+
+const { entry, platform } = Astro.props;
+const { Content } = await entry.render();
+---
+<Layout title={`Update ${entry.data.id}`}>
+
+    {(entry.previous || entry.next) && (
+        <div class="flex justify-between mb-4">
+            {entry.previous && (
+                <a href={`/updates/${entry.previous.slug}`} class="self-start bg-slate-800 text-white py-2 pl-2 pr-4 rounded inline-flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                    {entry.previous.data.version}
+                </a>
+            )}
+
+            {entry.next && (
+                <a href={`/updates/${entry.next.slug}`} class="self-end ml-auto bg-slate-800 text-white py-2 pr-2 pl-4 rounded inline-flex items-center">
+                    {entry.next.data.version}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                </a>
+            )}
+        </div>
+    )}
+
+    <article class="prose dark:prose-invert max-w-none break-words">
+        <p>Version <strong>{entry.data.version}</strong> based on Android {entry.data.android} for devices running on {platform.data.name} platform, built on <strong><DateTime date={entry.data.date} /></strong>.</p>
+
+        {!entry.next && (
+            <p>This appears to be the latest version (that we are aware of) for the {platform.data.id} platform.</p>
+        )}
+
+        <Content />
+
+        {entry.data.signatures && <FileSignatures signatures={entry.data.signatures} />}
+
+    </article>
+    <a href="/updates">Back to all updates</a>
+</Layout>

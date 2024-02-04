@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from "../../shared/layout/base-layout.astro";
+import Faq from "../../modules/faq/item.component.astro";
+
+export async function getStaticPaths() {
+    const entries = await getCollection('faq');
+    return entries.map(entry => ({
+        params: { slug: entry.slug }, props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+---
+<Layout title={`FAQ: Theme ${entry.data.question}`}>
+    <Faq slug={entry.slug} />
+</Layout>

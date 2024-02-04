@@ -1,0 +1,13 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ThemesListItem from './list-item.component.astro';
+
+interface Props {
+    themes: CollectionEntry<"themes">[];
+}
+
+const { themes } = Astro.props;
+---
+{themes.map(theme => (
+    <ThemesListItem theme={theme}></ThemesListItem>
+))}

@@ -1,0 +1,278 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from "../shared/layout/base-layout.astro";
+import ThemesList from '../modules/themes/list.component.astro'
+import ThemesFilters from '../modules/themes/filters.component.astro';
+import type { ITag } from '../modules/themes/tag.model';
+
+const themesCollection = await getCollection('themes');
+const themes = themesCollection.sort((a, b) => a.data.id.localeCompare(b.data.id));
+
+const tags = themes.reduce<ITag[]>((acc, theme) => {
+    for (const tag of theme.data?.tags) {
+        const split = tag.split('-');
+
+        let next = acc;
+        let partsSoFar: string[] = [];
+
+        for (const part of split) {
+            partsSoFar.push(part);
+            const current = partsSoFar.join('-');
+
+            let found = next.find(x => x.id === current);
+            if (found) {
+                found.themes.push(theme.data.id);
+                found.themes = [...new Set(found.themes)];
+            } else {
+                found = {
+                    id: current,
+                    active: true,
+                    themes: [theme.data.id],
+                    children: [],
+                    elements: {}
+                };
+                next.push(found);
+            }
+
+            next.sort((a, b) => a.id.localeCompare(b.id));
+            next = found.children;
+        }
+    }
+
+    return acc;
+}, []);
+
+const getFilterTagIds = (acc, tag) => {
+    if (tag.children.length) {
+        return tag.children.reduce(getFilterTagIds, acc);
+    }
+    acc.push(tag.id);
+    return acc;
+};
+
+const extraStyles = `[class=".themes-wrapper "] .no-results{display:block}`;
+const filterTagIds = tags.reduce(getFilterTagIds, []);
+const filterClassNames = filterTagIds.map(x => `tag-show--${x}`);
+const filterStyles = `${filterTagIds.map(x => `.tag-show--${x} .tag--${x}`).join(',')}{display:block}${extraStyles}`;
+---
+<Layout title="Themes">
+    <div class="themes-wrapper" class:list={filterClassNames} x-data="{ filters: false }" data-tags={JSON.stringify(tags)}>
+        <div class="relative z-40 lg:hidden" role="dialog" :aria-modal="filters" x-show="filters" x-cloak>
+            <!-- Backdrop -->
+            <div
+                class="fixed inset-0 bg-black bg-opacity-25"
+                x-show="filters"
+                x-transition:enter="transition-opacity ease-linear duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition-opacity ease-linear duration-300"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+            ></div>
+
+            <!-- Mobile filters -->
+            <div class="fixed inset-0 z-40 flex">
+                <div
+                    class="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl"
+                    x-transition:enter="transition ease-in-out duration-300 transform"
+                    x-transition:enter-start="translate-x-full"
+                    x-transition:enter-end="translate-x-0"
+                    x-transition:leave="transition ease-in-out duration-300 transform"
+                    x-transition:leave-start="translate-x-0"
+                    x-transition:leave-end="translate-x-full"
+                    x-show="filters"
+                    x-on:click.outside="filters = false"
+                >
+                    <div class="flex items-center justify-between px-4">
+                        <h3 class="text-lg font-medium text-gray-900 toggle-all-filters">Filters</h3>
+                        <button
+                            type="button"
+                            class="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
+                            x-on:click="filters = !filters"
+                        >
+                            <span class="sr-only">Close menu</span>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <form class="mt-4 border-t border-gray-200">
+                        <ul class="px-4 py-6 space-y-6">
+                            <ThemesFilters tags={tags} mode="mobile" labelClassName="ml-3 min-w-0 flex-1 text-gray-500"></ThemesFilters>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-x-8 lg:grid-cols-4">
+
+            <form>
+                <button
+                    type="button"
+                    class="lg:hidden mb-4 text-gray-400 hover:text-gray-500 inline-flex items-center"
+                    x-on:click="filters = !filters"
+                >
+                    <svg class="w-4 h-4 mr-3" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Filter by tags</span>
+                </button>
+
+                <div class="hidden lg:inline-flex mb-4 text-gray-400 relative items-center">
+                    <svg class="w-4 h-4 mr-3" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="toggle-all-filters">Filter by tags</span>
+                </div>
+
+                <ul class="space-y-4 hidden lg:block">
+                    <ThemesFilters tags={tags} mode="desktop" labelClassName="ml-3 text-sm text-gray-600 dark:text-gray-300"></ThemesFilters>
+                </ul>
+            </form>
+
+            <!-- Themes grid -->
+            <div class="lg:col-span-3">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-2 xl:gap-x-8">
+                    <ThemesList themes={themes}></ThemesList>
+                </div>
+
+                <div class="no-results hidden">
+                    Nothing to show. Please adjust the tag filters.
+                </div>
+
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<style is:inline set:html={filterStyles}></style>
+
+<script>
+    const wrapper = document.querySelector(`.themes-wrapper`);
+    const tags = JSON.parse(wrapper.dataset.tags);
+    const modes = ['desktop', 'mobile'];
+    let defaultValue = true;
+
+    const getSelector = (mode, tagId) => `input#filter-tag-${mode}-${tagId}`;
+    const getChildrenStatuses = ({ active, children }) => children.length ? [active, ...children.flatMap(getChildrenStatuses)] : active;
+
+    const getEnabledClassNames = (acc, tag) => {
+        if (tag.children.length) return tag.children.reduce(getEnabledClassNames, acc);
+        if (tag.active) acc.push(`tag-show--${tag.id}`);
+        return acc;
+    };
+
+    const updateEnabledClassNames = () => {
+        wrapper.className = `.themes-wrapper ${tags.reduce(getEnabledClassNames, []).join(' ')}`;
+    };
+
+    const updateChildren = (tag, value) => {
+        for (const child of tag.children) {
+            child.active = value;
+
+            for (const mode of modes) {
+                child.elements[mode].checked = value;
+                child.elements[mode].indeterminate = false;
+            }
+
+            if (child.children.length) {
+                updateChildren(child, value);
+            }
+        }
+    };
+
+    const updateParents = parentTag => {
+        const children = parentTag.children.flatMap(getChildrenStatuses);
+        const checked = children.filter(Boolean).length;
+        parentTag.active = checked === children.length;
+
+        for (const mode of modes) {
+            parentTag.elements[mode].checked = parentTag.active;
+            parentTag.elements[mode].indeterminate = checked && !parentTag.active;
+        }
+
+        if (parentTag.parentRef) {
+            updateParents(parentTag.parentRef);
+        }
+    };
+
+    // Traverse through all tags to add references to parents and to small/large checkbox elements
+    const addReferences = (tag, parentRef = null) => {
+        for (const mode of modes) tag.elements[mode] = wrapper.querySelector(getSelector(mode, tag.id));
+        if (parentRef) tag.parentRef = parentRef;
+        for (const child of tag.children) addReferences(child, tag);
+    };
+
+    // Utility to find a tag in tree by unique ID
+    const findTag = tagId => {
+        let next = tags;
+        let tag;
+
+        const split = tagId.split('-');
+        const partsSoFar = [];
+
+        for (const part of split) {
+            partsSoFar.push(part);
+            const current = partsSoFar.join('-');
+
+            tag = next.find(x => x.id === current);
+            next = tag.children;
+        }
+
+        return tag;
+    };
+
+    // Add element references to all tags
+    for (const tag of tags) {
+        addReferences(tag);
+    }
+
+    const toggleAll = (value, array = tags) => {
+        for (const item of array) {
+            item.active = value;
+            for (const mode of modes) {
+                item.elements[mode].checked = value;
+                item.elements[mode].indeterminate = false;
+            }
+            if (item.children.length) {
+                toggleAll(value, item.children);
+            }
+        }
+        updateEnabledClassNames();
+    };
+
+    const toggleOne = ({ target }) => {
+        if (target?.type === 'checkbox' && target.id?.startsWith('filter-tag-')) {
+            const tag = findTag(target.value);
+            if (tag) {
+                tag.active = target.checked;
+
+                for (const mode of modes) {
+                    if (!target.id.startsWith(`filter-tag-${mode}-`)) tag.elements[mode].checked = target.checked;
+                    tag.elements[mode].indeterminate = false;
+                }
+
+                updateChildren(tag, tag.active);
+
+                if (tag.parentRef) {
+                    updateParents(tag.parentRef);
+                }
+
+                updateEnabledClassNames();
+            }
+        }
+    };
+
+    wrapper.addEventListener('change', toggleOne);
+
+    wrapper.querySelectorAll('.toggle-all-filters').forEach(el => {
+        el.addEventListener('click', () => {
+            defaultValue = !defaultValue;
+            toggleAll(defaultValue);
+        });
+    });
+
+</script>
