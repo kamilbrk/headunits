@@ -1,0 +1,72 @@
+---
+import { slug } from 'github-slugger';
+import type { SettingItem } from "./collection";
+
+interface Props {
+    section: string;
+    setting: SettingItem;
+    parent?: string;
+}
+
+const { section, setting, parent } = Astro.props;
+
+const uniqueId = slug([section, parent, setting.name].filter(x => x).join(' '));
+const parentId = parent ? slug([section, parent].filter(x => x).join(' ')) : undefined;
+
+---
+<div>
+    <div class="flex items-center space-x-2">
+        {setting.control === 'checkbox' && (
+            <input
+                type="checkbox"
+                id={uniqueId}
+                name={uniqueId}
+                disabled="disabled"
+                class="rounded w-4 h-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            >
+        )}
+
+        {setting.control === 'radio' && (
+            <input
+                type="radio"
+                id={uniqueId}
+                name={parentId}
+                disabled="disabled"
+                class="w-4 h-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            >
+        )}
+
+        {setting.control ? (
+            <label for={uniqueId}>{setting.name}</label>
+        ) : (
+            <span id={uniqueId}>{setting.name}</span>
+        )}
+
+        {setting.max && (
+            <input
+                type="range"
+                id={uniqueId}
+                name={uniqueId}
+                min={setting.min}
+                max={setting.max}
+                disabled="disabled"
+                class="h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            >
+            <span>({setting.min} - {setting.max})</span>
+        )}
+    </div>
+
+    {setting.description && (
+        <div
+            class="mb-1 text-sm text-gray-600 dark:text-gray-400"
+            class:list={{ 'ml-6': setting.control === 'checkbox' || setting.control === 'radio' }}
+        >
+            {setting.description}
+        </div>
+    )}
+
+    {setting.children?.map(child => (
+        <Astro.self section={section} setting={child} parent={setting.name}></Astro.self>
+    ))}
+</div>
+

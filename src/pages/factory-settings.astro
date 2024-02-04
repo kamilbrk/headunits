@@ -1,0 +1,22 @@
+---
+import { Code } from 'astro:components';
+import { getCollection } from "astro:content";
+
+import Layout from "../shared/layout/base-layout.astro";
+import FactorySettingsSection from "../modules/factory-settings/section.component.astro";
+import xml from '../../public/factory_config.xml?raw';
+import { SHIKI_THEMES } from "../shared/config";
+
+const collection = await getCollection('factory-settings');
+
+---
+<Layout title="Factory settings">
+    <article class="prose dark:prose-invert max-w-none">
+        {collection.map(entry => <FactorySettingsSection slug={entry.slug} />)}
+    </article>
+
+    <hr>
+    
+    <h3>An example <code>factory_config.xml</code> file:</h3>
+    <Code lang="xml" code={xml} theme experimentalThemes={SHIKI_THEMES} />
+</Layout>

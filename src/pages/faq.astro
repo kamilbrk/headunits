@@ -1,0 +1,11 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../shared/layout/base-layout.astro";
+import FaqItem from "../modules/faq/item.component.astro";
+const collection = await getCollection('faq');
+---
+<Layout title="Frequently Asked Questions">
+    <div class="grid lg:grid-cols-2 lg:gap-10">
+        {collection.map(entry => <FaqItem slug={entry.slug} />)}
+    </div>
+</Layout>

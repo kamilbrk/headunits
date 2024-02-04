@@ -1,0 +1,28 @@
+---
+import type { CollectionEntry } from "astro:content";
+interface Props {
+    theme: CollectionEntry<"themes">;
+}
+const { theme } = Astro.props;
+const tagClassNames = theme.data.tags?.map(x => `tag--${x}`).join(' ');
+---
+<div class={`group relative ${tagClassNames} hidden`}>
+    <div class="overflow-hidden rounded-md w-full group-hover:opacity-75">
+        <img
+            src={theme.data.images[0].src}
+            alt="123"
+            class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+        />
+    </div>
+    <div class="mt-4">
+        <h3 class="text-sm text-gray-700 dark:text-gray-300">
+            <a href={`/themes/${theme.slug}`}>
+                <span aria-hidden="true" class="absolute inset-0"></span>
+                {theme.data.id}
+            </a>
+        </h3>
+        <p class="mt-1 text-sm text-gray-500">{theme.data.tags?.map(tag => (
+            <span>#{tag} </span>
+        ))}</p>
+    </div>
+</div>
