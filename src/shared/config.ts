@@ -11,14 +11,16 @@ export const BASE = '/ksw'; //
 /** Root URL user for home page links */
 export const ROOT = BASE || '/';
 
-const prefix = BASE ? `${BASE}/` : '/';
+/** Use this for other links across the site */
+export const URL_PREFIX = BASE ? `${BASE}/` : '/';
+
 export const NAVIGATION = [
-  { name: 'Updates', href: `${prefix}updates` },
-  { name: 'Themes', href: `${prefix}themes` },
-  { name: 'Factory settings', href: `${prefix}factory-settings` },
-  // { name: 'Apps', href: `${prefix}apps` },
-  { name: 'FAQ', href: `${prefix}faq` },
-  { name: 'About', href: `${prefix}about` }
+  { name: 'Updates', href: `${URL_PREFIX}updates` },
+  { name: 'Themes', href: `${URL_PREFIX}themes` },
+  { name: 'Factory settings', href: `${URL_PREFIX}factory-settings` },
+  // { name: 'Apps', href: `${URL_PREFIX}apps` },
+  { name: 'FAQ', href: `${URL_PREFIX}faq` },
+  { name: 'About', href: `${URL_PREFIX}about` }
 ];
 
 export const DEFAULT_PAGE_TITLE = 'KSW Head Units';
