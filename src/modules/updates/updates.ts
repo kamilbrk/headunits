@@ -16,22 +16,22 @@ export const getUpdatesByPlatform = async () => {
   }
 
   for (const entry of allUpdates) {
-    groups[entry.data.platform.slug]?.data.entries?.push(entry);
+    groups[entry.data.platform.slug]?.data.entries.push(entry);
   }
 
   for (const group of Object.values(groups)) {
-    const numberOfEntriesInGroup = group.data.entries?.length;
+    const numberOfEntriesInGroup = group.data.entries.length;
 
     group.data.entries = group.data.entries
-      ?.sort((a: any, b: any) => +new Date(b.data.date) - +new Date(a.data.date))
+      .sort((a: any, b: any) => +new Date(b.data.date) - +new Date(a.data.date))
       .map((entry: any, index: number) => {
         const match = entry.data.id.match(regex);
         entry.data.android = ANDROID_VERSIONS[match?.[1]];
         entry.data.version = match?.[2];
         return {
           ...entry,
-          previous: index + 1 === numberOfEntriesInGroup ? undefined : group.data.entries?.[index + 1],
-          next: index === 0 ? undefined : group.data.entries?.[index - 1]
+          previous: index + 1 === numberOfEntriesInGroup ? undefined : group.data.entries[index + 1],
+          next: index === 0 ? undefined : group.data.entries[index - 1]
         };
       });
 

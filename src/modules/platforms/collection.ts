@@ -1,7 +1,7 @@
 import { defineCollection, reference, z } from 'astro:content';
 
 export default defineCollection({
-  type: 'data',
+  type: 'content',
   schema: z.object({
     id: z.string(),
     name: z.string(),

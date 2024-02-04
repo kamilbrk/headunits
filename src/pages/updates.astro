@@ -2,6 +2,7 @@
 ---
 import Layout from "../shared/layout/base-layout.astro";
 import { getUpdatesByPlatform } from "../modules/updates/updates";
+import { URL_PREFIX } from "../shared/config";
 
 const platforms = await getUpdatesByPlatform();
 
@@ -14,7 +15,7 @@ const platforms = await getUpdatesByPlatform();
                 <ul>
                     {platform.data.entries.map(entry => (
                         <li>
-                            <a href={`/updates/${entry.slug}`}>{entry.data.id}</a>
+                            <a href={`${URL_PREFIX}updates/${entry.slug}`}>{entry.data.id}</a>
                             <time datetime={entry.data.date}>{entry.data.date.toString().slice(0,10)}</time>
                         </li>
                     ))}
