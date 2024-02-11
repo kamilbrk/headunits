@@ -6,8 +6,6 @@ node_modules/
 # testing
 coverage/
 test-results/
-playwright-report/
-playwright/.cache/
 
 # production
 dist/
