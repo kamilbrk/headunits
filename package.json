@@ -7,7 +7,6 @@
     "url": "https://github.com/doinel1a/astro-vanilla-ts"
   },
   "scripts": {
-    "postinstall": "npx playwright install",
     "lint": "eslint src/**/*.{astro,js,jsx,ts,tsx}",
     "lint:fix": "eslint --fix",
     "prettier": "prettier --write **/**/*.{astro,css,scss,js,cjs,mjs,ts,tsx}",
@@ -25,7 +24,6 @@
   "devDependencies": {
     "@astrojs/tailwind": "^5.1.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
-    "@playwright/test": "^1.41.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
