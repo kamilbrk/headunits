@@ -4,6 +4,8 @@ import { defineCollection, z } from 'astro:content';
 const BaseSettingItemSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
+  configKey: z.string().optional(),
+  configValue: z.union([z.string(), z.number()]).optional(),
   control: z.string().optional(),
   min: z.number().optional(),
   max: z.number().optional(),
