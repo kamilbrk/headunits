@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ConfigInfo>
 
-    <!-- Last updated 2024-02-03 kamilbrk, based on Kri's version 394 from Discord -->
+    <!-- Last updated 2024-02-13 kamilbrk, based on Kri's version 394 from Discord -->
 
     <!-- List of supported navigation applications -->
     <SupportNaviAppList>
@@ -329,7 +329,7 @@
         <client>ALS_6208</client>
 
         <!-- Password of factory setting (4~6 digits) -->
-        <password>070305</password>
+        <password>0000</password>
 
         <!-- Android 7.1 UI selection  see Supported UI -->
         <UI>2</UI>
@@ -370,8 +370,12 @@
         <!-- DTV function switch  0:Off  1:On -->
         <DTV_Type>0</DTV_Type>
 
-        <!-- DVR module type  0:Off  1: CVBS DVR  2:USB DVR (The following USB DVR application names can be set using USB, otherwise it cannot be customized) -->
-        <DVR_Type>2</DVR_Type>
+        <!-- DVR module type
+            0: Off
+            1: CVBS DVR
+            2: USB DVR (The following USB DVR application names can be set using USB, otherwise it cannot be customized)
+        -->
+        <DVR_Type>0</DVR_Type>
 
         <!-- USB DVR application names  Default: Ankai (Valid when the DVR module type is USB DVR) Old: com.anwensoft.cardvr  New: com.ankai.cardvr -->
         <DVRApk_PackageName>com.ankai.cardvr</DVRApk_PackageName>
@@ -382,7 +386,11 @@
         <!-- Installation of third-party apps 0:allow  1:Prohibited  -->
         <APK_Install>0</APK_Install>
 
-        <!-- Type of the original head unit with AUX input  1:Alpine  2:Harman  3: other -->
+        <!-- Type of the original head unit with AUX input
+            1: Alpine
+            2: Harman
+            3: other
+        -->
         <CarAux_auto_method>2</CarAux_auto_method>
 
         <!-- Switching mode of original head unit AUX input  0:Automatic switching  1:Manual switching -->
@@ -412,7 +420,10 @@
         <!-- TXZ Companion ambient temperature alarm setting  0:Off  1:On -->
         <txz_temp>0</txz_temp>
 
-        <!-- CCC_IDrive Type selection  0：IDrive_A  1：IDrive_B -->
+        <!-- CCC_IDrive Type selection
+            0：IDrive_A
+            1：IDrive_B
+        -->
         <CCC_IDrive>0</CCC_IDrive>
 
         <!-- Setting the maximum speed of the dashboard  0：240  1：260  2: 300  3:280 -->
@@ -421,7 +432,11 @@
         <!-- Switching of the Reversing Camera  0：Automatic 1：Manual -->
         <HandsetAutomaticSelect>0</HandsetAutomaticSelect>
 
-        <!-- Door settings  0：Left driver's seat  1：Right driver's seat  2：The door does not display  -->
+        <!-- Door settings
+            0：Left driver's seat
+            1：Right driver's seat
+            2：The door does not display
+        -->
         <CarDoorSelect>1</CarDoorSelect>
 
         <!-- USB mode  0：Off  1：On -->
@@ -430,10 +445,20 @@
         <!-- WiFi or 4G  0：4G  1：WiFi -->
         <Wifi_or_4G>0</Wifi_or_4G>
 
-        <!-- Selection the car's voice button function 0:No effect 1：Short press no effect, long press navigation function   2：Short press voice function, long press navigation function  3：Short press navigation function, long press no effect -->
-        <Voice_key>1</Voice_key>
+        <!--
+            Selection the car's voice button function
+            0: No effect
+            1: Short press no effect, long press navigation function
+            2: Short press voice function, long press navigation function
+            3: Short press navigation function, long press no effect
+        -->
+        <Voice_key>2</Voice_key>
 
-        <!-- Selection the car's NAV button function  0:Android navigation  1：Original car navigation -->
+        <!--
+            Selection the car's NAV or "Map" button function
+            0: Android navigation
+            1: Original car navigation
+        -->
         <Map_key>0</Map_key>
 
         <!-- 360 camera type  0:CVBS  1:VGA -->
@@ -456,12 +481,25 @@
         <BenzPanelEnable>0</BenzPanelEnable>
 
         <!-- Dashboard unit  0：Metric  1：Imperial -->
-        <DashBoardUnit>0</DashBoardUnit>
+        <DashBoardUnit>1</DashBoardUnit>
 
-        <!-- Dashboard selection  0：General  1：Tri-color dashboard 2: seven color Dashboard -->
+        <!-- Dashboard selection
+            0: General
+            1: Tri-color dashboard
+            2: Seven color Dashboard
+        -->
         <Dashboard_Select>2</Dashboard_Select>
 
-        <!-- AHD Camera settings 0:Automatic detection 1:AHD_1080_30 2:AHD_1080_25  3:AHD_720_30 4:AHD_720_25  5:AHD_720_50  6:CVBS_NTSC 7:CVBS_PAL -->
+        <!-- AHD Camera settings
+            0: Automatic detection
+            1: AHD_1080_30
+            2: AHD_1080_25
+            3: AHD_720_30
+            4: AHD_720_25
+            5: AHD_720_50
+            6: CVBS_NTSC
+            7: CVBS_PAL
+        -->
         <AHD_cam_Select>0</AHD_cam_Select>
 
         <!-- Wing TrucK NetwoRkIng e-car.cn 0: disabled  1:enabled-->
@@ -473,7 +511,11 @@
         <!-- car brand 1:BMW 2:Benz  3:Audi  4:Lexus 5:LuHu-->
         <car_manufacturer>1</car_manufacturer>
 
-        <!-- remember the last boot mode: 0:enable remember  1:always switch to OEM 2: always switch to Android -->
+        <!-- Remember the last boot mode:
+            0: Enable remember
+            1: Always switch to OEM
+            2: Always switch to Android
+        -->
         <Default_PowerBoot>0</Default_PowerBoot>
 
         <!-- climate controls 0：off  1：on -->
@@ -497,7 +539,11 @@
         <!-- Screencasting Switch 0:disabled  1:enabled-->
         <Screen_cast>0</Screen_cast>
 
-        <!-- Phone Key Selection 0: Original Vehicle Function  1: Android Bluetooth feature   2: Undefined  -->
+        <!-- Phone Key Selection
+            0: Original Vehicle Function
+            1: Android Bluetooth feature
+            2: Undefined
+        -->
         <phone_key>1</phone_key>
 
         <!-- Reverse Camera time  "0-0":disabled "1-1":1 sec up to "1-10" for 10 seconds -->

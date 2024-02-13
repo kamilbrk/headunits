@@ -1,27 +1,32 @@
 ---
 section: "Function"
 settings:  
-  - name: "USB HOST" # KeyConfig.USB_HOST='USB_HOST', this.funtion1
+  - name: "USB HOST"
+    configKey: USB_HOST
     control: checkbox
-  - name: "Zlink" # KeyConfig.ZLINK_AUTO_START='zlink_auto_start' / cbox_function_google_off
+  - name: "Zlink"
+    configKey: zlink_auto_start # See CenterService.BootReceiver. Also, when either `zlink_auto_start` or `hotspot_open` (undocumented) options are true, Settings.MyReceiver will run `start5GTether` to set Wi-FI AP config and start tethering.
     control: checkbox
-    description: "When enabled, Zlink should start automatically on boot. Additionally, it will take over Wi-Fi to create and maintain its wireless hotspot, therefore you won't be able to use Wi-Fi for other purposes."
-  - name: "HiCar" # zlink_hicar
+    description: "When enabled, Zlink should automatically start on boot. Additionally, it will take over Wi-Fi to create and maintain its wireless hotspot, therefore you will not be able to use Wi-Fi for other purposes."
+  - name: "HiCar"
+    configKey: zlink_hicar # See CenterService.BootReceiver
     control: checkbox
-    description: "When enabled, Zlink should start automatically on boot and enter Huwawei HiCar mode."
+    description: "When enabled, Zlink should automatically start on boot. It will also directly open the Huawei HiCar mode/screen in Zlink. Most likely dependant on the \"Zlink\" option above."
   - name: "Google Apps"
     control: checkbox
   - name: "AUX"
     control: checkbox
   - name: "DTV"
     control: checkbox
-  - name: "F_CAM" # F_CAM_Type / Front_view_camera
+  - name: "F_CAM"
+    configKey: Front_view_camera
     control: checkbox
   - name: "Txzing Assistant"
     control: checkbox
   - name: "BT"
     control: checkbox
   - name: "Touch data continuously sent"
+    configKey: touch_continuous_send
     control: checkbox
   - name: "Equalizer APP"
     control: checkbox
@@ -30,26 +35,41 @@ settings:
   - name: "360APK"
     control: checkbox
   - name: "Remember The Last Mode"
+    configKey: Default_PowerBoot
+    description: "You can choose what system is automatically launched on start-up"
     children:
       - name: "Enable"
+        description: "Try to remember last used interface and use that (OEM or Android)"
+        configValue: 0
         control: radio
       - name: "To OEM System"
+        description: "Start with OEM system, where you can switch to Android later"
+        configValue: 1
         control: radio
       - name: "To Android Homepage"
+        description: "Start with Android, where you can switch to OEM system later"
+        configValue: 2
         control: radio
   - name: "DVR"
+    configKey: DVR_Type
     children:
       - name: "Close"
+        configValue: 0
         control: radio
       - name: "CVBS DVR"
+        configValue: 1
         control: radio
       - name: "USB DVR"
+        configValue: 2
         control: radio
   - name: "Bluetooth Selection"
+    configKey: BT_Type
     children:
       - name: "OEM Bluetooth"
+        configValue: 1
         control: radio
       - name: "Android Bluetooth"
+        configValue: 0
         control: radio
   - name: "Amplifier Selection"
     children:
@@ -70,30 +90,43 @@ settings:
       - name: "Close"
         control: radio
   - name: "Unit Selection"
+    configKey: DashBoardUnit
     children:
       - name: "Metric Unit"
+        configValue: 0
         control: radio
       - name: "Imperial Unit"
+        configValue: 1
         control: radio
   - name: "AHD Camera Selection"
+    configKey: AHD_cam_Select
     children:
       - name: "Automatic Detection"
+        configValue: 0
         control: radio
       - name: "AHD-1080P-30HZ"
+        configValue: 1
         control: radio
       - name: "AHD-1080P-25HZ"
+        configValue: 2
         control: radio
       - name: "AHD-720P-30HZ"
+        configValue: 3
         control: radio
       - name: "AHD-720P-25HZ"
+        configValue: 4
         control: radio
       - name: "AHD-720P-50HZ"
+        configValue: 5
         control: radio
       - name: "CVBS-NTSC"
+        configValue: 6
         control: radio
       - name: "CVBS-PAL"
+        configValue: 7
         control: radio
   - name: "Disable Video In Motion"
+    configKey: DoNotPlayVideosWhileDriving
     control: checkbox
   - name: "Front view mirror setting"
     control: checkbox
