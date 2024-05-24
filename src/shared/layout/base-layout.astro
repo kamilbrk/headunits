@@ -22,36 +22,28 @@ const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
-    <meta name="keywords" content="ksw" />
+    <meta name="keywords" content="ksw zxw android head units factory config" />
 
     <!--<link rel="icon" type="image/svg+xml" href="/favicon.svg" />-->
     <!--<link rel="manifest" href="/app.webmanifest" />-->
-    <meta name="theme-color" content="#09090b" />
+    <meta name="theme-color" content="#111827" />
     <link rel="robots" href="/robots.txt" />
     <!--<link rel="sitemap" type="application/xml" href="/sitemap.xml" />-->
-
-    <!--<meta property="og:url" content={`https://${DOMAIN}`} />-->
-    <!--<meta property="og:type" content="website" />-->
-    <!--<meta property="og:title" content={title} />-->
-    <!--<meta property="og:description" content={description} />-->
-    <!--<meta property="og:image" content="/og.png" />-->
-
-    <!--<meta name="twitter:card" content="summary_large_image" />-->
-    <!--<meta property="twitter:domain" content={DOMAIN} />-->
-    <!--<meta property="twitter:url" content={`https://${DOMAIN}`} />-->
-    <!--<meta name="twitter:title" content={title} />-->
-    <!--<meta name="twitter:description" content={description} />-->
-    <!--<meta name="twitter:image" content="/og.png" />-->
   </head>
-  <body>
-    <Navigation />
-    {pageTitle && (<header class="bg-white dark:bg-gray-900 shadow">
-      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-300">{pageTitle}</h2>
+  <body x-data="{ sidebar: false }" class="bg-white dark:bg-gray-900">
+    <Navigation title={title} />
+
+    <main class="py-8 lg:pl-72">
+      <div class="px-4 sm:px-6 lg:px-8">
+        {title !== DEFAULT_PAGE_TITLE && (
+          <h3 class="pb-8 text-gray-900 dark:text-white leading-7 font-bold text-2xl sm:tracking-tight sm:text-3xl">{title}</h3>
+        )}
+        <slot />
       </div>
-    </header>)}
-    <main class="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
-      <slot />
     </main>
+
+    <div class="fixed inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">
+      <div class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"></div>
+    </div>
   </body>
 </html>

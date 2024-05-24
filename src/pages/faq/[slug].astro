@@ -1,0 +1,25 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+
+import Layout from '../../shared/layout/base-layout.astro';
+import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
+import FaqItem from "./_item.component.astro";
+
+export async function getStaticPaths() {
+    return await getFirstLevelStaticPathsFromCollection('updates');
+}
+
+const { slug } = Astro.params;
+const vendor = await getEntry('vendors', slug);
+const entries = await getCollection('faq', entry => entry.slug.startsWith(slug))
+---
+<Layout title=`Frequently Asked Questions for ${vendor.data.name}`>
+    <div class="grid lg:grid-cols-2 lg:gap-10">
+        {entries.length ? entries.map(entry => (
+            <FaqItem slug={entry.slug} />
+        )) : (
+            <p>We don't have any FAQs for this vendor yet.</p>
+        )}
+    </div>
+</Layout>
+
