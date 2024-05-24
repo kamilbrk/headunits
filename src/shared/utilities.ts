@@ -69,7 +69,11 @@ export async function getFirstLevelStaticPathsFromCollection<C extends Collectio
   }));
 }
 
-export async function getCollectionGroupedByCollection<C extends CollectionKey, P extends CollectionKey>(childrenCollectionKey: C, parentsCollectionKey: P, filterFn?: (parent: CollectionEntryWithEntries<P, C>) => boolean) {
+export async function getCollectionGroupedByCollection<C extends CollectionKey, P extends CollectionKey>(
+  childrenCollectionKey: C,
+  parentsCollectionKey: P,
+  filterFn?: (parent: CollectionEntryWithEntries<P, C>) => boolean
+) {
   const children = await getCollection(childrenCollectionKey);
   const parents: CollectionEntryWithEntries<P, C>[] = await getCollection(parentsCollectionKey);
 
