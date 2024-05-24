@@ -1,15 +1,15 @@
-import apps from '../modules/apps/collection.ts';
-import themes from '../modules/themes/collection.ts';
-import updates from '../modules/updates/collection.ts';
-import platforms from '../modules/platforms/collection.ts';
-import factorySettings from '../modules/factory-settings/collection.ts';
-import faq from '../modules/faq/collection.ts';
+import factorySettings from './factory-settings';
+import faq from './faq';
+import platforms from './platforms';
+import themes from './themes';
+import updates from './updates';
+import vendors from './vendors';
 
 export const collections = {
-  apps,
   'factory-settings': factorySettings,
-  themes,
+  faq,
   platforms,
+  themes,
   updates,
-  faq
+  vendors
 };

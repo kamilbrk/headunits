@@ -1,0 +1,39 @@
+---
+import { getEntry } from 'astro:content';
+
+import { URL_PREFIX } from '../../shared/config';
+import Layout from '../../shared/layout/base-layout.astro';
+import { getFirstLevelStaticPathsFromCollection, getCollectionGroupedByCollection, getAndroidVersion } from '../../shared/utilities';
+
+export async function getStaticPaths() {
+    return await getFirstLevelStaticPathsFromCollection('updates');
+}
+
+const { slug } = Astro.params;
+const vendor = await getEntry('vendors', slug);
+const platformsWithEntries = await getCollectionGroupedByCollection(
+    'updates',
+    'platforms',
+    entry => entry.slug.startsWith(slug)
+);
+---
+<Layout title=`Updates for ${vendor.data.name}`>
+    <div class="prose dark:prose-invert break-words">
+        {platformsWithEntries.map(group => (
+            <h3>{group.data.name}</h3>
+            <ul>
+                {group.entries.length ? group.entries.map(entry => (
+                    <li>
+                        <a href={`${URL_PREFIX}updates/${entry.slug}`}>{entry.data.id}</a>
+                        <span>(A{getAndroidVersion(entry)})</span>
+                        <time datetime={entry.data.date.toISOString()}>{entry.data.date.toISOString().slice(0,10)}</time>
+                    </li>
+                )) : (
+                    <li>
+                        We don't have information about updates for this platform yet.
+                    </li>
+                )}
+            </ul>
+        ))}
+    </div>
+</Layout>

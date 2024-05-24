@@ -1,0 +1,30 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+
+import Layout from '../../shared/layout/base-layout.astro';
+import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
+import ThemesListItem from "./_list-item.component.astro";
+
+export async function getStaticPaths() {
+    return await getFirstLevelStaticPathsFromCollection('updates');
+}
+
+const { slug } = Astro.params;
+const vendor = await getEntry('vendors', slug);
+const entries = await getCollection('themes', entry => entry.slug.startsWith(slug))
+entries.sort((a, b) => a.data.id.localeCompare(b.data.id));
+---
+<Layout title=`Themes for ${vendor.data.name}`>
+    {entries.length ? (
+        <div class="lg:col-span-3">
+            <div class="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-2 xl:gap-x-8">
+                {entries.map(entry => (
+                    <ThemesListItem theme={entry}></ThemesListItem>
+                ))}
+            </div>
+        </div>
+    ) : (
+        <p>We don't have any themes for this {vendor.data.name} vendor yet.</p>
+    )}
+</Layout>
+

@@ -8,6 +8,7 @@ body {
 
 [x-cloak] { display: none !important; }
 
+//noinspection CssUnusedSymbol
 html.dark .astro-code,
 html.dark .astro-code span {
   color: var(--shiki-dark) !important;

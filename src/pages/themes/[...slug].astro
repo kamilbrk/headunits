@@ -1,43 +1,51 @@
 ---
-import { getCollection } from 'astro:content';
+import { getEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import { Code } from 'astro:components';
-import Layout from "../../shared/layout/base-layout.astro";
+
 import { SHIKI_THEMES, URL_PREFIX } from "../../shared/config";
+import Layout from '../../shared/layout/base-layout.astro';
+import { getEntryStaticPathsFromCollection, getVendorSlug } from '../../shared/utilities';
 
 export async function getStaticPaths() {
-    const entries = await getCollection('themes');
-    return entries.map(entry => ({
-        params: { slug: entry.slug }, props: { entry },
-    }));
+    return await getEntryStaticPathsFromCollection('themes');
 }
 
-const { entry, entry: { data: theme } } = Astro.props;
+const { slug } = Astro.params;
+const vendor = await getEntry('vendors', getVendorSlug(slug));
+const entry = await getEntry('themes', slug);
 const { Content } = await entry.render();
 ---
+<Layout title={`${entry.data.display || entry.data.id}`}>
+    {entry.data.images?.length ? entry.data.images.map(image => (
+        <div class="mb-5">
+            <Image src={image} alt="" />
+        </div>
+    )) : (
+        <p class="prose dark:prose-invert mb-4">We don't have any screenshots of this theme yet.</p>
+    )}
 
-<Layout title={`Theme ${theme.id}`}>
-    <div class="">
-        {theme.images.map(image => (
-            <div class="mb-5">
-                <Image src={image} alt="" />
-            </div>
-        ))}
-    </div>
-
-    <div class="prose dark:prose-invert max-w-none">
-        <p>You need <Code lang="xml" code={`<Item id="1" name="${theme.id}" display="${theme.displayName}" />`} inline theme experimentalThemes={SHIKI_THEMES} /> in the <Code lang="xml" code={`<SupportUIList />`} inline theme experimentalThemes={SHIKI_THEMES} /> section your <code>factory_config.xml</code> file to activate this theme.</p>
-
-        {theme.since && (
-            <p>Available since <code>{theme.since}</code>.</p>
+    <div class="prose dark:prose-invert break-words">
+        {entry.data.invalid && (
+                <p>This theme appears to be invalid, so we do not recommend activating it.</p>
         )}
 
-        {theme.client && (
-            <p>Requires client <code>{theme.client}</code>.</p>
+        <p>To activate, find the <Code lang="xml" code={`<SupportUIList />`} inline themes={SHIKI_THEMES} /> section your <code>{vendor.data.factoryConfigFileName}</code> file and add the following line: {entry.data.number ? (
+            <Code lang="xml" code={`<Item id="${entry.data.number}" ui="${entry.data.id}" />`} inline themes={SHIKI_THEMES} />
+        ) : (
+            <Code lang="xml" code={`<Item id="1" name="${entry.data.id}" display="${entry.data.display}" />`} inline themes={SHIKI_THEMES} />
+        )}</p>
+
+        {entry.data.since && (
+            <p>Available since <code>{entry.data.since}</code>.</p>
+        )}
+
+        {entry.data.client && (
+            <p>Requires client <code>{entry.data.client}</code>.</p>
         )}
 
         <Content />
+
+        <a href={`${URL_PREFIX}themes/${vendor.slug}`}>Back to all {vendor.data.name} themes</a>
     </div>
-    
-    <a href={`${URL_PREFIX}themes`}>Back to all themes</a>
 </Layout>
