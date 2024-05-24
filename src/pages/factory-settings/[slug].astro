@@ -15,7 +15,7 @@ const { slug } = Astro.params;
 const vendor = await getEntry('vendors', slug);
 const entries = await getCollection('factory-settings', entry => entry.slug.startsWith(slug))
 
-const xmls = import.meta.glob<{ default: string }>('/public/*.xml', { as: 'raw', eager: true });
+const xmls = import.meta.glob<{ default: string }>('/public/*.xml', { query: '?raw', import: 'default', eager: true });
 const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
 ---
 <Layout title=`Factory settings for ${vendor.data.name}`>
