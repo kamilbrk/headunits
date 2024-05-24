@@ -12,7 +12,7 @@ export default defineConfig({
     base: BASE,
     markdown: {
         shikiConfig: {
-            experimentalThemes: SHIKI_THEMES
+            themes: SHIKI_THEMES
         }
     }
 });
