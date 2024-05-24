@@ -1,0 +1,35 @@
+---
+import { Code } from 'astro:components';
+import { getCollection, getEntry } from 'astro:content';
+
+import { SHIKI_THEMES } from "../../shared/config";
+import Layout from '../../shared/layout/base-layout.astro';
+import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
+import FactorySettingsSection from './_section.component.astro';
+
+export async function getStaticPaths() {
+    return await getFirstLevelStaticPathsFromCollection('updates');
+}
+
+const { slug } = Astro.params;
+const vendor = await getEntry('vendors', slug);
+const entries = await getCollection('factory-settings', entry => entry.slug.startsWith(slug))
+
+const xmls = import.meta.glob<{ default: string }>('/public/*.xml', { as: 'raw', eager: true });
+const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
+---
+<Layout title=`Factory settings for ${vendor.data.name}`>
+    <article class="prose dark:prose-invert">
+
+        {entries.length ? entries.map(entry => (
+            <FactorySettingsSection slug={entry.slug} />
+        )) : (
+            <p>We don't have any descriptions for factory settings for this vendor yet.</p>
+        )}
+
+        <hr>
+        <h2 class="prose dark:prose-invert mt-5">An example <code>{vendor.data.factoryConfigFileName}</code> file:</h2><br>
+    </article>
+    <Code lang="xml" code={xml} themes={SHIKI_THEMES} />
+</Layout>
+

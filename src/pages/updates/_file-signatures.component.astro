@@ -1,0 +1,21 @@
+---
+import { z } from 'astro:content';
+import { signaturesSchema } from '../../content/updates';
+
+interface Props {
+    signatures: z.infer<typeof signaturesSchema>;
+}
+
+const { signatures  } = Astro.props;
+const entries = Object.entries(signatures);
+entries.sort((a, b) => a[0].localeCompare(b[0]))
+
+---
+<div class="text-sm">
+    <p>File signatures</p>
+    <ul>
+        {entries.map(entry => (
+            <li>{entry[0]}: {entry[1]}</li>
+        ))}
+    </ul>
+</div>

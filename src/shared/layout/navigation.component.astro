@@ -1,84 +1,120 @@
 ---
+import { DEFAULT_PAGE_TITLE, ROOT, URL_PREFIX } from "../config";
+
+const { title } = Astro.props;
+const { vendor } = Astro.params;
+
+import XMark from 'astro-heroicons/outline/XMark.astro';
+import Bars3 from 'astro-heroicons/outline/Bars3.astro';
+import Home from 'astro-heroicons/outline/Home.astro';
+import Folder from 'astro-heroicons/outline/Folder.astro';
+import Swatch from 'astro-heroicons/outline/Swatch.astro';
+import Cog6Tooth from 'astro-heroicons/outline/Cog6Tooth.astro';
+import QuestionMarkCircle from 'astro-heroicons/outline/QuestionMarkCircle.astro';
 import ColorSchemeSwitch from './color-scheme.component.astro';
-import { BASE, NAVIGATION, ROOT } from "../config";
 
-const prefixes = {
-    current: 'bg-gray-900 text-white',
-    default: 'text-gray-300 hover:bg-gray-700 hover:text-white'
-};
+const menu = [
+    {
+        name: 'General',
+        children: [
+            { name: 'Home', path: '', icon: Home }
+        ]
+    },
+    {
+        name: 'KSW',
+        children: [
+            { name: 'Updates', path: 'updates/ksw', icon: Folder },
+            { name: 'Themes', path: 'themes/ksw', icon: Swatch },
+            { name: 'Factory settings', path: 'factory-settings/ksw', icon: Cog6Tooth },
+            { name: 'FAQ', path: 'faq/ksw', icon: QuestionMarkCircle },
+        ]
+    },
+    {
+        name: 'ZXW',
+        children: [
+            { name: 'Updates', path: 'updates/zxw', icon: Folder },
+            { name: 'Themes', path: 'themes/zxw', icon: Swatch },
+            { name: 'Factory settings', path: 'factory-settings/zxw', icon: Cog6Tooth },
+            { name: 'FAQ', path: 'faq/zxw', icon: QuestionMarkCircle },
+        ]
+    }
+];
 
+const getLink = (path: string) => `${URL_PREFIX}${path}`;
+const prefix = 'flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6';
 const suffixes = {
-    desktop: 'rounded-md px-3 py-2 text-sm font-medium',
-    mobile: 'block rounded-md px-3 py-2 text-base font-medium'
+    current: 'bg-gray-800 text-white',
+    default: 'text-gray-400 hover:bg-gray-800 hover:text-white'
 };
-
-const baseIndex = typeof BASE === 'string'
-    ? String(BASE).split('/').length
-    : 1;
 
 const isActive = (href: string) => {
-    const currentSplit = Astro.url.pathname.split('/');
-    const hrefSplit = href.split('/');
-    return currentSplit[baseIndex] === hrefSplit[baseIndex];
-}
+    return href === URL_PREFIX ?
+        Astro.url.pathname === URL_PREFIX :
+        Astro.url.pathname.startsWith(href)
+};
 
-const getClassName = (href: string, mode: string) => {
+const getClassName = (href: string) => {
     const state = isActive(href) ? 'current' : 'default';
-    return `${prefixes[state]} ${suffixes[mode]}`;
+    return `${prefix} ${suffixes[state]}`;
 };
 
 const getAriaCurrent = (href: string) => {
     return isActive(href) ? 'page' : undefined;
-}
----
-<nav class="bg-gray-800" x-data="{ open: false }">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between">
-            <div class="flex items-center">
-                <h1 class="flex-shrink-0 text-white text-xl">
-                    <a href={ROOT}>KSW Head Units</a>
-                </h1>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        {NAVIGATION.map(page => (
-                            <a
-                                href={page.href}
-                                class={getClassName(page.href, 'desktop')}
-                                aria-current={getAriaCurrent(page.href)}
-                            >{page.name}</a>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-center space-x-4">
-                <ColorSchemeSwitch></ColorSchemeSwitch>
-                <button
-                    type="button"
-                    class="md:hidden relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                    aria-controls="mobile-menu"
-                    :aria-expanded="open"
-                    x-on:click="open = !open"
-                >
-                    <span class="absolute -inset-0.5"></span>
-                    <span class="sr-only">Toggle main menu</span>
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                        <path x-show="!open" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
-                        <path x-cloak x-show="open" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
+};
 
-    <div class="md:hidden" id="mobile-menu" x-show="open" x-cloak >
-        <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            {NAVIGATION.map(page => (
-                <a
-                    href={page.href}
-                    class={getClassName(page.href, 'mobile')}
-                    aria-current={getAriaCurrent(page.href)}
-                >{page.name}</a>
-            ))}
+---
+<div class="fixed inset-0 w-72 z-10 flex lg:flex lg:inset-y-0 lg:w-72 lg:flex-col" :class="sidebar ? '' : 'hidden'">
+    <div class="flex grow flex-col gap-y-5 bg-gray-900 px-4 sm:px-6 overflow-y-auto">
+        <div class="flex h-14 shrink-0 items-center">
+            <button type="button" class="p-2.5 -m-2.5 mr-0.5 text-gray-400 lg:hidden" x-on:click="sidebar = !sidebar">
+                <span class="sr-only">Open sidebar</span>
+                <XMark class="w-6 h-6"></XMark>
+            </button>
+            <h1 class="text-white text-xl">
+                <a href={ROOT}>{DEFAULT_PAGE_TITLE}</a>
+            </h1>
         </div>
+        <nav class="flex flex-1 flex-col" id="sidebar">
+            <ul role="list" class="flex flex-1 flex-col gap-y-7">
+
+                {menu.map(section => (
+                    <li>
+                        {section.name && (
+                            <div class="text-xs leading-6 font-semibold text-gray-400">{section.name}</div>
+                        )}
+                        <ul role="list" class:list={['-mx-2 space-y-1', { 'mt-2': section.name }]}>
+                            {section.children.map(({ name, path, icon: NavIcon }) => (
+                                <li>
+                                    <a href={getLink(path)} class={getClassName(getLink(path))} aria-current={getAriaCurrent(getLink(path))}>
+                                        <NavIcon class="w-6 h-6 shrink-0" />
+                                        {name}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </li>
+                ))}
+
+                <li class="mt-auto mb-4">
+                    <ul role="list" class="-mx-2 space-y-1 mt-2">
+                        <li>
+                            <ColorSchemeSwitch></ColorSchemeSwitch>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+        </nav>
     </div>
-</nav>
+</div>
+
+<div class="sticky top-0 flex items-center gap-x-6 px-4 py-4 shadow-sm bg-gray-900 sm:px-6 lg:pl-72 lg:hidden">
+    <button type="button" class="p-2.5 -m-2.5 text-gray-400 lg:hidden" x-on:click="sidebar = !sidebar">
+        <span class="sr-only">Open sidebar</span>
+        <Bars3 class="w-6 h-6"></Bars3>
+    </button>
+    <div class="flex-1 text-sm font-semibold leading-6 text-white">
+        {DEFAULT_PAGE_TITLE}
+        <!-- {title} -->
+    </div>
+</div>

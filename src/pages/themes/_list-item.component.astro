@@ -1,0 +1,41 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { URL_PREFIX } from "../../shared/config";
+interface Props {
+    theme: CollectionEntry<"themes">;
+}
+const { theme } = Astro.props;
+const tagClassNames = theme.data.tags?.map(x => `tag--${x}`).join(' ');
+// Top div had `hidden` class
+---
+<div class={`group relative ${tagClassNames}`}>
+    <div class="overflow-hidden rounded-md w-full group-hover:opacity-75">
+        {theme.data.images?.[0] ? (
+            <img
+                src={theme.data.images?.[0]?.src}
+                alt={theme.data.display}
+                class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+            />
+        ) : (
+            <img
+                src={`https://placehold.co/1920x720?text=${theme.data.id}`}
+                alt={theme.data.display}
+                class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+            />
+        )}
+    </div>
+    <div class="mt-4">
+        <h3 class="text-sm text-gray-700 dark:text-gray-300">
+            <a href={`${URL_PREFIX}themes/${theme.slug}`}>
+                <span aria-hidden="true" class="absolute inset-0"></span>
+                {theme.data.number && (
+                    <span>ID#{theme.data.number} - </span>
+                )}
+                {theme.data.id}
+            </a>
+        </h3>
+        <p class="mt-1 text-sm text-gray-500">{theme.data.tags?.map(tag => (
+            <span>#{tag} </span>
+        ))}</p>
+    </div>
+</div>

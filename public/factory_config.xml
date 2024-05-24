@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ConfigInfo>
 
-    <!-- Last updated 2024-02-13 kamilbrk, based on Kri's version 394 from Discord -->
+    <!-- Last updated 2024-05-19 kamilbrk, based on Kri's version 394 from Discord -->
 
     <!-- List of supported navigation applications -->
     <SupportNaviAppList>
@@ -233,6 +233,7 @@
         <Item id="1" name="Benz_NTG6" display="Benz NTG6 (AVIN8)" />
         <Item id="1" name="Benz_NTG6_FY" display="Benz NTG6 FY" />
         <Item id="1" name="UI_NTG6_FY_V2" display="Benz NTG6 FY V2" /><!-- requires client set to ALS_6208 -->
+        <Item id="1" name="UI_NTG6_FY_V3" display="Benz NTG6 FY V3" />
 
         <Item id="1" name="Common_UI_GS" display="Common GS (AVIN8)" />
         <Item id="1" name="Common_UI_GS_UG" display="Common GS UG (ID7)" />
@@ -250,7 +251,7 @@
         <!-- Name of default navigation application -->
         <NaviApp>gb.xxy.hr</NaviApp>
 
-        <!-- Image of rear view camera  0：Not mirrored  1：Mirrored -->
+        <!-- Image of rearview camera  0：Not mirrored  1：Mirrored -->
         <RearCamMirror>0</RearCamMirror>
 
         <!-- Video disabled while driving  0：Off 1：On -->
@@ -505,7 +506,7 @@
         <!-- Wing TrucK NetwoRkIng e-car.cn 0: disabled  1:enabled-->
         <e_car>0</e_car>
 
-        <!-- enable WIFI Hotspot for ZLink Autostart 0:off  1:on-->
+        <!-- enable Wi-Fi Hotspot for ZLink Autostart 0:off  1:on-->
         <zlink_auto_start>0</zlink_auto_start>
 
         <!-- car brand 1:BMW 2:Benz  3:Audi  4:Lexus 5:LuHu-->
