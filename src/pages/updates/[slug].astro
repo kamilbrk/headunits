@@ -3,7 +3,12 @@ import { getEntry } from 'astro:content';
 
 import { URL_PREFIX } from '../../shared/config';
 import Layout from '../../shared/layout/base-layout.astro';
-import { getFirstLevelStaticPathsFromCollection, getCollectionGroupedByCollection, getAndroidVersion } from '../../shared/utilities';
+import {
+    getFirstLevelStaticPathsFromCollection,
+    getCollectionGroupedByCollection,
+    getAndroidVersion,
+    sortEntriesByDate
+} from '../../shared/utilities';
 
 export async function getStaticPaths() {
     return await getFirstLevelStaticPathsFromCollection('updates');
@@ -22,7 +27,7 @@ const platformsWithEntries = await getCollectionGroupedByCollection(
         {platformsWithEntries.map(group => (
             <h3>{group.data.name}</h3>
             <ul>
-                {group.entries.length ? group.entries.map(entry => (
+                {group.entries.length ? group.entries.sort(sortEntriesByDate).map(entry => (
                     <li>
                         <a href={`${URL_PREFIX}updates/${entry.slug}`}>{entry.data.id}</a>
                         <span>(A{getAndroidVersion(entry)})</span>
