@@ -33,7 +33,7 @@ const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
   <body x-data="{ sidebar: false }" class="bg-white dark:bg-gray-900">
     <Navigation title={title} />
 
-    <main class="py-8 lg:pl-72">
+    <main class="py-8 lg:pl-72 max-w-screen-2xl">
       <div class="px-4 sm:px-6 lg:px-8">
         {title !== DEFAULT_PAGE_TITLE && (
           <h3 class="pb-8 text-gray-900 dark:text-white leading-7 font-bold text-2xl sm:tracking-tight sm:text-3xl">{title}</h3>
