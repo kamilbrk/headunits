@@ -12,8 +12,8 @@ entries.sort((a, b) => a[0].localeCompare(b[0]))
 
 ---
 <div class="text-sm">
-    <p>File signatures</p>
-    <ul>
+    <p class="mb-0">File signatures</p>
+    <ul class="mt-0 break-all">
         {entries.map(entry => (
             <li>{entry[0]}: {entry[1]}</li>
         ))}

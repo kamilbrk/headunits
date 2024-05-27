@@ -17,7 +17,7 @@ entries.sort((a, b) => a.data.id.localeCompare(b.data.id));
 <Layout title=`Themes for ${vendor.data.name}`>
     {entries.length ? (
         <div class="lg:col-span-3">
-            <div class="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-2 xl:gap-x-8">
+            <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 xl:gap-x-8 xl:grid-cols-3">
                 {entries.map(entry => (
                     <ThemesListItem theme={entry}></ThemesListItem>
                 ))}
