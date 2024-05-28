@@ -2,7 +2,7 @@
 import { Code } from 'astro:components';
 import { getCollection, getEntry } from 'astro:content';
 
-import { SHIKI_THEMES } from "../../shared/config";
+import { SHIKI_THEMES, URL_PREFIX } from "../../shared/config";
 import Layout from '../../shared/layout/base-layout.astro';
 import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
 import FactorySettingsSection from './_section.component.astro';
@@ -20,16 +20,19 @@ const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
 ---
 <Layout title=`Factory settings for ${vendor.data.name}`>
     <article class="prose dark:prose-invert">
-
         {entries.length ? entries.map(entry => (
             <FactorySettingsSection slug={entry.slug} />
         )) : (
             <p>We don't have any descriptions for factory settings for this vendor yet.</p>
         )}
-
-        <hr>
-        <h2 class="prose dark:prose-invert mt-5">An example <code>{vendor.data.factoryConfigFileName}</code> file:</h2><br>
     </article>
-    <Code lang="xml" code={xml} themes={SHIKI_THEMES} />
+
+    {xml && (
+        <article class="prose dark:prose-invert">
+            <h3>An example <code>{vendor.data.factoryConfigFileName}</code> file</h3>
+            <p>Please <a href={`${URL_PREFIX}faq/${vendor.slug}/pull-factory-config`}>make a backup for your original file</a> first. Then make adjustments to your own file with parts from the following example and finally follow <a href={`${URL_PREFIX}faq/${vendor.slug}/apply-factory-config`}>instructions to import it to your Head Unit</a>.</p>
+        </article>
+        <Code class="-m-4 sm:-m-6 lg:-m-8 mt-4 sm:mt-6 lg:mt-8 p-4 sm:p-6 lg:p-8" lang="xml" code={xml} themes={SHIKI_THEMES} />
+    )}
 </Layout>
 
