@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ConfigInfo>
 
-    <!-- Last updated 2024-05-19 kamilbrk, based on Kri's version 394 from Discord -->
+    <!--
+        First make a backup of your own factory_settings.xml file, so that you
+        can revert to it when things go wrong. See FAQ section or Discord for
+        more information. Never use this entire file as-is. Instead, you should
+        use parts of this example file to adjust and maintain your own version.
 
-    <!-- List of supported navigation applications -->
+        Last updated on 2024-05-28 by kamilbrk
+        https://kamilbrk.github.io/headunits/factory-settings/ksw/
+        Originally based on Kri's versions for A10 3.9.4
+        https://f30.bimmerpost.com/forums/showthread.php?t=1699764
+    -->
+
+    <!--
+        List of applications that can be selected as a navigation app
+        in settings.
+    -->
     <SupportNaviAppList>
         <Item name = "com.baidu.BaiduMap" />
         <Item name = "com.baidu.BaiduMap.auto" />
@@ -82,7 +95,10 @@
         <Item name = "com.fujitech.flyaudio" />
     </SupportNaviAppList>
 
-    <!-- Apps Whitelist -->
+    <!--
+        List of applications that can be selected as media app
+        This does not seem to be used anymore on latest Android 13 firmwares.
+    -->
     <AppsWhiteList>
         <Item name = "com.kugou.android.auto" />
         <Item name = "com.kugou.android" />
@@ -105,7 +121,7 @@
         <Item name = "gb.xxy.hr" /><!-- Headunit Reloaded Emulator HUR -->
     </AppsWhiteList>
 
-    <!-- List of supported DVR applications -->
+    <!-- List of applications that can be selected as DVR app -->
     <SupportDvrAppList>
         <Item name = "com.ankai.cardvr" />
         <Item name = "com.anwensoft.cardvr" />
@@ -116,23 +132,23 @@
         <Item name = "com.zoulou.dab" />
     </SupportDvrAppList>
 
-    <!-- List of parameters of original car display -->
+    <!-- Types of OEM screens -->
     <CarDisplayParam>
-        <model id = "1"  >[01]NBT_F48/F49(6.5″,HalfScreen)</model>
-        <model id = "7"  >[02]NBT_F48/F49(6.5″,FullScreen)</model>
-        <model id = "9"  >[03]NBT_F48(8.8″,10.25″)</model>
+        <model id = "1"  >[01]NBT_F30/F20/F15/F22/F48(6.5″,HalfScreen)</model>
+        <model id = "7"  >[02]NBT_F30/F20/F15/F22/F48(6.5″,FullScreen)</model>
+        <model id = "9"  >[03]NBT_F30/F20/F15/F22/F48(8.8″,10.25″)</model>
 
-        <model id = "4"  >[04]CIC_E60(2012)/E83(6.5,HalfScreen)</model>
-        <model id = "5"  >[05]CIC_E60(2012)/E83(6.5,FullScreen)</model>
-        <model id = "11" >[06]CIC_E60(2011)(6.5,HalfScreen)</model>
-        <model id = "12" >[07]CIC_E60(2011)(6.5,FullScreen)</model>
-        <model id = "6"  >[08]CIC_E70_X5(2009)/E60(2011)(8.8″,10.25″)</model>
+        <model id = "4"  >[04]CIC_E60/E90(2012)/E83(6.5,HalfScreen)</model>
+        <model id = "5"  >[05]CIC_E60/E90(2012)/E83(6.5,FullScreen)</model>
+        <model id = "11" >[06]CIC_E60/E90(2011)(6.5,HalfScreen)</model>
+        <model id = "12" >[07]CIC_E60/E90(2011)(6.5,FullScreen)</model>
+        <model id = "6"  >[08]CIC_E70(2009)/E60(2011)(8.8″,10.25″)</model>
         <model id = "8"  >[09]CIC_F01/F02_7Series(2011)(8.8″,10.25″)</model>
 
-        <model id = "2"  >[10]CCC_E60(6.5″,FullScreen)</model>
-        <model id = "3"  >[11]CCC_E60(8.8″,FullScreen)</model>
-        <model id = "14" >[12]CCC_E60(2010)(8.8″,FullScreen)</model>
-        <model id = "18" >[13]CCC_E60(2008)(6.5″,FullScreen)</model>
+        <model id = "2"  >[10]CCC_E60/E90(6.5″,FullScreen)</model>
+        <model id = "3"  >[11]CCC_E60/E90(8.8″,FullScreen)</model>
+        <model id = "14" >[12]CCC_E60/E90(2010)(8.8″,FullScreen)</model>
+        <model id = "18" >[13]CCC_E60/E90(2008)(6.5″,FullScreen)</model>
 
         <model id = "13" >[14]18_EVO(6.5,HalfScreen)</model>
         <model id = "19" >[15]18_EVO(6.5,FullScreen)</model>
@@ -148,7 +164,7 @@
         <model id = "33" >[23]CCC_E60_JP(2004)(8.8″,FullScreen)</model>
     </CarDisplayParam>
 
-    <!-- List of CAN Bus protocols -->
+    <!-- Available CAN Bus protocols to select in settings -->
     <CANBusProtocol>
         <Protocol id = "1">[1]CCC / EVO_1.0DIN_OldCAN</Protocol>
         <Protocol id = "2">[2]CIC / EVO_1.0DIN_NewCAN</Protocol>
@@ -162,7 +178,7 @@
         <Protocol id = "9">[9]E39</Protocol>
     </CANBusProtocol>
 
-    <!-- List of supported languages -->
+    <!-- Languages to select in settings -->
     <SupportLanguageList>
         <Item id="0" name = "简体中文" tips ="Simplified Chinese (ZH-CN)" />
         <Item id="1" name = "繁體中文" tips ="Traditional Chinese (ZH-TW)" />
@@ -188,9 +204,11 @@
         <Item id="21" name = "Čeština" tips ="Czech (CS)" />
     </SupportLanguageList>
 
-    <!-- Supported UI
-        name field: UI identification keyword, cannot be changed
-        display field: The name displayed on the UI, which can be modified
+    <!--
+        Themes
+        - `id` - makes no difference on KSW firmware
+        - `name` - logical name, cannot be changed
+        - `display` - display name, can be changed
     -->
     <SupportUIList>
         <Item id="1" name="Alfa_Romeo" display="Alfa Romeo" />
@@ -248,13 +266,21 @@
 
     <!-- System settings -->
     <setings>
-        <!-- Name of default navigation application -->
-        <NaviApp>gb.xxy.hr</NaviApp>
+        <!-- Package name of default navigation application -->
+        <NaviApp>com.zjinnova.zlink</NaviApp>
 
-        <!-- Image of rearview camera  0：Not mirrored  1：Mirrored -->
+        <!--
+            Image of rearview camera
+            0：Not mirrored
+            1：Mirrored
+        -->
         <RearCamMirror>0</RearCamMirror>
 
-        <!-- Video disabled while driving  0：Off 1：On -->
+        <!--
+            Video disabled while driving
+            0：Off
+            1：On
+        -->
         <DoNotPlayVideosWhileDriving>0</DoNotPlayVideosWhileDriving>
 
         <!-- Display track when reversing  0：Off  1：On -->
@@ -269,7 +295,12 @@
         <!-- Open the front view camera  :0：Off  1：On  -->
         <Front_view_camera>0</Front_view_camera>
 
-        <!-- Selection of reversing camera  0：Aftermarket Rear camera  1：Original car camera  2：Aftermarket 360 camera -->
+        <!--
+            Selection of reversing camera
+            0：Aftermarket Rear camera
+            1：Original car camera
+            2：Aftermarket 360 camera
+        -->
         <RearCamType>1</RearCamType>
 
         <!-- Brightness 0～100 -->
@@ -332,19 +363,46 @@
         <!-- Password of factory setting (4~6 digits) -->
         <password>0000</password>
 
-        <!-- Android 7.1 UI selection  see Supported UI -->
+        <!--
+            Theme selection for Android 7-8 firmwares
+            See SupportUIList and their `ui` attributes
+        -->
         <UI>2</UI>
 
-        <!-- Android 9.0 - 10 UI selection  see Supported UI -->
+        <!--
+            Theme selection for Android 9+ firmwares
+            See SupportUIList and their `name` attributes
+        -->
         <UI_type>BMW_EVO_ID7_V2</UI_type>
 
         <!-- Original display style  0：full screen display  1：Half screen display, driving computer information on the right -->
         <CarVideoDisplayStyle>0</CarVideoDisplayStyle>
 
-        <!-- Left logo of Audi home page  0:Do not show 1:A4 (default) 2:A4L2 3:A4L3 4:Q5 5:special logo 6:A3 7:A5 8:A6 9:Q3 10:Q7 11: General-->
+        <!--
+            Left logo of Audi home page
+            0: Do not show
+            1: A4 (default)
+            2: A4L2
+            3: A4L3
+            4: Q5
+            5: Special logo
+            6: A3
+            7: A5
+            8: A6
+            9: Q3
+            10: Q7
+            11: General
+        -->
         <Audi_Logo_Left>1</Audi_Logo_Left>
 
-        <!-- Right logo of Audi home page  0:Do not show 1:display AUDI LOGO And high German navigation information 2:Display only AUDI LOGO 3:Display driving information 4:Display music information -->
+        <!--
+            Right logo of Audi home page
+            0: Do not show
+            1: Display AUDI LOGO And high German navigation information
+            2: Display only AUDI LOGO
+            3: Display driving information
+            4: Display music information
+        -->
         <Audi_Logo_Right>1</Audi_Logo_Right>
 
         <!-- Google APP  0:Off  1:On -->
@@ -378,7 +436,12 @@
         -->
         <DVR_Type>0</DVR_Type>
 
-        <!-- USB DVR application names  Default: Ankai (Valid when the DVR module type is USB DVR) Old: com.anwensoft.cardvr  New: com.ankai.cardvr -->
+        <!--
+            USB DVR application names
+            Default: Ankai (Valid when the DVR module type is USB DVR)
+            Old: com.anwensoft.cardvr
+            New: com.ankai.cardvr
+        -->
         <DVRApk_PackageName>com.ankai.cardvr</DVRApk_PackageName>
 
         <!-- Bluetooth function  0: Bluetooth of the Android Unit 1: Bluetooth of the car  -->
@@ -394,13 +457,25 @@
         -->
         <CarAux_auto_method>2</CarAux_auto_method>
 
-        <!-- Switching mode of original head unit AUX input  0:Automatic switching  1:Manual switching -->
+        <!--
+            Switching mode of original head unit AUX input
+            0: Automatic switching
+            1: Manual switching
+        -->
         <CarAux_Operate>0</CarAux_Operate>
 
-        <!-- Amplifier selection:  0:Original car amplifier 1:External amplifier box -->
+        <!--
+            Amplifier selection:
+            0: Original car amplifier
+            1: External amplifier box
+        -->
         <AMP_Type>0</AMP_Type>
 
-        <!-- Old BMW X1 (no display)  0:Display clock  1: Show original car monitor -->
+        <!--
+            Old BMW X1 (no display)
+            0: Display clock
+            1: Show original car monitor
+        -->
         <CarDisplay>1</CarDisplay>
 
         <!-- Support for voice commands  0:Off  1:On -->
@@ -421,7 +496,8 @@
         <!-- TXZ Companion ambient temperature alarm setting  0:Off  1:On -->
         <txz_temp>0</txz_temp>
 
-        <!-- CCC_IDrive Type selection
+        <!--
+            CCC_IDrive Type selection
             0：IDrive_A
             1：IDrive_B
         -->
@@ -433,7 +509,8 @@
         <!-- Switching of the Reversing Camera  0：Automatic 1：Manual -->
         <HandsetAutomaticSelect>0</HandsetAutomaticSelect>
 
-        <!-- Door settings
+        <!--
+            Door settings
             0：Left driver's seat
             1：Right driver's seat
             2：The door does not display
@@ -507,7 +584,7 @@
         <e_car>0</e_car>
 
         <!-- enable Wi-Fi Hotspot for ZLink Autostart 0:off  1:on-->
-        <zlink_auto_start>0</zlink_auto_start>
+        <zlink_auto_start>1</zlink_auto_start>
 
         <!-- car brand 1:BMW 2:Benz  3:Audi  4:Lexus 5:LuHu-->
         <car_manufacturer>1</car_manufacturer>

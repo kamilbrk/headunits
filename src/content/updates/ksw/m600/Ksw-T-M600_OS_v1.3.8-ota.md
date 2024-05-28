@@ -11,7 +11,7 @@ signatures:
 Summary:
 - Zlink update 5.4.23 with Huawei HiCar graphics
 - Czech translations
-- New `UI_MBUX_YO` theme which seems to be a variation of `Benz_MBUX_2021`
+- New [`UI_MBUX_YO`](../../../themes/ksw/ui_mbux_yo) theme which seems to be a variation of [`Benz_MBUX_2021`](../../../themes/ksw/benz_mbux_2021)
 - Greetings from Android Automotive Discord https://discord.gg/Ex8e6qE2eR
 - Some internal changes in KSW Bluetooth app around A2DP AVRCP profiles and resuming playback
 - Further work on Ksw 360 Camera app
@@ -28,28 +28,28 @@ Changes since `Ksw-T-M600_OS_v1.2.9-ota`:
 - KSWAirConditioner (`com.wits.ksw.airc`) app updated from `1.0_230803` to `1.0_231117`
 - KswPLauncher (`com.wits.ksw`) app updated from `1.20_231103` to `1.20_231201`
   - Added Czech translations
-  - Added support for Benz `UI_MBUX_YO` theme (which seems to be a variation of `Benz_MBUX_2021`)
+  - Added support for Benz [`UI_MBUX_YO`](../../../themes/ksw/ui_mbux_yo) theme (which seems to be a variation of `Benz_MBUX_2021`)
   - Improvements/internal cache for a list of installed applications
   - Fixed lots of themes to include `pt`, `tr`, `vi`, `pl`, `ar`, `ja`, `iw/IL`, `el`, `th`, `hr`, `cs` locale options
   - Improvements for Ksw360Camera app
 - KswPMusic (`com.wits.ksw.music`) app updated from `1.2_230923` to `1.2_231117`
-  - Added support for Benz `UI_MBUX_YO` theme
+  - Added support for Benz [`UI_MBUX_YO`](../../../themes/ksw/ui_mbux_yo) theme
   - Added Czech translations
   - Improved error handling to autoplay next song
 - KswPVideo (`com.wits.ksw.video`) app updated from `1.2_231106` to `1.2_231129`
-  - Added support for Benz `UI_MBUX_YO` theme
+  - Added support for Benz [`UI_MBUX_YO`](../../../themes/ksw/ui_mbux_yo) theme
   - Added Czech translations
   - Improved error handling to autoplay next video
   - Added handling for Huawei HiCar wired/wireless connection events
 - kswEq (`com.wits.csp.eq`) app updated from `1.01_230720` to `1.01_231121`
-  - Added support for Benz `UI_MBUX_YO` theme
+  - Added support for Benz [`UI_MBUX_YO`](../../../themes/ksw/ui_mbux_yo) theme
   - Added Czech translations
   - Added Croatian translations …file with Chinese labels inside, so not so much
 - CenterService (`com.wits.pms`) app updated from `1.0_231031` to `1.0_231121`
   - Added handling for Huawei HiCar
   - Added Czech locale support
 - KswBt (`com.wits.ksw.bt`) app updated from `1.0.22_231106_feasy` to `1.0.22_231129_feasy`
-  - Added support for Benz `UI_MBUX_YO` theme
+  - Added support for Benz [`UI_MBUX_YO`](../../../themes/ksw/ui_mbux_yo) theme
   - Added Czech translations
   - Improvements for Ksw360Camera app
   - Changed `CLOSE_A2DP_AVRCP` profile from `50185` to `246793`
