@@ -38,7 +38,7 @@ const { Content } = await entry.render();
             )}
 
             {next && (
-                <a href={`${URL_PREFIX}updates/${next.slug}`} class="self-end bg-slate-800 text-white ml-4 py-2 pr-2 pl-4 rounded inline-flex items-center">
+                <a href={`${URL_PREFIX}updates/${next.slug}`} class="self-end bg-slate-800 text-white ml-4 py-2 pr-2 pl-4 rounded inline-flex items-center first:last:ml-0">
                     {getUpdateVersion(next)}
                     <ChevronRight class="w-6 h-6" />
                 </a>
@@ -49,8 +49,15 @@ const { Content } = await entry.render();
     <div class="prose dark:prose-invert break-words">
         <p>Version <strong>{getUpdateVersion(entry)}</strong> based on Android {getAndroidVersion(entry)} for {vendor.data.name} devices running on {platform.data.name} platform, built on <strong><DateTime date={entry.data.date} /></strong>.</p>
 
-        <Content />
-        {entry.data.signatures && <FileSignatures signatures={entry.data.signatures} />}
+        {entry.body ? (
+            <Content />
+        ) : (
+            <em>We do not have any information about what's new in this update. All changelogs are done manually by comparing two decompiled versions of firmwares, therefore it's likely that we did not get around to do it for this version yet. If previous and next versions were built at similar times, it might be that we did not compare changes in-between, therefore have a look at them instead.</em>
+        )}
+
+        {entry.data.signatures && (
+            <FileSignatures signatures={entry.data.signatures} />
+        )}
 
         <a href={`${URL_PREFIX}updates/${vendor.slug}`}>Back to all {vendor.data.name} updates</a>
     </div>

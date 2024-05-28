@@ -152,6 +152,7 @@ settings:
     - name: "track2" # 1
       control: radio
   - name: "360 boot up camera"
+    configKey: BootUpCamera
     children:
     - name: "No camera use"
       control: radio
@@ -166,6 +167,7 @@ settings:
     - name: "Controlled"
       control: radio
   - name: "MIC external built-in toggle switch"
+    configKey: MicControl
     children:
     - name: "External"
       control: radio

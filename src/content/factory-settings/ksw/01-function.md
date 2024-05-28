@@ -13,10 +13,13 @@ settings:
     control: checkbox
     description: "When enabled, Zlink should automatically start on boot. It will also directly open the Huawei HiCar mode/screen in Zlink. Most likely dependant on the \"Zlink\" option above."
   - name: "Google Apps"
+    configKey: GoogleAPP
     control: checkbox
   - name: "AUX"
+    configKey: AUX_Type
     control: checkbox
   - name: "DTV"
+    configKey: DTV_Type
     control: checkbox
   - name: "F_CAM"
     configKey: Front_view_camera
@@ -24,6 +27,7 @@ settings:
   - name: "Txzing Assistant"
     control: checkbox
   - name: "BT"
+    configKey: BT_Type
     control: checkbox
   - name: "Touch data continuously sent"
     configKey: touch_continuous_send
@@ -31,8 +35,10 @@ settings:
   - name: "Equalizer APP"
     control: checkbox
   - name: "Global Weather App"
+    configKey: globalweather_app
     control: checkbox
   - name: "360APK"
+    configKey: APK360
     control: checkbox
   - name: "Remember The Last Mode"
     configKey: Default_PowerBoot
@@ -52,16 +58,19 @@ settings:
         control: radio
   - name: "DVR"
     configKey: DVR_Type
+    description: "Choose type of the DVR module"
     children:
       - name: "Close"
         configValue: 0
         control: radio
+        description: "Turn off DVR"
       - name: "CVBS DVR"
         configValue: 1
         control: radio
       - name: "USB DVR"
         configValue: 2
         control: radio
+        description: "Set the `<SupportDvrAppList>` to supply supported application package names. Then, to select an app to use USB DVR, use the `<DVRApk_PackageName>` setting separately, which is often set to `com.ankai.cardvr` by default on some devices."
   - name: "Bluetooth Selection"
     configKey: BT_Type
     children:
@@ -72,10 +81,13 @@ settings:
         configValue: 0
         control: radio
   - name: "Amplifier Selection"
+    configKey: AMP_Type
     children:
       - name: "OEM Amplifier"
+        configValue: 0
         control: radio
       - name: "Aftermarket Amplifier"
+        configValue: 1
         control: radio
   - name: "360 Camera"
     children:
@@ -129,5 +141,6 @@ settings:
     configKey: DoNotPlayVideosWhileDriving
     control: checkbox
   - name: "Front view mirror setting"
+    configKey: forwardCamMirror
     control: checkbox
 ---

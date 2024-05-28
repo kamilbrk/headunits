@@ -1,6 +1,6 @@
 ---
 section: "UI Configuration"
+settings:
+  - name: "Current Selection"
+    description: "Choose user interface theme from all possible options as found on Themes. This list can be adjusted in zxw_factory_config.xml file and its `<SupportUIList>` section"
 ---
-UI Selection
-
-Choose user interface theme from all possible options as found on [Themes page](../themes/zxw). This list can be adjusted with `zxw_factory_config.xml` file and its <code>&lt;SupportUIList&gt;</code> section.
