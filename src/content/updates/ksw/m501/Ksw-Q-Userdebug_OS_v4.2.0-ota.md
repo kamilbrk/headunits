@@ -10,7 +10,7 @@ signatures:
 ---
 Changes since `Ksw-Q-Userdebug_OS_v4.1.6-ota`
 - KswAirConditioner (`com.wits.ksw.airc`) app updated from `1.0` to `1.0_230803`
-    - Added support for [Audi_MMI_4G](../../../themes/ksw/audi_mmi_4g), [Audi_mib3](../../../themes/ksw/audi_mib3), [Audi_mib3_FY](../../../themes/ksw/audi_mib3_fy), [Audi_mib3_FY_V2](../../../themes/ksw/audi_mib3_fy_v2), [Audi_mib3_ty](../../../themes/ksw/audi_mib3_ty), Benz and [UI_mib3_v2](../../../themes/ksw/ui_mib3_v2) themes
+    - Added support for [Audi_MMI_4G](/headunits/themes/ksw/audi_mmi_4g), [Audi_mib3](/headunits/themes/ksw/audi_mib3), [Audi_mib3_FY](/headunits/themes/ksw/audi_mib3_fy), [Audi_mib3_FY_V2](/headunits/themes/ksw/audi_mib3_fy_v2), [Audi_mib3_ty](/headunits/themes/ksw/audi_mib3_ty), Benz and [UI_mib3_v2](/headunits/themes/ksw/ui_mib3_v2) themes
 - KswPLauncher (`com.wits.ksw`) app updated from `1.20_230710` to `1.20_230907`
     - Added support for 360 camera (`com.ivicar.avm`) app
 - Framework

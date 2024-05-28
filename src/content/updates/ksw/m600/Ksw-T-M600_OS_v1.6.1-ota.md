@@ -12,4 +12,4 @@ Summary:
 - Nothing, really.
 
 Changes since `Ksw-T-M600_OS_v1.5.9-ota` built 18 days earlier:
-- Further changes to support [`UI_NTG6_FY_V3`](../../../themes/ksw/ui_ntg6_fy_v3) Benz theme partially introduced in 1.5.9
+- Further changes to support [`UI_NTG6_FY_V3`](/headunits/themes/ksw/ui_ntg6_fy_v3) Benz theme partially introduced in 1.5.9
