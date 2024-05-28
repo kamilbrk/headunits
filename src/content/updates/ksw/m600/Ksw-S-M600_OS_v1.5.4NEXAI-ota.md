@@ -8,10 +8,10 @@ Changes since `Ksw-S-M600_OS_v1.2.1NEXAI-ota`:
 - Added Croatian language option (`hr`)
 - Added "MCU restart" option
 - KswPLauncher (`com.wits.ksw`) app updated from `1.20_230129` to `1.20_230727`
-    - Added [`Alfa_Romeo_V2`](../../../themes/ksw/alfa_romeo_v2) theme
-    - Added [`UI_MBUX_2021_KSW_1024`](../../../themes/ksw/ui_mbux_2021_ksw_1024) theme
-    - Added [`UI_MBUX_2021_KSW_1024_V2`](../../../themes/ksw/ui_mbux_2021_ksw_1024_v2) theme
-    - Added [`UI_PEMP_ID8`](../../../themes/ksw/ui_pemp_id8) theme
+    - Added [`Alfa_Romeo_V2`](/headunits/themes/ksw/alfa_romeo_v2) theme
+    - Added [`UI_MBUX_2021_KSW_1024`](/headunits/themes/ksw/ui_mbux_2021_ksw_1024) theme
+    - Added [`UI_MBUX_2021_KSW_1024_V2`](/headunits/themes/ksw/ui_mbux_2021_ksw_1024_v2) theme
+    - Added [`UI_PEMP_ID8`](/headunits/themes/ksw/ui_pemp_id8) theme
     - New settings:
     - 360 boot up camera: No camera use, Retrofit camera, Original car camera
     - Turn signal control: Uncontrolled, Controlled
@@ -20,7 +20,7 @@ Changes since `Ksw-S-M600_OS_v1.2.1NEXAI-ota`:
     - Added unread count bubble (?)
     - Added two more default splash screen images
     - Added native support for iGO maps (`com.nng.igo.*`)
-    - Added "CAR INFO" icon in [`BMW_ID8_UI`](../../../themes/ksw/bmw_id8_ui) theme
+    - Added "CAR INFO" icon in [`BMW_ID8_UI`](/headunits/themes/ksw/bmw_id8_ui) theme
     - Added handling for equalizer app `com.wits.csp.eq`
     - Added handling for weather app `com.txznet.weather`
 - CarplayZlink app updated from `5.3.28` to `5.3.49`
