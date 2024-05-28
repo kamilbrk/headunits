@@ -1,4 +1,8 @@
 ---
 section: "Logo Settings"
+settings:
+  - name: "Boot logo"
+    description: "Change logo displayed during start-up"
+  - name: "Boot animation"
+    description: "Change animation displayed during start-up"
 ---
-On this screen you can choose a boot image displayed during Head Unit's startup. On page three you can import, restore or delete custom boot logos and boot animations. 

@@ -1,6 +1,8 @@
 ---
 section: "UI Configuration"
+settings:
+  - name: "UI Selection"
+    configKey: UI_type
+    description: "Choose user interface theme from all possible options as found on Themes. This list can be adjusted in factory_config.xml file and its `<SupportUIList>` section"
 ---
-UI Selection
 
-Choose user interface theme from all possible options as found on [Themes page](../themes/ksw). This list can be adjusted with `factory_config.xml` file and its <code>&lt;SupportUIList&gt;</code> section.
