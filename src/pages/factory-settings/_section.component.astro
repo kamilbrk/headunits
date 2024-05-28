@@ -15,11 +15,13 @@ const { Content } = await entry.render();
         {entry.data.section}
     </h3>
 
-    <div>
-        {entry.data.settings?.map(setting => (
-            <FactorySettingsSetting section={entry.data.section} setting={setting}></FactorySettingsSetting>
-        ))}
-    </div>
+    {entry.data.settings && (
+        <div>
+            {entry.data.settings?.map(setting => (
+                <FactorySettingsSetting section={entry.data.section} setting={setting}></FactorySettingsSetting>
+            ))}
+        </div>
+    )}
 
     <Content />
 </div>
