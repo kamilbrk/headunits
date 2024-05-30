@@ -52,7 +52,7 @@ const { Content } = await entry.render();
         {entry.body ? (
             <Content />
         ) : (
-            <em>We do not have any information about what's new in this update. All changelogs are done manually by comparing two decompiled versions of firmwares, therefore it's likely that we did not get around to do it for this version yet. If previous and next versions were built at similar times, it might be that we did not compare changes in-between, therefore have a look at them instead.</em>
+            <p>We do not have any information about what's new in this update.</p>
         )}
 
         {entry.data.signatures && (
