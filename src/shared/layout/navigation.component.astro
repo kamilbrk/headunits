@@ -4,14 +4,15 @@ import { DEFAULT_PAGE_TITLE, ROOT, URL_PREFIX } from "../config";
 const { title } = Astro.props;
 const { vendor } = Astro.params;
 
-import XMark from 'astro-heroicons/outline/XMark.astro';
 import Bars3 from 'astro-heroicons/outline/Bars3.astro';
-import Home from 'astro-heroicons/outline/Home.astro';
-import Folder from 'astro-heroicons/outline/Folder.astro';
-import Swatch from 'astro-heroicons/outline/Swatch.astro';
-import Cog6Tooth from 'astro-heroicons/outline/Cog6Tooth.astro';
-import QuestionMarkCircle from 'astro-heroicons/outline/QuestionMarkCircle.astro';
+import BuildingStorefront from 'astro-heroicons/outline/BuildingStorefront.astro';
 import ChatBubbleLeftRight from 'astro-heroicons/outline/ChatBubbleLeftRight.astro';
+import Cog6Tooth from 'astro-heroicons/outline/Cog6Tooth.astro';
+import Folder from 'astro-heroicons/outline/Folder.astro';
+import Home from 'astro-heroicons/outline/Home.astro';
+import QuestionMarkCircle from 'astro-heroicons/outline/QuestionMarkCircle.astro';
+import Swatch from 'astro-heroicons/outline/Swatch.astro';
+import XMark from 'astro-heroicons/outline/XMark.astro';
 import ColorSchemeSwitch from './color-scheme.component.astro';
 
 const menu = [
@@ -19,7 +20,8 @@ const menu = [
         name: 'General',
         children: [
             { name: 'Home', path: '', icon: Home },
-            { name: 'Discord', path: 'https://discord.gg/Ex8e6qE2eR', icon: ChatBubbleLeftRight }
+            { name: 'Discord', path: 'https://discord.gg/Ex8e6qE2eR', icon: ChatBubbleLeftRight },
+            // { name: 'Apps', path: 'apps', icon: BuildingStorefront }
         ]
     },
     {
