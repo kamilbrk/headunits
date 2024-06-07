@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+
+import Layout from "../../shared/layout/base-layout.astro";
+import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
+
+export async function getStaticPaths() {
+    return await getFirstLevelStaticPathsFromCollection('apps');
+}
+
+const entries = await getCollection('apps');
+---
+<Layout title="Apps">
+    <article class="prose dark:prose-invert">
+        {entries.length ? entries.map(entry => (
+            <p>{entry.data.name}</p>
+        )) : (
+            <p>We don't have any apps to show here yet. Stay tuned</p>
+        )}
+    </article>
+</Layout>
