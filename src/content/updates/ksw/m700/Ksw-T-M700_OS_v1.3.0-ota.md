@@ -2,7 +2,7 @@
 id: "Ksw-T-M700_OS_v1.3.0-ota"
 vendor: ksw
 platform: m600
-date: 2024-05-11T14:05:22Z
+date: 2024-05-11T13:58:22Z
 signatures:
   md5: 2f8fc65493a36ea47098c7755e571665
   sha1: 965e6bc832cfd6a28c2e86f9ef7367fb88892303
