@@ -1,8 +1,9 @@
 ---
 id: "gt7"
-name: "GT7 (SD680/SM6225)"
+name: "GT7 (SD680/SM6225) and GT7PRO (SD685/SM6225-AD)"
 ---
-Qualcomm Snapdragon 680 (SM6225), 8-core 2.4GHz, Cortex-A73
+GT7: Qualcomm Snapdragon 680 (SM6225), 8-core 2.4GHz, Cortex-A73
+GT7PRO: Qualcomm Snapdragon 685 (SM6225-AD), 8-core 2.8GHz, Cortex-A73
 
 ```
 build.prop
