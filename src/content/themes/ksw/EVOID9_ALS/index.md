@@ -4,8 +4,6 @@ display: "BMW ID9"
 tags: ["bmw", "bmw-id9", "bmw-evo", "als"]
 images: [
   "./home.png",
-  "./home-settings-01.jpeg",
-  "./home-settings-02.jpeg",
   "./home-custom-01.jpeg",
   "./home-custom-02.jpeg",
   "./custom-modes-01.jpeg",
