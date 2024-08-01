@@ -2,6 +2,7 @@
 id: "Ksw-T-M600_OS_v1.5.0-ota"
 vendor: ksw
 platform: m600
+android: 13
 date: 2024-01-29T03:06:58Z
 signatures:
   md5: 7e09236b4d7ffc85659d4b34edfcd9fa

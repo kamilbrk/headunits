@@ -2,6 +2,7 @@
 id: "Ksw-Q-Userdebug_OS_v3.9.1-ota"
 vendor: ksw
 platform: m501
+android: 10
 date: 2022-10-24T13:17:37Z
 signatures:
   md5: 36219a688b37204d257875469b928e8a

@@ -237,6 +237,8 @@
         <Item id="1" name="BMW_ID8_UI" display="BMW ID8" />
         <Item id="1" name="UI_PEMP_ID8" display="BMW ID8 PEMP (Blue)" />
         <Item id="1" name="UI_GS_ID8" display="BMW ID8 GS" />
+        <Item id="1" name="EVOID8_UG_2mode" display="BMW ID8 UG" /><!-- requires M700 1.3.8 -->
+        <Item id="1" name="EVOID9_ALS" display="BMW ID9" /><!-- requires M700 1.3.8 -->
 
         <Item id="1" name="Benz_GS" display="Benz GS" />
         <Item id="1" name="Benz_MBUX" display="Benz MBUX" />

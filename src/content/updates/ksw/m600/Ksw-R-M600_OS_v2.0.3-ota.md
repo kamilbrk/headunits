@@ -2,6 +2,7 @@
 id: "Ksw-R-M600_OS_v2.0.3-ota"
 vendor: ksw
 platform: m600
+android: 11
 date: 2022-03-25T08:31:14Z
 signatures:
   md5: ed14d3f5a6472894a7f095bed2ff89c0

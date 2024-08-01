@@ -2,6 +2,7 @@
 id: "Ksw-S-M600_OS_v1.1.4NEXAI-ota"
 vendor: ksw
 platform: m600
+android: 12
 date: 2022-12-15T06:17:54Z
 signatures:
   md5: 2913ca28c5cf617e69f514d61e6388dc

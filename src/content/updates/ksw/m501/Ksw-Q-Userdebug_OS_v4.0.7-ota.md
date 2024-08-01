@@ -2,6 +2,7 @@
 id: "Ksw-Q-Userdebug_OS_v4.0.7-ota"
 vendor: ksw
 platform: m501
+android: 10
 date: 2023-03-23T07:34:25Z
 ---
 Changes since `Ksw-Q-Userdebug_OS_v4.0.4-ota`
