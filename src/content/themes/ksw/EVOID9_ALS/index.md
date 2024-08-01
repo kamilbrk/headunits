@@ -3,8 +3,7 @@ id: EVOID9_ALS
 display: "BMW ID9"
 tags: ["bmw", "bmw-id9", "bmw-evo", "als"]
 images: [
-  "./home-01.jpeg",
-  "./home-02.jpeg",
+  "./home.png",
   "./home-settings-01.jpeg",
   "./home-settings-02.jpeg",
   "./home-custom-01.jpeg",
