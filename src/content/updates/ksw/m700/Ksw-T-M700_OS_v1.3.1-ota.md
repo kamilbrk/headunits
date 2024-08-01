@@ -2,6 +2,7 @@
 id: "Ksw-T-M700_OS_v1.3.1-ota"
 vendor: ksw
 platform: m700
+android: 13
 date: 2024-05-16T03:27:59Z
 signatures:
   md5: afff5f225da521b0cf697d9cd02e8b57
@@ -21,3 +22,7 @@ Changes since `Ksw-T-M700_OS_v1.1.5-ota` built 5 months earlier:
 - Launcher3QuickStep: Potential changes to recent apps and split views
 - Added more French translations
 - Sound settings are now hidden (?)
+
+Changes since `Ksw-T-M600_OS_v1.6.1-ota` built 20 days earlier:
+- KswBt (Bluetooth app): Fixes around displaying caller name
+- Added more French translations

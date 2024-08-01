@@ -2,6 +2,7 @@
 id: "Ksw-Q-Userdebug_OS_v3.9.6-ota"
 vendor: ksw
 platform: m501
+android: 10
 date: 2022-12-16T05:37:01Z
 ---
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.2.74` to `5.3.24`

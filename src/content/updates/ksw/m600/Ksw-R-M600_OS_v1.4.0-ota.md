@@ -2,6 +2,7 @@
 id: "Ksw-R-M600_OS_v1.4.0-ota"
 vendor: ksw
 platform: m600
+android: 11
 date: 2021-08-07T08:09:38Z
 signatures:
   md5: 18d383f45241dfbaa63be37814579bf6
