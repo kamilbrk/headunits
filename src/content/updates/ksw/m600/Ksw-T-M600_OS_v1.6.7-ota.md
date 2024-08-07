@@ -1,5 +1,5 @@
 ---
-id: "Ksw-T-m700_OS_v1.6.7-ota"
+id: "Ksw-T-M600_OS_v1.6.7-ota"
 vendor: ksw
 platform: m600
 android: 13
