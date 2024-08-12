@@ -82,7 +82,7 @@ export async function getCollectionGroupedByCollection<C extends CollectionKey, 
   }
   
   if (filterFn) {
-    return parents.filter(x => filterFn(x));
+    return parents.reverse().filter(x => filterFn(x));
   }
 
   return parents;
