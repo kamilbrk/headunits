@@ -31,6 +31,9 @@ settings:
   - name: "Weather APK"
     configKey: weatherVisible
     control: checkbox
+  - name: "Bluetooth transmitter switch"
+    configKey: doubleBtTransmit
+    control: checkbox
   - name: "Amplifier Selection"
     configKey: amplifierSelection
     children:
