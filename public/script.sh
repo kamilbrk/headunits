@@ -1,44 +1,40 @@
 #!/bin/bash
 
-# OTA Processing Script
-# Tested on macOS and Linux
-# Ensure the script is executable: chmod +x script.sh
+# Android Head Units OTA update processing script
+# Tested on macOS and Linux, works with KSW and ZXW firmwares
 
 # Installation and usage (macOS Sonoma with Apple Silicon)
 
-# 2. Then you can use pre-compiled tools in the supplied "bin" folder, although if you feel like getting all that stuff yourself or perhaps updating the binaries:
-#     - Create "bin" folder next to this script
-#     - Build ext4fuse from source:
-#         ```sh
-#         git clone https://github.com/gerard/ext4fuse.git
-#         cd ext4fuse
-#         make
-#         ```
-#         and put that entire ext4fuse folder into "bin"
-#     - Get payload-dumper-go from https://github.com/ssut/payload-dumper-go and make it executable
-#         ```sh
-#         chmod +x payload-dumper-go
-#         ```
-#         and similarly, put that into the "bin" folder
-#     - Get sdat2img.py file from https://github.com/xpirt/sdat2img and put that into "bin" folder as well
+# 1. Install various tools using Homebrew
+#    brew install pkg-config # for compiling ext4fuse
+#    brew install payload-dumper-go
+#    brew install brotli # only needed for Android 10 images
+#    brew install apktool # to decompile apps
+#    brew install jadx # to decompile apps
 
-# 3. Install tools using Homebrew on macOS
-#     ```sh
-#     brew install brotli # only needed for Android 10 images
-#     brew install apktool
-#     brew install jadx
-#     ```
+# 2. Install macFUSE
+#    https://eengstrom.github.io/musings/install-macfuse-and-sshfs-on-macos-monterey
 
-# 4. Make sure the provided script is executable:
+# 3. Clone and compile ext4fuse
+#    git clone https://github.com/gerard/ext4fuse.git
+#    cd ext4fuse
+#    make
+
+# 4. Move just the compiled `ext4fuse` binary from that folder to "bin" folder next to this script
+
+# 5. Get sdat2img.py file from https://github.com/xpirt/sdat2img and put that into "bin" folder as well
+
+# 6. Make sure the provided script itself is executable:
 #     ```sh
 #     chmod +x script.sh
 #     ```
 
-# 5. Download KSW OTA zip updates
+# 7. Download KSW OTA zip updates
 
-# 6. Run it like so
+# 8. Run it like so
 #     ```sh
-#     ./script.sh ./Firmwares/Ksw-T-M600_OS_v1.6.5-ota.zip --frontmatter --decompile-apk --decompile-jar
+#     cd ~/Dev/headunits/public
+#     ./script.sh ../src/content/updates/ksw/m600/Ksw-T-M600_OS_v1.7.1-ota.zip --frontmatter --decompile-apk --decompile-jar
 #     ```
 
 # Global Variables
@@ -124,7 +120,7 @@ get_images_from_bin() {
   local payload_file="$UNCOMPRESSED_DIR/payload.bin"
   if [[ -f "$payload_file" ]]; then
     echo " - Extracting partitions from payload.bin"
-    ./bin/payload-dumper-go -c 4 -o "$PARTITIONS_DIR" "$payload_file"
+    payload-dumper-go -c 4 -o "$PARTITIONS_DIR" "$payload_file"
   fi
 }
 
@@ -136,7 +132,7 @@ mount_and_copy_from_partitions() {
     if [[ -f "$img_file" ]]; then
       echo " - Processing partition $image"
       mkdir -p "$mount_point"
-      sudo ./bin/ext4fuse/ext4fuse "$img_file" "$mount_point" -o allow_other,defer_permissions
+      sudo ./bin/ext4fuse "$img_file" "$mount_point" -o allow_other,defer_permissions
 
       if [[ $? -eq 0 ]]; then
         if [[ "$image" == "system" ]]; then
