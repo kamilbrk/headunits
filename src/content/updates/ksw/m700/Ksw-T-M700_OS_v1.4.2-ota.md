@@ -22,7 +22,7 @@ Changes since `Ksw-T-M700_OS_v1.4.0-ota` built 6 days earlier:
 - GoogleTTS (text-to-speech) engine package is now pre-installed
 - Other minor user interface adjustments across a handful of apps, e.g. changed fonts and sizes, resized elements and graphics, etc.
 
-Modification points (provided by Witstek):
+Changes provided by Witstek:
 - Split screen】 Version: 1.3.4 When split screen, after the carplay call ends, exit the split screen interface
 - ZLINK】 1.6.4, after playing the USB music, return to carplay to play music, the car plays the USB music, and the phone plays the carplay music (appears once)
 - Support Apple Music

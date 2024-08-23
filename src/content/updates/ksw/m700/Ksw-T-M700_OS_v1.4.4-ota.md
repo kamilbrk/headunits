@@ -15,3 +15,7 @@ Summary:
 Changes since `Ksw-T-M700_OS_v1.4.2-ota` built 7 days earlier:
 - Minor fixes for ID8 theme
 - WitsScreencast app learned new tricks, has a new "USB Display" launcher icon and ability to flash firmware upgrades. Some internal packages were renamed from `com.ms.ms2160` to `com.ms.msdisplay` and its display name changed from `MS9120` to `MS`. There are new labels suggesting switching between low and high quality, screen resolution, etc.
+
+Changes provided by Witstek:
+- Optimize the focus interaction of ID8 main interface
+- After the APK installer installs SM9120 and restarts, clicking the application icon shows that it is not activated (2/3) Changed the ID8 main interface knob to jump to the right card
