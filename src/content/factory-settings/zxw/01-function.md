@@ -52,4 +52,13 @@ settings:
       - name: "Disable"
         configValue: 1
         control: radio
+  - name: "Secondary screen application"
+    configKey: sLauncherAppOverseas
+    children:
+      - name: "Domestic"
+        configValue: 0
+        control: radio
+      - name: "Oveseas"
+        configValue: 1
+        control: radio
 ---
