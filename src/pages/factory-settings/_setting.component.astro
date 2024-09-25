@@ -1,8 +1,7 @@
 ---
-
 import { slug } from 'github-slugger';
 import CodeBracket from 'astro-heroicons/outline/CodeBracket.astro'
-import type { SettingItem } from "../../content/factory-settings";
+import type { SettingItem } from "../../data/factory-settings";
 
 interface Props {
     section: string;
@@ -53,6 +52,10 @@ if (typeof setting.configValue !== "undefined") {
             <label for={uniqueId}>{setting.name}</label>
         ) : (
             <span id={uniqueId}>{setting.name}</span>
+        )}
+
+        {setting.nameOld && (
+            <span>Old name: {setting.nameOld}</span>
         )}
 
         {setting.max && (

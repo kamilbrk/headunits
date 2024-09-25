@@ -19,7 +19,7 @@ const vendor = await getEntry('vendors', slug);
 const platformsWithEntries = await getCollectionGroupedByCollection(
     'updates',
     'platforms',
-    entry => entry.slug.startsWith(slug)
+    entry => entry.id.startsWith(slug)
 );
 ---
 <Layout title=`Updates for ${vendor.data.name}`>
@@ -29,7 +29,7 @@ const platformsWithEntries = await getCollectionGroupedByCollection(
             <ul>
                 {group.entries.length ? group.entries.sort(sortEntriesByDate).map(entry => (
                     <li>
-                        <a href={`${URL_PREFIX}updates/${entry.slug}`}>{entry.data.id}</a>
+                        <a href={`${URL_PREFIX}updates/${entry.id}`}>{entry.data.id}</a>
                         <span>(A{getAndroidVersion(entry)})</span>
                         <time datetime={entry.data.date.toISOString()}>{entry.data.date.toISOString().slice(0,10)}</time>
                     </li>

@@ -1,20 +1,24 @@
 ---
 section: "Vehicle"
 settings:
-  - name: "Car Without OEM Monitor"
+  - name: "Car without Original Display"
+    nameOld: "Car Without OEM Monitor"
     configKey: CarDisplay
     control: checkbox
     description: "Selecting the \"CAR\" menu option will display a clock instead of OEM system. Choose this option on cars without OEM screen, e.g. old BMW X1."
   - name: "AUX Switching Modes"
     configKey: CarAux_Operate
     children:
-    - name: "Automatic"
+    - name: "Automatic Switching"
+      nameOld: "Automatic"
       configValue: 0
       control: radio
-    - name: "Manual"
+    - name: "Manual Switching"
+      nameOld: "Manual"
       configValue: 1
       control: radio
-  - name: "AUX auto switching"
+  - name: "AUX Auto Switching Scheme"
+    nameOld: "AUX auto switching"
     configKey: CarAux_auto_method
     children:
     - name: "Alpine"
@@ -37,20 +41,23 @@ settings:
       control: radio
   - name: "Driver's seat"
     children:
-    - name: "Left driver's seat"
+    - name: "Driver's Seat on Left"
+      nameOld: "Left driver's seat"
       control: radio
-    - name: "Right driver's seat"
+    - name: "Driver's Seat on Right"
+      nameOld: "Right driver's seat"
       control: radio
   - name: "Number of doors"
     configKey: CarDoorSelect
     children:
-    - name: "4 doors"
+    - name: "4 Doors"
       configValue: 0
       control: radio
-    - name: "2 doors"
+    - name: "2 Doors"
       configValue: 1
       control: radio
-    - name: "Hide doors"
+    - name: "Do Not Display Doors"
+      nameOld: "Hide doors"
       configValue: 2
       control: radio
   - name: "Speedometer Selection"
@@ -62,11 +69,11 @@ settings:
       control: radio
   - name: "Gear Selection"
     children:
-    - name: "Gear type 1"
+    - name: "Gear Type 1"
       control: radio
-    - name: "Gear type 2"
+    - name: "Gear Type 2"
       control: radio
-    - name: "Gear type 3"
+    - name: "Gear Type 3"
       control: radio
   - name: "MAP Key Selection"
     configKey: Map_key
@@ -83,13 +90,16 @@ settings:
   - name: "MODE Key Selection"
     configKey: Mode_key
     children:
-    - name: "Enable"
+    - name: "Active"
+      nameOld: "Enable"
       configValue: 0
       control: radio
-    - name: "Disable"
+    - name: "Inactive"
+      nameOld: "Disable"
       configValue: 1
       control: radio
-  - name: "FL Speaker Enable"
+  - name: "Use Left Front Speaker or Not?"
+    nameOld: "FL Speaker Enable"
     configKey: Front_left
     children:
     - name: "Enable"
@@ -110,34 +120,42 @@ settings:
   - name: "Voice Key Selection"
     configKey: Voice_key
     children:
-    - name: "Not used"
+    - name: "No function"
+      nameOld: "Not used"
       configValue: 0
       control: radio
-    - name: "Short press does nothing, Long press opens NAVI"
+    - name: "Short Press: No Function, Long Press: Navigation"
+      nameOld: "Short press does nothing, Long press opens NAVI"
       configValue: 1
       control: radio
-    - name: "Short press opens Voice Command, Long press opens NAVI"
+    - name: "Short Press: Voice Command, Long Press: Navigation"
+      nameOld: "Short press opens Voice Command, Long press opens NAVI"
       configValue: 2
       control: radio
-    - name: "Short press opens NAVI, Long press does nothing"
+    - name: "Short Press: Navigation, Long Press: No Function"
+      nameOld: "Short press opens NAVI, Long press does nothing"
       configValue: 3
       control: radio
-    - name: "HiCar voice function key"
+    - name: "HiCar Voice Command Key"
+      nameOld: "HiCar voice function key"
       configValue: 4
       control: radio
   - name: "Phone Key Selection"
     configKey: phone_key
     children:
-    - name: "Original vehicle function"
+    - name: "Original Car Function"
+      nameOld: "Original vehicle function"
       configValue: 0
       control: radio
-    - name: "Android Bluetooth feature"
+    - name: "Android Bluetooth Function"
+      nameOld: "Android Bluetooth feature"
       configValue: 1
       control: radio
     - name: "Undefined"
       configValue: 2
       control: radio
-  - name: "Collect CAN Bus Data"
+  - name: "CAN Bus Data Acquisition"
+    nameOld: "Collect CAN Bus Data"
     control: checkbox
     children:
       - name: "Can1"

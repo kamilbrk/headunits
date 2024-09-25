@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getEntry, render } from 'astro:content';
 
 import { URL_PREFIX } from "../../shared/config";
 import Layout from '../../shared/layout/base-layout.astro';
@@ -12,11 +12,11 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', getVendorSlug(slug));
 const entry = await getEntry('faq', slug);
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 ---
 <Layout title={`${entry.data.question}`}>
     <div class="prose dark:prose-invert break-words">
         <Content />
-        <a href={`${URL_PREFIX}faq/${vendor.slug}`}>Back to all {vendor.data.name} FAQs</a>
+        <a href={`${URL_PREFIX}faq/${vendor.id}`}>Back to all {vendor.data.name} FAQs</a>
     </div>
 </Layout>

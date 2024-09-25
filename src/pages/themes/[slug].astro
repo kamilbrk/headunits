@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', slug);
-const entries = await getCollection('themes', entry => entry.slug.startsWith(slug))
+const entries = await getCollection('themes', entry => entry.id.startsWith(slug))
 entries.sort((a, b) => a.data.id.localeCompare(b.data.id));
 ---
 <Layout title=`Themes for ${vendor.data.name}`>

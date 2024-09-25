@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', slug);
-const entries = await getCollection('factory-settings', entry => entry.slug.startsWith(slug))
+const entries = await getCollection('factory-settings', entry => entry.id.startsWith(slug))
 
 const xmls = import.meta.glob<{ default: string }>('/public/*.xml', { query: '?raw', import: 'default', eager: true });
 const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
@@ -21,7 +21,7 @@ const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
 <Layout title=`Factory settings for ${vendor.data.name}`>
     <article class="prose dark:prose-invert">
         {entries.length ? entries.map(entry => (
-            <FactorySettingsSection slug={entry.slug} />
+            <FactorySettingsSection slug={entry.id} />
         )) : (
             <p>We don't have any descriptions for factory settings for this vendor yet.</p>
         )}
@@ -30,7 +30,7 @@ const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
     {xml && (
         <article class="prose dark:prose-invert">
             <h3>An example <code>{vendor.data.factoryConfigFileName}</code> file</h3>
-            <p>Please <a href={`${URL_PREFIX}faq/${vendor.slug}/pull-factory-config`}>make a backup for your original file</a> first. Then make adjustments to your own file with parts from the following example and finally follow <a href={`${URL_PREFIX}faq/${vendor.slug}/apply-factory-config`}>instructions to import it to your Head Unit</a>.</p>
+            <p>Please <a href={`${URL_PREFIX}faq/${vendor.id}/pull-factory-config`}>make a backup for your original file</a> first. Then make adjustments to your own file with parts from the following example and finally follow <a href={`${URL_PREFIX}faq/${vendor.id}/apply-factory-config`}>instructions to import it to your Head Unit</a>.</p>
         </article>
         <Code class="-m-4 sm:-m-6 lg:-m-8 mt-4 sm:mt-6 lg:mt-8 p-4 sm:p-6 lg:p-8" lang="xml" code={xml} themes={SHIKI_THEMES} />
     )}

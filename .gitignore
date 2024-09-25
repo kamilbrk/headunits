@@ -340,7 +340,7 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/astro,intellij,visualstudiocode,macos,windows,node
 
 # OTA updates, zips and folders
-src/content/updates/*/*/*.zip
-src/content/updates/*/*/*/**
+src/data/updates/*/*/*.zip
+src/data/updates/*/*/*/**
 public/bin/*
 !public/bin/.gitkeep
