@@ -32,7 +32,8 @@ settings:
   - name: "Touch data continuously sent"
     configKey: touch_continuous_send
     control: checkbox
-  - name: "Equalizer APP"
+  - name: "Equaliser App"
+    nameOld: "Equalizer APP"
     control: checkbox
   - name: "Global Weather App"
     configKey: globalweather_app
@@ -40,7 +41,8 @@ settings:
   - name: "360APK"
     configKey: APK360
     control: checkbox
-  - name: "Remember The Last Mode"
+  - name: "Boot Mode Memory"
+    nameOld: "Remember The Last Mode"
     configKey: Default_PowerBoot
     description: "You can choose what system is automatically launched on start-up"
     children:
@@ -48,11 +50,13 @@ settings:
         description: "Try to remember last used interface and use that (OEM or Android)"
         configValue: 0
         control: radio
-      - name: "To OEM System"
+      - name: "Original Car Interface"
+        nameOld: "To OEM System"
         description: "Start with OEM system, where you can switch to Android later"
         configValue: 1
         control: radio
-      - name: "To Android Homepage"
+      - name: "Android Interface"
+        nameOld: "To Android Homepage"
         description: "Start with Android, where you can switch to OEM system later"
         configValue: 2
         control: radio
@@ -74,30 +78,37 @@ settings:
   - name: "Bluetooth Selection"
     configKey: BT_Type
     children:
-      - name: "OEM Bluetooth"
+      - name: "Original Car Bluetooth"
+        nameOld: "OEM Bluetooth"
         configValue: 1
         control: radio
-      - name: "Android Bluetooth"
+      - name: "Additional Bluetooth"
+        nameOld: "Android Bluetooth"
         configValue: 0
         control: radio
   - name: "Amplifier Selection"
     configKey: AMP_Type
     children:
-      - name: "OEM Amplifier"
+      - name: "Original Car Amplifier"
+        nameOld: "OEM Amplifier"
         configValue: 0
         control: radio
-      - name: "Aftermarket Amplifier"
+      - name: "External Amplifier Box"
+        nameOld: "Aftermarket Amplifier"
         configValue: 1
         control: radio
-  - name: "360 Camera"
+  - name: "360 Camera Type"
+    nameOld: "360 Camera"
     children:
       - name: "CVBS Camera"
         control: radio
       - name: "VGA Camera"
         control: radio
-  - name: "Automatic Brightness"
+  - name: "Automatic Backlight Control"
+    nameOld: "Automatic Brightness"
     children:
-      - name: "Width Lamp Control"
+      - name: "Sidelight Control"
+        nameOld: "Width Lamp Control"
         control: radio
       - name: "Close"
         control: radio

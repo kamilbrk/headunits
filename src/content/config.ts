@@ -1,9 +1,9 @@
-import factorySettings from './factory-settings';
-import faq from './faq';
-import platforms from './platforms';
-import themes from './themes';
-import updates from './updates';
-import vendors from './vendors';
+import factorySettings from '../data/factory-settings';
+import faq from '../data/faq';
+import platforms from '../data/platforms';
+import themes from '../data/themes';
+import updates from '../data/updates';
+import vendors from '../data/vendors';
 
 export const collections = {
   'factory-settings': factorySettings,

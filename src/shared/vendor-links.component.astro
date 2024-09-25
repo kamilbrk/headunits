@@ -15,7 +15,7 @@ const vendors = await getCollection('vendors');
     <ul>
         {vendors.map(vendor => (
             <li>
-                <a href={`${URL_PREFIX}${route}/${vendor.slug}`}>{vendor.data.name}</a>
+                <a href={`${URL_PREFIX}${route}/${vendor.id}`}>{vendor.data.name}</a>
             </li>
         ))}
     </ul>

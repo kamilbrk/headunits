@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getEntry, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import { Code } from 'astro:components';
 
@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', getVendorSlug(slug));
 const entry = await getEntry('themes', slug);
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 ---
 <Layout title={`${entry.data.display || entry.data.id}`}>
     {entry.data.images?.length ? entry.data.images.map(image => (
@@ -46,6 +46,6 @@ const { Content } = await entry.render();
 
         <Content />
 
-        <a href={`${URL_PREFIX}themes/${vendor.slug}`}>Back to all {vendor.data.name} themes</a>
+        <a href={`${URL_PREFIX}themes/${vendor.id}`}>Back to all {vendor.data.name} themes</a>
     </div>
 </Layout>

@@ -11,12 +11,12 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', slug);
-const entries = await getCollection('faq', entry => entry.slug.startsWith(slug))
+const entries = await getCollection('faq', entry => entry.id.startsWith(slug))
 ---
 <Layout title=`Frequently Asked Questions for ${vendor.data.name}`>
     <div class="grid lg:grid-cols-2 lg:gap-10">
         {entries.length ? entries.map(entry => (
-            <FaqItem slug={entry.slug} />
+            <FaqItem slug={entry.id} />
         )) : (
             <p>We don't have any FAQs for this vendor yet.</p>
         )}

@@ -13,7 +13,7 @@ export const ANDROID_VERSIONS: Record<string, number> = {
 };
 
 export type EntryStaticPath<C extends CollectionKey> = {
-  params: { slug: CollectionEntry<C>['slug'] },
+  params: { slug: CollectionEntry<C>['id'] },
   props: { entry: CollectionEntry<C> }
 }
 
@@ -29,7 +29,7 @@ export function getTreeFromCollection<C extends CollectionKey>(collection: Colle
   const tree: CollectionTree<C> = {};
 
   for (const entry of collection) {
-    const path = entry.slug.split('/');
+    const path = entry.id.split('/');
     let currentNode: CollectionTree<C> = tree;
 
     for (let i = 0; i < path.length - 1; i++) {
@@ -53,14 +53,14 @@ export async function getEntryStaticPathsFromCollection<C extends CollectionKey>
   const collection = await getCollection(collectionKey);
 
   return collection.map(entry => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
     props: { entry }
   }));
 }
 
 export async function getFirstLevelStaticPathsFromCollection<C extends CollectionKey>(collectionKey: C) {
   const collection = await getCollection(collectionKey);
-  const firstLevelSlugs = collection.map(x => x.slug.split('/')[0] as string);
+  const firstLevelSlugs = collection.map(x => x.id.split('/')[0] as string);
   const unique = new Set(firstLevelSlugs);
 
   return [...unique].map(folder => ({
@@ -78,7 +78,7 @@ export async function getCollectionGroupedByCollection<C extends CollectionKey, 
   const parents: CollectionEntryWithEntries<P, C>[] = await getCollection(parentsCollectionKey);
 
   for (const parent of parents) {
-    parent.entries = children.filter(entry => entry.slug.startsWith(parent.slug));
+    parent.entries = children.filter(entry => entry.id.startsWith(parent.id));
   }
   
   if (filterFn) {
@@ -111,7 +111,7 @@ type CollectionEntryWithPrevNext<C extends CollectionKey> = {
 
 export async function getEntryWithPrevNext<C extends CollectionKey>(collectionKey: C, slug: string, filter?: (entry: CollectionEntry<C>) => boolean): Promise<CollectionEntryWithPrevNext<C>> {
   const entries = await getCollection(collectionKey, filter);
-  const entry = entries.find(entry => entry.slug === slug);
+  const entry = entries.find(entry => entry.id === slug);
   if (!entry) return { entry: undefined, previous: undefined, next: undefined };
 
   const index = entries.indexOf(entry);
