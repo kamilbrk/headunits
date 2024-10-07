@@ -30,19 +30,19 @@ const { Content } = await render(entry);
                 <p>This theme appears to be invalid, so we do not recommend activating it.</p>
         )}
 
-        <p>To activate, find the <Code lang="xml" code={`<SupportUIList />`} inline themes={SHIKI_THEMES} /> section your <code>{vendor.data.factoryConfigFileName}</code> file and add the following line: {entry.data.number ? (
-            <Code lang="xml" code={`<Item id="${entry.data.number}" ui="${entry.data.id}" />`} inline themes={SHIKI_THEMES} />
-        ) : (
-            <Code lang="xml" code={`<Item id="1" name="${entry.data.id}" display="${entry.data.display}" />`} inline themes={SHIKI_THEMES} />
-        )}</p>
-
         {entry.data.since && (
-            <p>Available since <code>{entry.data.since}</code>.</p>
+            <p>This theme was introduced in update <code>{entry.data.since}</code>, therefore it might not be available to activate on older firmwares.</p>
         )}
 
         {entry.data.client && (
-            <p>Requires client <code>{entry.data.client}</code>.</p>
+            <p>This theme requires client <code>{entry.data.client}</code> set in your factory config file. See the factory settings section for more information.</p>
         )}
+
+        <p>To make this theme available for selection in your factory settings, you might need to modify your <code>{vendor.data.factoryConfigFileName}</code> file. Find the <Code lang="xml" code={`<SupportUIList />`} inline themes={SHIKI_THEMES} /> section and add the following line: {entry.data.number ? (
+                <Code lang="xml" code={`<Item id="${entry.data.number}" ui="${entry.data.id}" />`} inline themes={SHIKI_THEMES} />
+        ) : (
+                <Code lang="xml" code={`<Item id="1" name="${entry.data.id}" display="${entry.data.display}" />`} inline themes={SHIKI_THEMES} />
+        )}. More information and examples can be found in <a href={`${URL_PREFIX}factory-settings/${vendor.id}`}>factory settings</a> section.</p>
 
         <Content />
 
