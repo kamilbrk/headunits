@@ -49,13 +49,9 @@ if (typeof setting.configValue !== "undefined") {
         )}
 
         {setting.control ? (
-            <label for={uniqueId}>{setting.name}</label>
+            <label for={uniqueId} title={'Old name: ' + setting.nameOld}>{setting.name}</label>
         ) : (
-            <span id={uniqueId}>{setting.name}</span>
-        )}
-
-        {setting.nameOld && (
-            <span>Old name: {setting.nameOld}</span>
+            <span id={uniqueId} title={'Old name: ' + setting.nameOld}>{setting.name}</span>
         )}
 
         {setting.max && (
