@@ -7,7 +7,7 @@
         more information. Never use this entire file as-is. Instead, you should
         use parts of this example file to adjust and maintain your own version.
 
-        Last updated on 2024-08-07 by kamilbrk
+        Last updated on 2024-10-07 by kamilbrk
         https://kamilbrk.github.io/headunits/factory-settings/ksw/
         Originally based on Kri's versions for A10 3.9.4
         https://f30.bimmerpost.com/forums/showthread.php?t=1699764
@@ -202,6 +202,7 @@
         <Item id="19" name = "ภาษาไทย" tips ="Thai (TH)"/>
         <Item id="20" name = "Hrvatski" tips ="Croatian (HR)" />
         <Item id="21" name = "Čeština" tips ="Czech (CS)" />
+        <Item id="22" name = "український" tips ="Ukrainian (UK)" /><!-- not tested, requires M600 1.7.4 / M700 1.5.0 -->
     </SupportLanguageList>
 
     <!--

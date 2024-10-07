@@ -1,7 +1,7 @@
 ---
 question: 'How to apply factory_config.xml file?'
 ---
-Before making any changes, make sure you have a backup of your original file.
+Before making any changes, make sure you have a [backup of your original file](/headunits/faq/zxw/pull-factory-config).
 
 1. Use a USB drive with FAT32 formatted partition
 2. On the root of the USB drive, create a folder called `OEM`
