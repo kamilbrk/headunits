@@ -34,6 +34,12 @@ settings:
   - name: "Bluetooth transmitter switch"
     configKey: doubleBtTransmit
     control: checkbox
+  - name: "USB BT transmit"
+    configKey: btTransmitVisible
+    control: checkbox
+  - name: "Automatically enter navigation upon startup"
+    configKey: bootStartNavi
+    control: checkbox
   - name: "Amplifier Selection"
     configKey: amplifierSelection
     children:
