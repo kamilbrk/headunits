@@ -172,6 +172,7 @@
         <Item id="22" ui="KSW_BENZ_FY" />
         <Item id="46" ui="KSW_BENZ_FY_WITHOUT_WEATHER" />
         <Item id="30" ui="KSW_BENZ_V1" />
+        <Item id="48" ui="KSW_BENZ_LS" />
         <Item id="31" ui="KSW_BENZ_NTG6_0_2021_V1" />
         <Item id="33" ui="KSW_MBUX_1024" />
 
@@ -184,6 +185,7 @@
         <Item id="17" ui="KSW_BMW_ID8" />
         <!-- <Item id="20" ui="KSW_PEMP_BMW_ID8" /> Not listed -->
         <Item id="41" ui="KSW_BMW_ID8_COPILOT" />
+        <Item id="47" ui="KSW_BMW_ID8_KJD" />
 
         <!-- <Item id="26" ui="COMMON_GS" /> Invalid ID -->
         <!-- <Item id="34" ui="KSW_Common_UI_GS_UG" /> Invalid ID -->
