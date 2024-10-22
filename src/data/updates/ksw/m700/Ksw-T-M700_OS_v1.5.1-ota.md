@@ -15,5 +15,5 @@ Summary:
 Changes since `Ksw-T-M700_OS_v1.5.0-ota` built 12 days earlier:
 - Zlink app updated from `5.4.63` to `5.4.75`, potential updates to wireless mirroring for Android and iOS phones, using mobile phone's Wi-Fi hotspot
 - Minor updates to [`EVOID9_ALS`](/headunits/themes/ksw/evoid9_als) theme including new graphics, ability to show car speed in mph (in addition to existing kph) and support for more apps like Music, Video and Equalizer
-- More Ukraininan translations
+- More Ukrainian translations
 - Mentions of Zlink config file that can be imported from USB at `/OEM/zjAecConfig.txt` into internal storage under `/mnt/vendor/persist/OEM/other/zjAecConfig.txt`

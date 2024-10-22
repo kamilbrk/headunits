@@ -19,6 +19,6 @@ Changes since `Ksw-T-M700_OS_v1.4.5-ota` built 27 days earlier:
 - Free window on [`EVOID9_ALS`](/headunits/themes/ksw/evoid9_als) theme can be now hidden/shown
 - Memory management optimisations on [`EVOID8_UG_2mode`](/headunits/themes/ksw/evoid8_ug_2mode) theme
 - Updated English translations (mostly spelling and grammar) across main launcher, media apps, factory settings, etc.
-- Added Ukraininan language option
+- Added Ukrainian language option
 - Ksw360Camera app: changes to limit the amount of "open" cameras to three
 - WitsScreencast app: new prompts to grant read and write storage permissions
