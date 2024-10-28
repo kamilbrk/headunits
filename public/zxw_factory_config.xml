@@ -259,11 +259,11 @@
     <SupportUIList>
         <Item id="45" ui="KSW_ALFA_ROMEO" />
 
-        <Item id="23" ui="KSW_AUDI" />
-        <Item id="24" ui="KSW_AUDI_FY" />
-        <Item id="27" ui="KSW_AUDI_TY" />
+        <Item id="23" ui="KSW_AUDI_MIB3" />
+        <Item id="24" ui="KSW_AUDI_MIB3_FY" />
+        <Item id="27" ui="KSW_AUDI_MIB3_TY" />
         <!-- <Item id="29" ui="KSW_AUDI_CADILLAC" /> Invalid ID -->
-        <Item id="38" ui="KSW_GT6_AUDI" />
+        <Item id="38" ui="KSW_AUDI_MMI_4G" />
         <!-- <Item id="40" ui="KSW_AUDI_BENTLEY" /> Invalid ID -->
         <Item id="43" ui="KSW_AUDI_PORSCHE" />
 
