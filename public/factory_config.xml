@@ -78,10 +78,6 @@
         <Item name = "com.skt.skaf.l001mtm091" />
         <Item name = "com.nng.igoprimoisr.javaclient" />
         <Item name = "com.nng.igoprimoluna.javaclient" />
-        <Item name = "cn.manstep.phonemirrorBox" /><!-- Carlink Autokit -->
-        <Item name = "com.zjinnova.zlink" /><!-- Zlink -->
-        <Item name = "gb.xxy.hr" /><!-- Headunit Reloaded Emulator HUR -->
-        <Item name = "pl.neptis.yanosik.mobi.android" /><!-- Yanosik -->
         <Item name = "com.voiceactionapp" />
         <Item name = "com.navitel" />
         <Item name = "com.papago.M9Samsung" />
@@ -93,6 +89,10 @@
         <Item name = "com.vicom.vicomassistant" />
         <Item name = "com.tnt.hongsenapi" />
         <Item name = "com.fujitech.flyaudio" />
+        <Item name = "cn.manstep.phonemirrorBox" /><!-- Carlink Autokit -->
+        <Item name = "com.zjinnova.zlink" /><!-- Zlink -->
+        <Item name = "gb.xxy.hr" /><!-- Headunit Reloaded Emulator HUR -->
+        <Item name = "pl.neptis.yanosik.mobi.android" /><!-- Yanosik -->
     </SupportNaviAppList>
 
     <!--
@@ -130,9 +130,10 @@
         <Item name = "com.ankai.gd.ardvr" />
         <Item name = "com.ankai.ardvr" />
         <Item name = "com.zoulou.dab" />
+        <Item name = "com.fvision.camera" />
     </SupportDvrAppList>
 
-    <!-- Types of OEM screens -->
+    <!-- Types of OEM screens - example values for BMW -->
     <CarDisplayParam>
         <model id = "1"  >[01]NBT_F30/F20/F15/F22/F48(6.5″,HalfScreen)</model>
         <model id = "7"  >[02]NBT_F30/F20/F15/F22/F48(6.5″,FullScreen)</model>
@@ -164,7 +165,7 @@
         <model id = "33" >[23]CCC_E60_JP(2004)(8.8″,FullScreen)</model>
     </CarDisplayParam>
 
-    <!-- Available CAN Bus protocols to select in settings -->
+    <!-- Available CAN Bus protocols - example values for BMW -->
     <CANBusProtocol>
         <Protocol id = "1">[1]CCC / EVO_1.0DIN_OldCAN</Protocol>
         <Protocol id = "2">[2]CIC / EVO_1.0DIN_NewCAN</Protocol>
@@ -180,29 +181,29 @@
 
     <!-- Languages to select in settings -->
     <SupportLanguageList>
-        <Item id="0" name = "简体中文" tips ="Simplified Chinese (ZH-CN)" />
-        <Item id="1" name = "繁體中文" tips ="Traditional Chinese (ZH-TW)" />
-        <Item id="2" name = "English" tips ="English (EN)"/>
-        <Item id="3" name = "Deutsch" tips ="German (DE)"/>
-        <Item id="4" name = "Português" tips ="Portuguese (PT)"/>
-        <Item id="5" name = "Español" tips ="Spanish (ES)"/>
-        <Item id="6" name = "Pусский" tips ="Russian (RU)"/>
-        <Item id="7" name = "日本語" tips ="Japanese (JA)"/>
-        <Item id="8" name = "한국어" tips ="Korean (KO)"/>
-        <Item id="9" name = "Italiano" tips ="Italian (IT)"/>
-        <Item id="10" name = "Suomi" tips ="Finnish (FI)"/>
-        <Item id="11" name = "Türkçe" tips ="Turkish (TR)"/>
-        <Item id="12" name = "Tiếng Việt" tips ="Vietnamese (VI)"/>
-        <Item id="13" name = "Nederlands" tips ="Dutch (NL)"/>
-        <Item id="14" name = "עברית" tips ="Hebrew (iw-IL)"/>
-        <Item id="15" name = "Français" tips ="French (FR)"/>
-        <Item id="16" name = "Polski" tips ="Polish (PL)"/>
-        <Item id="17" name = "العربية" tips ="Arabic (AR)"/>
-        <Item id="18" name = "Ελληνικά" tips ="Greek (EL)"/>
-        <Item id="19" name = "ภาษาไทย" tips ="Thai (TH)"/>
-        <Item id="20" name = "Hrvatski" tips ="Croatian (HR)" />
-        <Item id="21" name = "Čeština" tips ="Czech (CS)" />
-        <Item id="22" name = "Українська" tips ="Ukrainian (UK)" /><!-- not tested, requires M600 1.7.4 / M700 1.5.0 -->
+        <Item id="0" name = "简体中文" tips="Simplified Chinese (ZH-CN)" />
+        <Item id="1" name = "繁體中文" tips="Traditional Chinese (ZH-TW)" />
+        <Item id="2" name = "English" tips="English (EN)"/>
+        <Item id="3" name = "Deutsch" tips="German (DE)"/>
+        <Item id="4" name = "Português" tips="Portuguese (PT)"/>
+        <Item id="5" name = "Español" tips="Spanish (ES)"/>
+        <Item id="6" name = "Pусский" tips="Russian (RU)"/>
+        <Item id="7" name = "日本語" tips="Japanese (JA)"/>
+        <Item id="8" name = "한국어" tips="Korean (KO)"/>
+        <Item id="9" name = "Italiano" tips="Italian (IT)"/>
+        <Item id="10" name = "Suomi" tips="Finnish (FI)"/>
+        <Item id="11" name = "Türkçe" tips="Turkish (TR)"/>
+        <Item id="12" name = "Tiếng Việt" tips="Vietnamese (VI)"/>
+        <Item id="13" name = "Nederlands" tips="Dutch (NL)"/>
+        <Item id="14" name = "עברית" tips="Hebrew (iw-IL)"/>
+        <Item id="15" name = "Français" tips="French (FR)"/>
+        <Item id="16" name = "Polski" tips="Polish (PL)"/>
+        <Item id="17" name = "العربية" tips="Arabic (AR)"/>
+        <Item id="18" name = "Ελληνικά" tips="Greek (EL)"/>
+        <Item id="19" name = "ภาษาไทย" tips="Thai (TH)"/>
+        <Item id="20" name = "Hrvatski" tips="Croatian (HR)" />
+        <Item id="21" name = "Čeština" tips="Czech (CS)" />
+        <Item id="22" name = "Українська" tips="Ukrainian (UK)" /><!-- requires M600 1.7.4 / M700 1.5.0 -->
     </SupportLanguageList>
 
     <!--
@@ -295,7 +296,7 @@
         <!-- Mute sound while reversing  0：Off 1：On -->
         <ReversingMuteSelect>0</ReversingMuteSelect>
 
-        <!-- Open the front view camera  :0：Off  1：On  -->
+        <!-- Open the front view camera  0：Off  1：On  -->
         <Front_view_camera>0</Front_view_camera>
 
         <!--
@@ -360,7 +361,15 @@
         <!-- Version information-->
         <ver>ALS-BM-20221126.en</ver>
 
-        <!-- Vendor information possible values: - GS - KSW - ALS_6208 - yc_2306 - LC3208 - CUSP_210407 (req 3.0.4) - -->
+        <!--
+            Vendor information possible values:
+            - GS
+            - KSW
+            - ALS_6208
+            - yc_2306
+            - LC3208
+            - CUSP_210407 (req 3.0.4)
+        -->
         <client>ALS_6208</client>
 
         <!-- Password of factory setting (4~6 digits) -->
@@ -370,7 +379,7 @@
             Theme selection for Android 7-8 firmwares
             See SupportUIList and their `ui` attributes
         -->
-        <UI>2</UI>
+        <UI>1</UI>
 
         <!--
             Theme selection for Android 9+ firmwares
@@ -432,7 +441,8 @@
         <!-- DTV function switch  0:Off  1:On -->
         <DTV_Type>0</DTV_Type>
 
-        <!-- DVR module type
+        <!--
+            DVR module type
             0: Off
             1: CVBS DVR
             2: USB DVR (The following USB DVR application names can be set using USB, otherwise it cannot be customized)
@@ -453,7 +463,8 @@
         <!-- Installation of third-party apps 0:allow  1:Prohibited  -->
         <APK_Install>0</APK_Install>
 
-        <!-- Type of the original head unit with AUX input
+        <!--
+            Type of the original head unit with AUX input
             1: Alpine
             2: Harman
             3: other
@@ -564,14 +575,16 @@
         <!-- Dashboard unit  0：Metric  1：Imperial -->
         <DashBoardUnit>1</DashBoardUnit>
 
-        <!-- Dashboard selection
+        <!--
+            Dashboard selection
             0: General
             1: Tri-color dashboard
             2: Seven color Dashboard
         -->
         <Dashboard_Select>2</Dashboard_Select>
 
-        <!-- AHD Camera settings
+        <!--
+            AHD Camera settings
             0: Automatic detection
             1: AHD_1080_30
             2: AHD_1080_25
@@ -586,13 +599,21 @@
         <!-- Wing TrucK NetwoRkIng e-car.cn 0: disabled  1:enabled-->
         <e_car>0</e_car>
 
-        <!-- enable Wi-Fi Hotspot for ZLink Autostart 0:off  1:on-->
+        <!-- Enable Wi-Fi Hotspot for ZLink Autostart 0:off  1:on-->
         <zlink_auto_start>1</zlink_auto_start>
 
-        <!-- car brand 1:BMW 2:Benz  3:Audi  4:Lexus 5:LuHu-->
+        <!--
+            Car brand
+            1:BMW
+            2:Benz
+            3:Audi
+            4:Lexus
+            5:LuHu
+        -->
         <car_manufacturer>1</car_manufacturer>
 
-        <!-- Remember the last boot mode:
+        <!--
+            Remember the last boot mode:
             0: Enable remember
             1: Always switch to OEM
             2: Always switch to Android
@@ -620,7 +641,8 @@
         <!-- Screencasting Switch 0:disabled  1:enabled-->
         <Screen_cast>0</Screen_cast>
 
-        <!-- Phone Key Selection
+        <!--
+            Phone Key Selection
             0: Original Vehicle Function
             1: Android Bluetooth feature
             2: Undefined
