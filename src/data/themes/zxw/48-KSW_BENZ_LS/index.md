@@ -1,5 +1,5 @@
 ---
-number: 49
+number: 48
 id: KSW_BENZ_LS
 display: "Benz LS"
 tags: ["benz"]

@@ -179,6 +179,7 @@
         <Item id="42" ui="KSW_BMW_ID6" />
 
         <Item id="16" ui="KSW_BMW_ID7" />
+        <Item id="50" ui="KSW_BMW_ID7_800" />
         <Item id="44" ui="KSW_COMMON_ID7" />
         <!-- <Item id="19" ui="KSW_PEMP_BMW_ID7" /> Not listed -->
 
@@ -186,6 +187,7 @@
         <!-- <Item id="20" ui="KSW_PEMP_BMW_ID8" /> Not listed -->
         <Item id="41" ui="KSW_BMW_ID8_COPILOT" />
         <Item id="47" ui="KSW_BMW_ID8_KJD" />
+        <Item id="49" ui="KSW_BMW_ID8_BFD" />
 
         <!-- <Item id="26" ui="COMMON_GS" /> Invalid ID -->
         <!-- <Item id="34" ui="KSW_Common_UI_GS_UG" /> Invalid ID -->
