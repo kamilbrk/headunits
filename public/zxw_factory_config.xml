@@ -228,7 +228,9 @@
             16: ภาษาไทย / Thai (TH)
             17: Türkçe / Turkish (TR)
             18: Tiếng Việt / Vietnamese (VI)
-            19: Hrvatski / Croatian (HR) (might be unsupported) -->
+            19: Hrvatski / Croatian (HR)
+            20: Українська / Ukrainian (UK) (might be unsupported)
+        -->
         <languageSelection>2</languageSelection>
 
         <!-- Time setting -->

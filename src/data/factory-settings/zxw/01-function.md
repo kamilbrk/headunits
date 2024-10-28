@@ -40,6 +40,9 @@ settings:
   - name: "Automatically enter navigation upon startup"
     configKey: bootStartNavi
     control: checkbox
+  - name: "Night brightness bar"
+    configKey: backlightBrightnessNightShow
+    control: checkbox
   - name: "Amplifier Selection"
     configKey: amplifierSelection
     children:
