@@ -3,7 +3,7 @@
 
     <!-- Basic information settings -->
     <basic>
-        <ver>YC-BC-20230704.0.en</ver>
+        <ver>KSW-AD-20240802.0.en</ver>
         <client>KSW</client>
         <!-- Resolution:
             1280x480 = 1280x480 lvds screen
@@ -13,6 +13,27 @@
             720x1920 = 720x1920 mipi screen (KLGD)
          -->
         <resolution>1920x720</resolution>
+        <!-- Car manufacturer:
+            1: BMW
+            2: Benz
+            3: Audi
+            4: Lexus
+            5: LuHu
+        -->
+        <car_manufacturer>3</car_manufacturer>
+        <!-- Product type
+            0: Screen replacement machine
+            1: Decoder v2
+            2: Decoder v3
+            3: MiPi screen replacement
+        -->
+        <product>0</product>
+
+        <!-- Dual screen device (default 0)
+            0: Not dual-screen
+            1: Dual-screen
+        -->
+        <dualScreen>0</dualScreen>
     </basic>
 
     <!-- List of supported navigation software package names -->
@@ -20,6 +41,7 @@
         <Item name = "com.baidu.BaiduMap" />
         <Item name = "com.baidu.BaiduMap.auto" />
         <Item name = "com.baidu.naviauto" />
+        <Item name = "com.baidu.mapauto" />
         <Item name = "com.mxnavi" />
         <Item name = "com.mxnavi.naviapp" />
         <Item name = "com.autonavi.minimap" />
@@ -36,6 +58,11 @@
         <Item name = "cld.navi" />
         <Item name = "com.kingwaytek" />
         <Item name = "com.kingwaytek.naviking3d" />
+        <Item name = "com.kingwaytek.a5i_3d.plus" />
+        <Item name = "com.kingwaytek.naviking4g" />
+        <Item name = "com.kingwaytek.naviking4G" />
+        <Item name = "com.kingwaytek.naviking3d.google.std" />
+        <Item name = "com.kingwaytek.naviking.telemetrics" />
         <Item name = "com.papago.M11_Int" />
         <Item name = "com.papago.M11General" />
         <Item name = "com.papago.s1OBU" />
@@ -53,29 +80,30 @@
         <Item name = "com.nng.igo.primong.igoworld" />
         <Item name = "com.nng.igoprimoisr2013march24.javaclient" />
         <Item name = "com.nng.igoprimoisrael.javaclient" />
+        <Item name = "com.nng.igo.primong.palestine" />
         <Item name = "com.navngo.igo.javaclient" />
         <Item name = "com.basarsoft.igo.javaclient" />
         <Item name = "com.basarsoft.igonextgen.javaclient" />
         <Item name = "com.mapswithme.maps.pro" />
         <Item name = "com.here.app.maps" />
         <Item name = "ru.yandex.yandexnavi" />
+        <Item name = "ru.yandex.yandexmaps" />
         <Item name = "com.polstar.polnav6" />
         <Item name = "com.nhn.android.nmap" />
         <Item name = "jp.co.yahoo.android.apps.navi" />
         <Item name = "com.mnsoft.mappyobn" />
         <Item name = "com.mnsoft.mappyauto" />
         <Item name = "com.skt.tmap.ku" />
+        <Item name = "com.skt.skaf.l001mtm091" />
         <Item name = "com.locnall.KimGiSa" />
         <Item name = "kr.mappers.AtlanSmart" />
         <Item name = "com.tomtom.gplay.navapp" />
-        <Item name = "com.kingwaytek.naviking4g" />
-        <Item name = "com.kingwaytek.naviking3d.google.std" />
-        <Item name = "com.nng.igo.primong.palestine" />
-        <Item name = "com.skt.skaf.l001mtm091" />
-        <Item name = "ru.yandex.yandexmaps" />
+        <Item name = "com.tomtom.speedcams.android.map" />
+        <Item name = "jp.co.toyota_ms.TcSpNavi" />
         <Item name = "com.generalmagic.magicearth" />
-        <Item name = "ai.zalo.kiki.car" />
-        <Item name = "com.fujitech.flyaudio" />
+        <Item name = "com.huawei.maps.app" />
+        <Item name = "ru.dublgis.dgismobile" />
+        <Item name = "com.jvstudios.gpstracker" />
     </SupportNaviAppList>
 
     <!-- List of supported DVR software package names -->
@@ -89,9 +117,8 @@
         <Item name = "com.fvision.camera" />
     </SupportDvrAppList>
 
-    <!-- Original car display parameter list -->
+    <!-- Original car display parameter list, example values for Benz
     <CarDisplayParam>
-
         <model id = "1"  >[01]NTG5.5_8.4″</model>
         <model id = "2"  >[02]NTG5.5_8.4″(half screen)</model>
 
@@ -138,8 +165,48 @@
         <model id = "30" >[30]NTG4.0_5.8″(2008—2010)(half screen)</model>
 
     </CarDisplayParam>
+    -->
 
-    <!-- CAN protocol list -->
+    <!-- Original car display parameter list, example values for Audi -->
+    <CarDisplayParam>
+
+        <model id = "1">[01]Q5(6.5″)_LOW_400x240_FullScreen</model>
+        <model id = "2">[02]Q5(6.5″)_LOW_400x240_HalfScreen</model>
+
+        <model id = "3">[03]3G/3G_Plus_800x480_FullScreen</model>
+        <model id = "4">[04]3G/3G_Plus_800x480_HalfScreen</model>
+
+        <model id = "5">[05]A3_400x272_FullScreen(2017)</model>
+        <model id = "6">[06]A3_400x272_HalfScreen(2014~2016)</model>
+
+        <model id = "7">[07]A3_FullScreen(2014~2016)</model>
+        <model id = "8">[08]A3_HalfScreen(2017)</model>
+
+        <model id = "9">[09]A4L_800x480_FullScreen(2017)</model>
+        <model id = "10">[10]A4L_800x480_HalfScreen(2017)</model>
+
+        <model id = "11">[11]Q3_A1_FullScreen</model>
+        <model id = "12">[12]Q3_A1_HalfScreen</model>
+
+        <model id = "13">[13]A3_400x272_FullScreen(2013)</model>
+
+        <model id = "14">[14]Q7_800x480_FullScreen(2010~2013)</model>
+        <model id = "15">[15]Q7_800x480_HalfScreen(2010~2013)</model>
+
+        <model id = "16">[16]A6_480x240_FullScreen(2006~2009)</model>
+        <model id = "17">[17]A6_480x240_HalfScreen(2006~2009)</model>
+
+        <model id = "18">[18]3G_480x240_FullScreen</model>
+        <model id = "19">[19]3G_480x240_HalfScreen</model>
+
+        <model id = "20">[20]A4L_1024x480_FullScreen(2017~)</model>
+        <model id = "21">[21]A4L_1024x480_HalfScreen(2017~)</model>
+
+        <model id = "22">[22]A6_800x480_FullScreen(2016~2018)</model>
+        <model id = "23">[23]A6_800x480_HalfScreen(2016~2018)</model>
+    </CarDisplayParam>
+
+    <!-- CAN protocol list, example values for Benz
     <CANBusProtocol>
         <Protocol id = "0">[0]BC_Protocol_type_5.0C</Protocol>
         <Protocol id = "1">[1]BC_Protocol_type_5.0A</Protocol>
@@ -149,6 +216,27 @@
         <Protocol id = "5">[5]BC_Protocol_type_3.0</Protocol>
         <Protocol id = "6">[6]BC_Protocol_type_5.5</Protocol>
         <Protocol id = "7">[7]BC_Protocol_type_6.0</Protocol>
+    </CANBusProtocol>
+    -->
+
+    <!-- CAN protocol list, example values for Audi -->
+    <CANBusProtocol>
+        <Protocol id = "0">[0]Q5_3G( [09-16]A4L/Q5_High_config )</Protocol>
+        <Protocol id = "1">[1]Q5_3G+( [09-16]A4L/Q5_High_config )</Protocol>
+
+        <Protocol id = "2">[2]MIB_A4L ( [17-18]A4L/A5/Q5L/Q2 )</Protocol>
+        <Protocol id = "3">[3]MIB_A3</Protocol>
+
+        <Protocol id = "4">[4]A6L(12-15)</Protocol>
+        <Protocol id = "5">[5]Q5_LOW ( [09-16]A4L/Q5_Low_config )</Protocol>
+
+        <Protocol id = "6">[6]Q3_3G ( Q3/A1 )</Protocol>
+        <Protocol id = "7">[7]Q3_3G+ ( Q3/A1 )</Protocol>
+
+        <Protocol id = "8">[8]Q7_2G_3G ( [05-11]A6/Q7 or [12-15]Q7 ) </Protocol>
+        <Protocol id = "9">[9]Q7_3G+ ( [12-15]Q7 )</Protocol>
+
+        <Protocol id = "10">[10]A6L(16-18)</Protocol>
     </CANBusProtocol>
 
     <!-- Supported UI themes
@@ -236,9 +324,15 @@
         <languageSelection>2</languageSelection>
 
         <!-- Time setting -->
-        <!-- Time mode 0: Use original car time 1: Automatically synchronize GPS time -->
+        <!-- Time mode
+            0: Use original car time
+            1: Automatically synchronize GPS time
+        -->
         <timeModeSelection>1</timeModeSelection>
-        <!-- Time format 0: 12-hour system 1: 24-hour system -->
+        <!-- Time format
+            0: 12-hour system
+            1: 24-hour system
+        -->
         <user24Hour>1</user24Hour>
 
         <!-- Volume setting -->
@@ -295,21 +389,41 @@
         <reversingCameraType>0</reversingCameraType>
 
         <!-- Display settings -->
-        <!-- Block watching videos while driving 0: Allowed 1: Blocked -->
+        <!-- Block watching videos while driving
+            0: Allowed
+            1: Blocked
+        -->
         <videoDrivingBan>0</videoDrivingBan>
-        <!-- Small light controls backlight brightness 0: Control 1: Not control -->
+        <!-- Small light controls backlight brightness
+            0: Control
+            1: Not control
+        -->
         <lightControlBrightness>0</lightControlBrightness>
         <!-- Backlight brightness 0~100 -->
         <backlightBrightness>70</backlightBrightness>
 
         <!-- Bluetooth settings -->
-        <!-- Bluetooth selection 0: Install additional Bluetooth 1: Original car Bluetooth -->
+        <!-- Bluetooth selection
+            0: Install additional Bluetooth
+            1: Original car Bluetooth
+        -->
         <btSelection>0</btSelection>
+        <!-- GT6 microphone gain -16~16 -->
+        <micGainGT6>8</micGainGT6>
+        <!-- GT7 microphone gain -16~16 -->
+        <micGainGT7>6</micGainGT7>
 
         <!-- Unit settings -->
-        <!-- Distance unit 0: Metric unit 1: Imperial unit -->
+        <!-- Distance unit
+            0: Metric unit
+            1: Imperial unit
+        -->
         <unitDistance>0</unitDistance>
-        <!-- Oil quantity unit 0: L 1: gal(US) 2: gal(UK) -->
+        <!-- Oil quantity unit
+            0: L
+            1: gal(US)
+            2: gal(UK)
+        -->
         <unitOil>0</unitOil>
         <!-- Temperature unit (no need to configure this on ID8 theme)
             0: Celsius
@@ -318,7 +432,11 @@
         <unitTemperature>0</unitTemperature>
 
         <!-- DVR settings -->
-        <!-- DVR selection 0: Off 1: CVBS DVR 2: USB DVR -->
+        <!-- DVR selection
+            0: Off
+            1: CVBS DVR
+            2: USB DVR
+        -->
         <dvrSelection>1</dvrSelection>
         <!-- USB DVR APP -->
         <usbDvrApp>com.ankai.cardvr</usbDvrApp>
@@ -326,7 +444,11 @@
         <!-- Automatically switch AUX settings -->
         <!-- Automatically switch AUX 0: Off 1: On -->
         <autoAux>0</autoAux>
-        <!-- AUX switching plan 1: Plan A 2: Plan H 3: Customized -->
+        <!-- AUX switching plan
+            1: Plan A
+            2: Plan H
+            3: Customized
+        -->
         <auxProgram>3</auxProgram>
         <!-- Original car AUX item position 1 0~12 -->
         <auxPosition1>0</auxPosition1>
@@ -339,7 +461,11 @@
         <videoPlayer>com.szchoiceway.videoplayer</videoPlayer>
 
         <!-- Other settings -->
-        <!-- Power-on mode memory 0: Enable 2: Android interface 1: Original car interface -->
+        <!-- Power-on mode memory
+            0: Enable
+            1: Original car interface
+            2: Android interface
+        -->
         <bootModeMemory>0</bootModeMemory>
 
     </setings>
@@ -347,10 +473,13 @@
     <!-- Factory settings -->
     <factory>
         <!-- Factory setting password -->
-        <password>2018</password>
+        <password>1314</password>
 
         <!-- Function configuration -->
-        <!-- USB host mode 0: Debugging 1: Reading USB disk -->
+        <!-- USB host mode
+            0: Debugging
+            1: Reading USB disk
+        -->
         <usbHostMode>1</usbHostMode>
         <!-- Whether CarAuto is displayed in the application list 0: Hide 1: Show -->
         <carAutoVisible>1</carAutoVisible>
@@ -360,7 +489,7 @@
         <googleVisible>1</googleVisible>
         <!-- Whether Aux is displayed in the application list 0: Hide 1: Show -->
         <auxVisible>0</auxVisible>
-        <!-- Whether DTV is displayed in the application list 0: Hide 1: Display -->
+        <!-- Whether DTV is displayed in the application list 0: Hide 1: Show -->
         <dtvVisible>0</dtvVisible>
         <!-- Whether the Wing Truck Network is displayed in the application list 0: Hide 1: Show -->
         <ecar>0</ecar>
@@ -374,17 +503,23 @@
         <weatherVisible>1</weatherVisible>
         <!-- Forward view 0: Close 1: Open -->
         <frontCamera>0</frontCamera>
-        <!-- Whether screencast MS9120 is displayed in the application list 0: hidden 1: displayed -->
+        <!-- Whether screencast MS9120 is displayed in the application list 0: Hide 1: Show -->
         <screenCastVisible>0</screenCastVisible>
         <!-- Whether touch data is sent continuously 0: No 1: Yes -->
         <touchData>0</touchData>
-        <!-- Amplifier selection 0: Original car amplifier 1: External amplifier box -->
+        <!-- Amplifier selection
+            0: Original car amplifier
+            1: External amplifier box
+        -->
         <amplifierSelection>0</amplifierSelection>
         <!-- Whether to use the left front speaker 0: Use 1: Not use -->
         <useHorn>0</useHorn>
 
         <!-- Vehicle settings -->
-        <!-- Cars without display screen 0: With display screen 1: No display screen -->
+        <!-- Cars without display screen
+            0: With display screen
+            1: No display screen
+        -->
         <notHaveScreen>0</notHaveScreen>
         <!-- Knob type 0: Knob A 1: Knob B -->
         <iDriverType>0</iDriverType>
@@ -413,10 +548,6 @@
         <driverSeat>0</driverSeat>
         <!-- Number of doors 0: 4 doors 1: 2 doors 2: No doors shown -->
         <doorAmount>0</doorAmount>
-        <!-- Mercedes-Benz control panel 0: Off 1: NTG3.5 2: NTG3.0 -->
-        <benzControl>0</benzControl>
-        <!-- Air conditioner display 0: Hide 1: Display -->
-        <airVisible>1</airVisible>
         <!-- Speed type selection
             0: Speed type 1
             1: Speed type 2
@@ -432,6 +563,34 @@
         <corneringLampControl>0</corneringLampControl>
         <!-- MIC external and internal switching 0: external 1: internal -->
         <micType>1</micType>
+        <!-- LCD LVDS mode 0: VESA 1: JEIDA Default VESA -->
+        <lvdsMode>0</lvdsMode>
+        <!-- LCD CLK polarity 0:L 1:H -->
+        <lcdClkPolarity>0</lcdClkPolarity>
+
+        <!-- Car settings are selected according to the car manufacturer -->
+        <!-- Mercedes-Benz, Audi, Lexus air conditioning display 0: Hide 1: Show -->
+        <airVisible>0</airVisible>
+        <!-- Mercedes-Benz control panel 0: Off 1: NTG3.5 2: NTG3.0 -->
+        <benzControl>0</benzControl>
+        <!-- Audi homepage left widget 0: Hide 1: A4 2: A4_old 3: A4L 4: A3 5: A5 6: A6 7: Q3 8: Q5 9: Q7 -->
+        <audiGt6LeftCarIcon>2</audiGt6LeftCarIcon>
+        <!-- Audi homepage right widget 0: Hide 1: Show weather and Amap navigation information 2: Show weather information 3: Show driving information 4: Show music information -->
+        <audiGt6RightWidget>1</audiGt6RightWidget>
+        <!-- Original car LVDS chip type Mercedes-Benz 0: NTG5.0 1: NTG5.5 Audi 0: MIB_LOW 1: MIB_HIGHT -->
+        <originalLvdsChipType>0</originalLvdsChipType>
+        <!-- Lexus air conditioning control 0: Uncontrolled 1: Controlled -->
+        <lexusAirControl>0</lexusAirControl>
+        <!-- Lexus original car FM 0: Hide 1: Show -->
+        <lexusOriginFM>0</lexusOriginFM>
+        <!-- Land Rover host selection 0: Bosch host capacitive screen 1: Bosch host resistive screen 1 2: Bosch host resistive screen 2 3: Harman host -->
+        <lrHostSelection>0</lrHostSelection>
+        <!-- Land Rover square control type 0: Lin 1: ADC -->
+        <lrWheelSelection>1</lrWheelSelection>
+        <!-- Land Rover left button panel 0, 1, 2, 3, 4 -->
+        <lrLeftPanelSelection>3</lrLeftPanelSelection>
+        <!-- Land Rover right button panel 0, 1, 2 -->
+        <lrRightPanelSelection>1</lrRightPanelSelection>
 
         <!-- Vehicle button settings -->
         <!-- MAP key selection 0: Android navigation 1: Original car navigation -->
@@ -463,9 +622,10 @@
         <!-- Can protocol selection -->
         <canProtocolSelection>0</canProtocolSelection>
         <!-- Theme ID, use a value from `SupportUIList` -->
-        <uiSelection>31</uiSelection>
+        <uiSelection>23</uiSelection>
         <!-- Boot logo, whether to use the default boot logo 0: Not used 1: Used -->
         <bootLogoRestore>0</bootLogoRestore>
-
+        <!-- Whether to display the KSW logo on the first page of the car logo setting 0: Hide the logo 1: Show the logo -->
+        <ksw_logo>0</ksw_logo>
     </factory>
 </ConfigInfo>
