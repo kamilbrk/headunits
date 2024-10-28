@@ -12,7 +12,7 @@ The `factory_config.xml` file is a device/vendor specific configuration file tha
     ```
 5. Pull the file into your laptop
     ```sh
-    adb pull /mnt/vendor/persist/OEM/zxw_factory_config.xml
+    adb pull /mnt/privdata1/zxw_factory_config.xml
     ```
 6. Disconnect
     ```sh
