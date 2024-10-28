@@ -423,6 +423,14 @@
         <lightControlBrightness>0</lightControlBrightness>
         <!-- Backlight brightness 0~100 -->
         <backlightBrightness>70</backlightBrightness>
+        <!--
+            Night Backlight brightness UI setting enabed
+            0: Disabled
+            1: Enabled
+        -->
+        <backlightBrightnessNightShow>1</backlightBrightnessNightShow>
+        <!-- Night Backlight brightness 0~100 -->
+        <backlightBrightnessNight>0</backlightBrightnessNight>
 
         <!-- Bluetooth settings -->
         <!--
