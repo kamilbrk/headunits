@@ -20,6 +20,8 @@
     <SupportNaviAppList>
         <Item name = "com.baidu.BaiduMap" />
         <Item name = "com.baidu.BaiduMap.auto" />
+        <Item name = "com.baidu.naviauto" />
+        <Item name = "com.baidu.mapauto" />
         <Item name = "com.mxnavi" />
         <Item name = "com.mxnavi.naviapp" />
         <Item name = "com.autonavi.minimap" />
@@ -36,6 +38,11 @@
         <Item name = "cld.navi" />
         <Item name = "com.kingwaytek" />
         <Item name = "com.kingwaytek.naviking3d" />
+        <Item name = "com.kingwaytek.a5i_3d.plus" />
+        <Item name = "com.kingwaytek.naviking4g" />
+        <Item name = "com.kingwaytek.naviking4G" />
+        <Item name = "com.kingwaytek.naviking3d.google.std" />
+        <Item name = "com.kingwaytek.naviking.telemetrics" />
         <Item name = "com.papago.M11_Int" />
         <Item name = "com.papago.M11General" />
         <Item name = "com.papago.s1OBU" />
@@ -73,9 +80,14 @@
         <Item name = "com.kingwaytek.naviking4g" />
         <Item name = "com.kingwaytek.naviking3d.google.std" />
         <Item name = "com.nng.igo.primong.palestine" />
+        <Item name = "com.skt.skaf.l001mtm091" />
         <Item name = "cityguide.probki.net" />
         <Item name = "com.generalmagic.magicearth" />
-        <Item name = "com.skt.skaf.l001mtm091" />
+        <Item name = "com.tomtom.speedcams.android.map" />
+        <Item name = "com.huawei.maps.app" />
+        <Item name = "ru.yandex.yandexmaps" />
+        <Item name = "ru.dublgis.dgismobile" />
+        <Item name = "com.jvstudios.gpstracker" />
         <Item name = "com.nng.igoprimoisr.javaclient" />
         <Item name = "com.nng.igoprimoluna.javaclient" />
         <Item name = "com.voiceactionapp" />
