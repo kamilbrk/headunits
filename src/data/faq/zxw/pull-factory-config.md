@@ -14,14 +14,14 @@ The `factory_config.xml` file is a device/vendor specific configuration file tha
     ```sh
     adb pull /mnt/privdata1/zxw_factory_config.xml
     ```
-    If this command fails with a 'Permission Denied' error, you will need to change the permissions on the file in order to pull/copy it:
-   ```sh
-   adb shell
-   su
-   chmod +r /mnt/privdata1/zxw_factory_config.xml
-   exit
-   exit
-   ```
+    If this command fails with a "Permission Denied" error, you will need to change the permissions on the file in order to pull/copy it:
+    ```sh
+    adb shell
+    su
+    chmod +r /mnt/privdata1/zxw_factory_config.xml
+    exit
+    exit
+    ```
    Then re-run the `adb pull` command above
 6. Disconnect
     ```sh
