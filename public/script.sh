@@ -110,7 +110,7 @@ get_images_from_dat() {
     local img_file="$PARTITIONS_DIR/$image.img"
     if [[ -f "$transfer_list" && -f "$dat_file" && ! -f "$img_file" ]]; then
       echo " - Converting $image image"
-      python ./bin/sdat2img.py "$transfer_list" "$dat_file" "$img_file"
+      python3 ./bin/sdat2img.py "$transfer_list" "$dat_file" "$img_file"
     fi
   done
 }
