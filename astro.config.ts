@@ -10,6 +10,9 @@ export default defineConfig({
   output: 'static',
   site: DOMAIN,
   base: BASE,
+  image: {
+    layout: "responsive",
+  },
   markdown: {
     shikiConfig: {
       themes: SHIKI_THEMES

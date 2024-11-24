@@ -19,7 +19,7 @@ const { Content } = await render(entry);
 <Layout title={`${entry.data.display || entry.data.id}`}>
     {entry.data.images?.length ? entry.data.images.map(image => (
         <div class="mb-5">
-            <Image src={image} alt="" />
+            <Image src={image} alt="" layout="responsive" />
         </div>
     )) : (
         <p class="prose dark:prose-invert mb-4">We don't have any screenshots of this theme yet.</p>

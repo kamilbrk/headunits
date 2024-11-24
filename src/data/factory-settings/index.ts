@@ -22,7 +22,6 @@ const SettingItemSchema: z.ZodType<SettingItem> = BaseSettingItemSchema.extend({
 });
 
 export default defineCollection({
-  // type: 'content',
   loader: glob({ pattern: '**\/[^_]*.md', base: './src/data/factory-settings' }),
   schema: z.object({
     section: z.string(),

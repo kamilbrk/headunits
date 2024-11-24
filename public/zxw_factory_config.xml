@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ConfigInfo>
 
+    <!--
+        First make a backup of your own factory_settings.xml file, so that you
+        can revert to it when things go wrong. See FAQ section or Discord for
+        more information. Never use this entire file as-is. Instead, you should
+        use parts of this example file to adjust and maintain your own version.
+
+        Last updated on 2024-11-24 by kamilbrk
+        https://kamilbrk.github.io/headunits/factory-settings/zxw/
+    -->
+
     <!-- Basic information settings -->
     <basic>
         <ver>KSW-AD-20240802.0.en</ver>
         <client>KSW</client>
+
+        <!--
+            Car manufacturer
+            1: BMW
+            2: Benz
+            3: Audi
+            4: Lexus
+            5: LuHu
+        -->
+        <car_manufacturer>1</car_manufacturer>
 
         <!--
             Resolution
@@ -15,16 +35,6 @@
             720x1920 = 720x1920 mipi screen (KLGD)
          -->
         <resolution>1920x720</resolution>
-
-        <!--
-            Car manufacturer
-            1: BMW
-            2: Benz
-            3: Audi
-            4: Lexus
-            5: LuHu
-        -->
-        <car_manufacturer>3</car_manufacturer>
 
         <!--
             Product type
@@ -129,7 +139,32 @@
         <Item name = "com.fvision.camera" />
     </SupportDvrAppList>
 
-    <!-- Original car display parameter list - example values for Benz
+    <!-- Types of OEM screens - example values for BMW -->
+    <CarDisplayParam>
+        <model id = "1">[01]NBT_F30/F20/F15/F22/F48(6.5″,HalfScreen)</model>
+        <model id = "7">[02]NBT_F30/F20/F15/F22/F48(6.5″,FullScreen)</model>
+        <model id = "9">[03]NBT_F30/F20/F15/F22/F48(8.8″,10.25″)</model>
+
+        <model id = "4">[04]CIC_E60/E90(2012)/E83(6.5,HalfScreen)</model>
+        <model id = "5">[05]CIC_E60/E90(2012)/E83(6.5,FullScreen)</model>
+        <model id = "11">[06]CIC_E60/E90(2011)(6.5,HalfScreen)</model>
+        <model id = "12">[07]CIC_E60/E90(2011)(6.5,FullScreen)</model>
+        <model id = "6">[08]CIC_E70(2009)/E60(2011)(8.8″,10.25″)</model>
+        <model id = "8">[09]CIC_F01/F02_7Series(2011)(8.8″,10.25″)</model>
+
+        <model id = "2">[10]CCC_E60/E90(6.5″,FullScreen)</model>
+        <model id = "3">[11]CCC_E60/E90(8.8″,FullScreen)</model>
+        <model id = "14">[12]CCC_E60/E90(2010)(8.8″,FullScreen)</model>
+        <model id = "18">[13]CCC_E60/E90(2008)(6.5″,FullScreen)</model>
+
+        <model id = "15">[14]CCC_E65/E66_7Series(2005)(8.8″)</model>
+        <model id = "16">[15]CCC_E65/E66_7Series(2005)(6.5″,FullScreen)</model>
+        <model id = "17">[16]CCC_E65/E66_7Series(2005)(6.5″,HalfScreen)</model>
+
+        <model id = "32">[17]05_E83(VGA,FullScreen)</model>
+    </CarDisplayParam>
+
+    <!-- Types of OEM screens - example values for Benz
     <CarDisplayParam>
         <model id = "1"  >[01]NTG5.5_8.4″</model>
         <model id = "2"  >[02]NTG5.5_8.4″(half screen)</model>
@@ -179,7 +214,7 @@
     </CarDisplayParam>
     -->
 
-    <!-- Original car display parameter list - example values for Audi -->
+    <!-- Types of OEM screens - example values for Audi
     <CarDisplayParam>
         <model id = "1">[01]Q5(6.5″)_LOW_400x240_FullScreen</model>
         <model id = "2">[02]Q5(6.5″)_LOW_400x240_HalfScreen</model>
@@ -216,8 +251,39 @@
         <model id = "22">[22]A6_800x480_FullScreen(2016~2018)</model>
         <model id = "23">[23]A6_800x480_HalfScreen(2016~2018)</model>
     </CarDisplayParam>
+    -->
 
-    <!-- CAN protocol list - example values for Benz
+    <!-- Types of MIPI screens - example values for BMW -->
+    <CarDisplayParamMipiScreen>
+        <model id = "1">[01]800x480</model>
+        <model id = "2">[02]400x240</model>
+        <model id = "3">[03]480x240</model>
+        <model id = "4">[04]640x240</model>
+        <model id = "5">[05]1024x600</model>
+        <model id = "6">[06]1280x480</model>
+        <model id = "7">[07]1440x540</model>
+        <model id = "8">[08]1920x720</model>
+        <model id = "20">[09]CCC_400x240(NDE) (BMW)</model>
+        <model id = "21">[03]CCC_640x240(NDE) (BMW)</model>
+        <model id = "40">[03]NTG5_960x540 (Benz)</model>
+        <model id = "60">[03]MIB_1024x480 (Audi)</model>
+        <model id = "200">[200]Adaptive Parameters</model>
+    </CarDisplayParamMipiScreen>
+
+    <!-- Available CAN Bus protocols - example values for BMW -->
+    <CANBusProtocol>
+        <Protocol id = "1">[1]ID6_X1</Protocol>
+        <Protocol id = "2">[2]ID6_5S</Protocol>
+        <Protocol id = "3">[3]ID5_X1</Protocol>
+        <Protocol id = "4">[4]ID5_5S</Protocol>
+        <Protocol id = "5">[5]NBT</Protocol>
+        <Protocol id = "6">[6]CIC</Protocol>
+        <Protocol id = "7">[7]CCC</Protocol>
+        <Protocol id = "8">[8]E66</Protocol>
+        <Protocol id = "9">[9]E39</Protocol>
+    </CANBusProtocol>
+
+    <!-- Available CAN Bus protocols - example values for Benz
     <CANBusProtocol>
         <Protocol id = "0">[0]BC_Protocol_type_5.0C</Protocol>
         <Protocol id = "1">[1]BC_Protocol_type_5.0A</Protocol>
@@ -230,7 +296,7 @@
     </CANBusProtocol>
     -->
 
-    <!-- CAN protocol list - example values for Audi -->
+    <!-- Available CAN Bus protocols - example values for Audi
     <CANBusProtocol>
         <Protocol id = "0">[0]Q5_3G( [09-16]A4L/Q5_High_config )</Protocol>
         <Protocol id = "1">[1]Q5_3G+( [09-16]A4L/Q5_High_config )</Protocol>
@@ -249,6 +315,7 @@
 
         <Protocol id = "10">[10]A6L(16-18)</Protocol>
     </CANBusProtocol>
+    -->
 
     <!--
         Supported UI themes
@@ -387,7 +454,7 @@
         <!-- Reversing radar  0: Off  1: On -->
         <reversingRadar>1</reversingRadar>
         <!-- Reverse mute  0: Off  1: On -->
-        <reversingMute>1</reversingMute>
+        <reversingMute>0</reversingMute>
         <!--
             Selection of reversing camera
             0: Aftermarket rear camera
@@ -396,6 +463,12 @@
             3: Android360 app
         -->
         <reversingCameraSelection>0</reversingCameraSelection>
+        <!--
+            Android camera selection
+            0: 1080P
+            1: 720P a13 and Android 360 optional, default 1080P
+        -->
+        <androidCameraSelection>0</androidCameraSelection>
         <!--
             Camera signal type
             0: Automatic detection
@@ -430,7 +503,7 @@
         -->
         <backlightBrightnessNightShow>1</backlightBrightnessNightShow>
         <!-- Night Backlight brightness 0~100 -->
-        <backlightBrightnessNight>0</backlightBrightnessNight>
+        <backlightBrightnessNight>70</backlightBrightnessNight>
 
         <!-- Bluetooth settings -->
         <!--
@@ -482,18 +555,18 @@
             0: Off
             1: On
         -->
-        <autoAux>0</autoAux>
+        <autoAux>1</autoAux>
         <!--
             AUX switching plan
             1: Plan A
             2: Plan H
             3: Customized
         -->
-        <auxProgram>3</auxProgram>
+        <auxProgram>2</auxProgram>
         <!-- Original car AUX item position 1 0~12 -->
-        <auxPosition1>0</auxPosition1>
+        <auxPosition1>2</auxPosition1>
         <!-- Original car AUX item position 2 0~12 -->
-        <auxPosition2>0</auxPosition2>
+        <auxPosition2>2</auxPosition2>
 
         <!-- Default music app -->
         <musicPlayer>com.szchoiceway.musicplayer</musicPlayer>
@@ -508,6 +581,12 @@
             2: Android interface
         -->
         <bootModeMemory>0</bootModeMemory>
+        <!--
+            Whether to use 8953 to replace the version number
+            0: No
+            1: Yes
+        -->
+        <replaceVersionWith8953>0</replaceVersionWith8953>
     </setings>
 
     <!-- Factory settings -->
@@ -546,6 +625,12 @@
         <frontCamera>0</frontCamera>
         <!-- Screencast MS9120 app visibility  0: Hide  1: Show -->
         <screenCastVisible>0</screenCastVisible>
+        <!--
+            Whether the Bentley background color is displayed in the application list
+            0: Hide
+            1: Show (only when theme KSW_AUDI_BENTLEY with ID 40 is activated)
+        -->
+        <bentleyBgVisible>0</bentleyBgVisible>
         <!-- Whether touch data is sent continuously  0: No  1: Yes -->
         <touchData>0</touchData>
         <!--
@@ -556,9 +641,38 @@
         <amplifierSelection>0</amplifierSelection>
         <!-- Whether to use the left front speaker  0: Use  1: Not use -->
         <useHorn>0</useHorn>
+        <!--
+            Whether the original car icon of Mercedes-Benz UI uses the SUV icon
+            0: Do not use
+            1: Use
+        -->
+        <benzOriginalCarIconSuv>0</benzOriginalCarIconSuv>
+        <!--
+            Dual Bluetooth machine Bluetooth transmission switch
+            0: Close (use the car microphone)
+            1: Open (use the original car microphone)
+            Default 0 Close
+        -->
+        <doubleBtTransmit>0</doubleBtTransmit>
+        <!--
+            Sound chip
+            0: BD37033+Sound APP
+            1: BD37033
+            2: Audio DSP-A
+        -->
+        <soundProcessorChip>0</soundProcessorChip>
+        <!-- Car KTV 0: Close 1: Open -->
+        <carKTV>0</carKTV>
+        <!-- Secondary screen application 0: Domestic 1: Overseas -->
+        <sLauncherAppOverseas>0</sLauncherAppOverseas>
+        <!-- Whether the external USB Bluetooth transmitter box App is displayed in the application list 0: Hide 1: Display -->
+        <btTransmitVisible>0</btTransmitVisible>
+        <!-- Automatically enter navigation when booting 0: Off 1: On -->
+        <bootStartNavi>0</bootStartNavi>
 
         <!-- Vehicle settings -->
-        <!-- Cars without display screen
+        <!--
+            Cars without display screen
             0: With display screen
             1: No display screen
         -->
@@ -758,5 +872,7 @@
             1: Show the logo
         -->
         <ksw_logo>0</ksw_logo>
+        <!-- An offset (?) -->
+        <AnOffset>0</AnOffset>
     </factory>
 </ConfigInfo>

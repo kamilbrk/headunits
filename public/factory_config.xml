@@ -7,7 +7,7 @@
         more information. Never use this entire file as-is. Instead, you should
         use parts of this example file to adjust and maintain your own version.
 
-        Last updated on 2024-10-07 by kamilbrk
+        Last updated on 2024-11-24 by kamilbrk
         https://kamilbrk.github.io/headunits/factory-settings/ksw/
         Originally based on Kri's versions for A10 3.9.4
         https://f30.bimmerpost.com/forums/showthread.php?t=1699764
@@ -167,7 +167,7 @@
         <model id = "19" >[15]18_EVO(6.5,FullScreen)</model>
         <model id = "20" >[16]18_EVO(8.8)</model>
         <model id = "21" >[17]18_EVO_X1(8.8,1280x480)</model>
-        <model id = "22" >[18]19_EVO_X3(10.25, 1440x540)</model>
+        <model id = "22" >[18]19_EVO_X3(10.25,1440x540)</model>
 
         <model id = "15" >[19]CCC_E65/E66_7Series(2005)(8.8″)</model>
         <model id = "16" >[20]CCC_E65/E66_7Series(2005)(6.5″,FullScreen)</model>
