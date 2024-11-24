@@ -29,7 +29,7 @@ const { Content } = await render(entry);
 ---
 <Layout title={`${entry.data.id}`}>
     {(previous || next) && (
-        <div class="flex max-sm:justify-between mb-4">
+        <div class="flex max-sm:justify-between mb-4 select-none">
             {previous && (
                 <a href={`${URL_PREFIX}updates/${previous.id}`} class="self-start bg-slate-800 text-white py-2 pl-2 pr-4 rounded inline-flex items-center">
                     <ChevronLeft class="w-6 h-6" />

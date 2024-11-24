@@ -92,7 +92,7 @@ export function sortEntriesByDate<E extends CollectionKey>(entryA: CollectionEnt
   return +new Date(entryB.data.date) - +new Date(entryA.data.date);
 }
 
-const REGEX_KSW = /Ksw-([A-Z])-.+v(.+)-ota/;
+const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-.+v(.+)-ota/;
 const REGEX_ZXW = /(\d{8})GT_KSW/;
 
 export function getAndroidVersion<E extends CollectionKey>(entry: CollectionEntry<E>) {
@@ -111,12 +111,12 @@ type CollectionEntryWithPrevNext<C extends CollectionKey> = {
 
 export async function getEntryWithPrevNext<C extends CollectionKey>(collectionKey: C, slug: string, filter?: (entry: CollectionEntry<C>) => boolean): Promise<CollectionEntryWithPrevNext<C>> {
   const entries = await getCollection(collectionKey, filter);
-  const entry = entries.find(entry => entry.id === slug);
+  const entry = entries.sort(sortEntriesByDate).find(entry => entry.id === slug);
   if (!entry) return { entry: undefined, previous: undefined, next: undefined };
 
   const index = entries.indexOf(entry);
-  const previous = index === 0 ? undefined : entries[index - 1];
-  const next = index + 1 === entries.length ? undefined : entries[index + 1];
+  const next = index === 0 ? undefined : entries[index - 1];
+  const previous = index + 1 === entries.length ? undefined : entries[index + 1];
   return { entry, previous, next };
 }
 
