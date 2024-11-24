@@ -16,4 +16,4 @@ Summary:
 Changes since `Ksw-Q-Userdebug_OS_v4.2.9-ota` built 5 months earlier:
 - Backported theme [`UI_NTG6_FY_V3`](/headunits/themes/ksw/ui_ntg6_fy_v3) that was previously made available in [A13 M600 1.5.9](/headunits/updates/ksw/m600/ksw-t-m600_os_v159-ota) with ability to customise wallpapers
 - Support for [`UI_MBUX_YO`](/headunits/themes/ksw/ui_mbux_yo) theme across more apps
-- Firmware version will now have a `Witstek-` prefix, same as on M600 and M700 builds
+- Firmware version will now have a `Witstek-` prefix shown in settings, same as on M600 and M700 builds
