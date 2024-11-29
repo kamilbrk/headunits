@@ -45,6 +45,7 @@ const menu = [
 ];
 
 const getLink = (path: string) => path.startsWith('http') ? path : `${URL_PREFIX}${path}`;
+const getTarget = (path: string) => path.startsWith('http') ? '_blank' : undefined;
 const prefix = 'flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6';
 const suffixes = {
     current: 'bg-gray-800 text-white',
@@ -89,7 +90,12 @@ const getAriaCurrent = (href: string) => {
                         <ul role="list" class:list={['-mx-2 space-y-1', { 'mt-2': section.name }]}>
                             {section.children.map(({ name, path, icon: NavIcon }) => (
                                 <li>
-                                    <a href={getLink(path)} class={getClassName(getLink(path))} aria-current={getAriaCurrent(getLink(path))}>
+                                    <a
+                                        href={getLink(path)}
+                                        class={getClassName(getLink(path))}
+                                        aria-current={getAriaCurrent(getLink(path))}
+                                        target={getTarget(getLink(path))}
+                                    >
                                         <NavIcon class="w-6 h-6 shrink-0" />
                                         {name}
                                     </a>
