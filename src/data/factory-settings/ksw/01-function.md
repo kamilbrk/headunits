@@ -4,6 +4,7 @@ settings:
   - name: "USB HOST"
     configKey: USB_HOST
     control: checkbox
+    description: "Allow USB devices to be available to Android system. Switch this off if you want to run fastboot or other related tools."
   - name: "Zlink"
     configKey: zlink_auto_start # See CenterService.BootReceiver. Also, when either `zlink_auto_start` or `hotspot_open` (undocumented) options are true, Settings.MyReceiver will run `start5GTether` to set Wi-FI AP config and start tethering.
     control: checkbox
