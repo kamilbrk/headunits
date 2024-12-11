@@ -15,3 +15,4 @@ Summary:
 Changes since `Witstek-T-M700_OS_v1.5.6-ota` built 21 days earlier:
 - New graphics for Bluetooth contact refresh/search buttons on [`EVOID9_ALS`](/headunits/themes/ksw/evoid9_als) theme
 - Further logic to detect and replace displayed Android version based on the `ksw_android11` setting
+- [Easter Eggs app](https://play.google.com/store/apps/details?id=com.dede.android_eggs) comes pre-installed and shows up in 3rd party launchers
