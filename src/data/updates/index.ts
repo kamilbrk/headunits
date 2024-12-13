@@ -8,7 +8,7 @@ export const signaturesSchema = z.object({
 });
 
 export default defineCollection({
-  loader: glob({ pattern: '**\/[^_]*.md', base: './src/data/updates' }),
+  loader: glob({ pattern: '**\/[^_]*.{md,mdx}', base: './src/data/updates' }),
   schema: z.object({
     id: z.string(),
     vendor: z.string(),
