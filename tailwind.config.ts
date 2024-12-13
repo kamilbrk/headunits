@@ -4,7 +4,7 @@ import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
 
 export default {
-  content: ['./src/**/*.{astro,html,js,jsx,ts,tsx}'],
+  content: ['./src/**/*.{astro,html,js,jsx,ts,tsx,md,mdx}'],
   darkMode: 'class',
   theme: {
     extend: {
