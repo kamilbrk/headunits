@@ -19,8 +19,15 @@ Some updates require certain prior versions to ensure compatibility. If your uni
 9. [Ksw-T-M600_OS_v1.6.9-ota](/headunits/updates/ksw/m600/ksw-t-m600_os_v169-ota) A13 - _required before [1.7.8](/headunits/updates/ksw/m600/witstek-t-m600_os_v178-ota)_
 10. [Witstek-T-M600_OS_v1.7.8-ota](http://localhost:4321/headunits/updates/ksw/m600/witstek-t-m600_os_v178-ota) or later Android 13
 
-#### M501 (SD625/MSM8953)
+#### M501 (SD625/MSM8953) and M501A- (SD450/SDM450)
 
-1. It depends, see [detailed guide from Kri on Bimmerpost](https://f30.bimmerpost.com/forums/showthread.php?t=1699764)
+For units that [originally came with Android 9](https://f30.bimmerpost.com/forums/showthread.php?p=25873709&postcount=4):
 
-Sources: [Kri (Bimmerpost)](https://f30.bimmerpost.com/forums/showthread.php?t=1832178), [RedErik (Bimmerpost)](https://f30.bimmerpost.com/forums/showpost.php?p=27674534&postcount=4), [bimmer5101](https://discord.com/channels/702437587679313920/702438814274158644/1190606092837867550) ([Discord](https://discord.gg/Ex8e6qE2eR))
+1. [Ksw-P-Userdebug_OS_v1.2.0-ota](https://f30.bimmerpost.com/forums/showthread.php?p=25873690&postcount=4) A9 - _required before A10_
+2. [Ksw-Q-Userdebug_OS_v3.1.5-ota](https://f30.bimmerpost.com/forums/showthread.php?p=25873690&postcount=4) A10 - _last compatible version_
+
+For units that [originally came with Android 10](https://f30.bimmerpost.com/forums/showthread.php?p=25873709&postcount=4):
+
+1. [Ksw-Q-Userdebug_OS_v4.3.3-ota](/headunits/updates/ksw/m501/ksw-q-userdebug_os_v433-ota) or later Android 10
+
+Sources: [Kri (Bimmerpost)](https://f30.bimmerpost.com/forums/showthread.php?t=1832178), [RedErik (Bimmerpost)](https://f30.bimmerpost.com/forums/showpost.php?p=27674534&postcount=4), [bimmer5101 (Discord)](https://discord.com/channels/702437587679313920/702438814274158644/1190606092837867550)
