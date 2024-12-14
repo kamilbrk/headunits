@@ -342,6 +342,8 @@
         <Item id="48" ui="KSW_BENZ_LS" />
         <Item id="31" ui="KSW_BENZ_NTG6_0_2021_V1" />
         <Item id="33" ui="KSW_MBUX_1024" />
+        <Item id="51" ui="KSW_BENZ_NTG7" /><!-- requires 20241129GT_KSW -->
+        <Item id="52" ui="KSW_BENZ_VITO" /><!-- requires 20241129GT_KSW -->
 
         <Item id="42" ui="KSW_BMW_ID6" />
 
