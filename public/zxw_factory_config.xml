@@ -14,6 +14,12 @@
     <!-- Basic information settings -->
     <basic>
         <ver>KSW-AD-20240802.0.en</ver>
+
+        <!--
+            Client setting used to determine visibility of certain functions,
+            for example themes. Can be set to "KSW" or other possible values:
+            ALS_6208, GS, LHX2306, LS2682, CK, BFD, QWST1127
+        -->
         <client>KSW</client>
 
         <!--
