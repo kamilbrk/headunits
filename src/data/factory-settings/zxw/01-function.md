@@ -10,6 +10,10 @@ settings:
   - name: "Google Apps"
     configKey: googleVisible
     control: checkbox
+  # - name: "Google Voice"
+  #   configKey: googleVoiceSwitch
+  #   control: checkbox
+  #   description: "This seems to be saved in internal settings rather than XML file"
   - name: "AUX"
     configKey: auxVisible
     control: checkbox
@@ -22,7 +26,8 @@ settings:
   - name: "screen cast-MS9120"
     configKey: screenCastVisible
     control: checkbox
-  - name: "Touch data continuously sent"
+  - name: "The original car host supports touch"
+    nameOld: "Touch data continuously sent"
     configKey: touchData
     control: checkbox
   - name: "Sound APK"
