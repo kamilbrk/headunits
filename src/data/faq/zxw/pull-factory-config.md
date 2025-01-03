@@ -1,7 +1,7 @@
 ---
-question: 'How to pull factory_config.xml file from Head Unit?'
+question: 'How to pull zxw_factory_config.xml file from Head Unit?'
 ---
-The `factory_config.xml` file is a device/vendor specific configuration file that gets shipped with your Head Unit. Before you make any changes, please make a backup of the original file, so that you can always revert to it.
+The `zxw_factory_config.xml` file is a device/vendor specific configuration file that gets shipped with your Head Unit. Before you make any changes, please make a backup of the original file, so that you can always revert to it.
 
 1. Download ADB from [Android SDK Platform Tools](https://developer.android.com/tools/releases/platform-tools)
 2. Create a Wi-Fi hotspot on your phone
