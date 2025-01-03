@@ -1,5 +1,5 @@
 ---
-question: 'How to apply factory_config.xml file?'
+question: 'How to apply zxw_factory_config.xml file?'
 ---
 Before making any changes, make sure you have a [backup of your original file](/headunits/faq/zxw/pull-factory-config).
 
