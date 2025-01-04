@@ -15,7 +15,7 @@ const { Content } = await render(entry);
 <article class="prose dark:prose-invert prose-pre:my-1 max-w-none">
     <h3 class="flex items-center relative">
         <QuestionMarkCircle class="w-6 h-6 mr-2" />
-        <a href={`${URL_PREFIX}faq/${entry.id}`}>
+        <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>
             <span aria-hidden="true" class="absolute inset-0"></span>
             {entry.data.question}
         </a>

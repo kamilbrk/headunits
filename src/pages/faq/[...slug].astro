@@ -17,6 +17,6 @@ const { Content } = await render(entry);
 <Layout title={`${entry.data.question}`}>
     <div class="prose dark:prose-invert break-words">
         <Content />
-        <a href={`${URL_PREFIX}faq/${vendor.id}`}>Back to all {vendor.data.name} FAQs</a>
+        <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`}>Back to all {vendor.data.name} FAQs</a>
     </div>
 </Layout>

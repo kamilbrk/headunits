@@ -1,8 +1,10 @@
 ---
 id: Benz_MBUX
-display: "Benz MBUX"
-tags: ["benz", "benz-mbux"]
+display: Benz MBUX
+tags:
+  - benz
+  - benz-mbux
 images:
-  - "./home.png"
-  - "./settings.png"
+  - ./home.png
+  - ./settings.png
 ---

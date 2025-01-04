@@ -7,8 +7,8 @@
         more information. Never use this entire file as-is. Instead, you should
         use parts of this example file to adjust and maintain your own version.
 
-        Last updated on 2024-11-24 by kamilbrk
-        https://kamilbrk.github.io/headunits/factory-settings/zxw/
+        Last updated on 2025-01-04 by kamilbrk
+        https://kamilbrk.github.io/headunits/factory-settings/zxw
     -->
 
     <!-- Basic information settings -->
@@ -16,8 +16,9 @@
         <ver>KSW-AD-20240802.0.en</ver>
 
         <!--
-            Client setting used to determine visibility of certain functions,
-            for example themes. Can be set to "KSW" or other possible values:
+            Different client setting might be needed to enable certain
+            functionality like various themes locked to specific vendors.
+            This is often set to "KSW" by default. Other possible values:
             ALS_6208, GS, LHX2306, LS2682, CK, BFD, QWST1127
         -->
         <client>KSW</client>
@@ -39,7 +40,7 @@
             1024x600 = 1024x600 lvds screen
             1280x720 = 1280x720 lvds screen
             720x1920 = 720x1920 mipi screen (KLGD)
-         -->
+        -->
         <resolution>1920x720</resolution>
 
         <!--
@@ -52,8 +53,8 @@
         <product>0</product>
 
         <!--
-            Dual screen device (default 0)
-            0: Not dual-screen
+            Dual screen device
+            0: Not dual-screen (default)
             1: Dual-screen
         -->
         <dualScreen>0</dualScreen>
@@ -217,6 +218,7 @@
         <model id = "29" >[29]NTG4.0_5.8″(2008—2010)</model>
         <model id = "30" >[30]NTG4.0_5.8″(2008—2010)(half screen)</model>
 
+        <model id = "31" >[31]NTG5.0_1600x540(2014-2017 S-Class)</model>
     </CarDisplayParam>
     -->
 
@@ -330,54 +332,51 @@
         You can set theme by its ID with the `uiSelection` setting later
     -->
     <SupportUIList>
-        <Item id="45" ui="KSW_ALFA_ROMEO" />
+        <Item id="45" ui="KSW_ALFA_ROMEO" /><!-- requires GT6-20240613 / GT7-20240525 -->
 
         <Item id="23" ui="KSW_AUDI" />
         <Item id="24" ui="KSW_AUDI_FY" />
         <Item id="27" ui="KSW_AUDI_TY" />
-        <!-- <Item id="29" ui="KSW_AUDI_CADILLAC" /> Invalid ID -->
+        <Item id="29" ui="KSW_AUDI_CADILLAC" /><!-- requires client LHX2306 -->
         <Item id="38" ui="KSW_GT6_AUDI" />
-        <!-- <Item id="40" ui="KSW_AUDI_BENTLEY" /> Invalid ID -->
+        <Item id="40" ui="KSW_AUDI_BENTLEY" /><!-- requires client CK -->
         <Item id="43" ui="KSW_AUDI_PORSCHE" />
 
         <Item id="18" ui="KSW_BENZ" /><!-- UI_NTG6 -->
         <Item id="21" ui="KSW_BENZ_NTG6_0_2021" /><!-- UI_NTG6_3 -->
         <Item id="22" ui="KSW_BENZ_FY" />
-        <Item id="46" ui="KSW_BENZ_FY_WITHOUT_WEATHER" />
+        <Item id="46" ui="KSW_BENZ_FY_WITHOUT_WEATHER" /><!-- requires GT6-20240801 / GT7-20240812 -->
         <Item id="30" ui="KSW_BENZ_V1" />
-        <Item id="48" ui="KSW_BENZ_LS" />
+        <Item id="48" ui="KSW_BENZ_LS" /><!-- requires GT6-20240919 / GT7-20241019 -->
         <Item id="31" ui="KSW_BENZ_NTG6_0_2021_V1" />
         <Item id="33" ui="KSW_MBUX_1024" />
-        <Item id="51" ui="KSW_BENZ_NTG7" /><!-- requires 20241129GT_KSW -->
-        <Item id="52" ui="KSW_BENZ_VITO" /><!-- requires 20241129GT_KSW -->
+        <Item id="51" ui="KSW_BENZ_NTG7" /><!-- requires GT6-20241129 / GT7-20241214 -->
+        <Item id="52" ui="KSW_BENZ_VITO" /><!-- requires GT6-20241129 / GT7-20241214 -->
 
         <Item id="42" ui="KSW_BMW_ID6" />
 
         <Item id="16" ui="KSW_BMW_ID7" />
-        <Item id="50" ui="KSW_BMW_ID7_800" /><!-- requires 20241018GT_KSW -->
-        <Item id="44" ui="KSW_COMMON_ID7" />
-        <!-- <Item id="19" ui="KSW_PEMP_BMW_ID7" /> Not listed -->
+        <Item id="50" ui="KSW_BMW_ID7_800" /><!-- requires GT6-20241018 / GT7-20241019 -->
+        <Item id="44" ui="KSW_COMMON_ID7" /><!-- requires GT6-20240613 / GT7-20240525 -->
+        <Item id="19" ui="KSW_PEMP_BMW_ID7" /><!-- requires client ALS_6208 -->
 
         <Item id="17" ui="KSW_BMW_ID8" />
-        <!-- <Item id="20" ui="KSW_PEMP_BMW_ID8" /> Not listed -->
+        <Item id="20" ui="KSW_PEMP_BMW_ID8" /><!-- requires client ALS_6208 -->
         <Item id="41" ui="KSW_BMW_ID8_COPILOT" />
-        <Item id="47" ui="KSW_BMW_ID8_KJD" />
-        <Item id="49" ui="KSW_BMW_ID8_BFD" /><!-- requires 20241018GT_KSW -->
+        <Item id="47" ui="KSW_BMW_ID8_KJD" /><!-- requires GT6-20240919 / GT7-20241019 -->
+        <Item id="49" ui="KSW_BMW_ID8_BFD" /><!-- requires GT6-20241018 / GT7-20241019 -->
+        <!-- <Item id="53" ui="KSW_BMW_ID8_GS_DOUBLE" /> not yet -->
 
-        <!-- <Item id="26" ui="COMMON_GS" /> Invalid ID -->
-        <!-- <Item id="34" ui="KSW_Common_UI_GS_UG" /> Invalid ID -->
-        <!-- <Item id="35" ui="KSW_Common_UI_GS_UG_1024" /> Invalid ID -->
+        <Item id="26" ui="COMMON_GS" /><!-- requires client GS -->
+        <Item id="34" ui="KSW_Common_UI_GS_UG" /><!-- requires client GS -->
+        <Item id="35" ui="KSW_Common_UI_GS_UG_1024" /><!-- requires client GS -->
 
         <Item id="25" ui="KSW_LANDROVER" />
         <Item id="32" ui="KSW_LANDROVER_BLUE_WHITE" />
-        <!-- <Item id="39" ui="KSW_LANDROVER_COPILOT" /> Invalid ID -->
+        <Item id="39" ui="KSW_LANDROVER_COPILOT" /><!-- requires client LS2682 -->
 
         <Item id="36" ui="LEXUS_UI" />
         <Item id="37" ui="LEXUS_LS_UI" />
-
-        <Item id="100" ui="KSW_SAILOR_T001" />
-        <Item id="101" ui="KSW_SAILOR_T002" />
-        <Item id="102" ui="KSW_SAILOR_T003" />
     </SupportUIList>
 
     <!-- Settings -->
@@ -407,8 +406,8 @@
             17: Türkçe / Turkish (TR)
             18: Tiếng Việt / Vietnamese (VI)
             19: Hrvatski / Croatian (HR)
-            20: Українська / Ukrainian (UK)
-            21: Čeština / Czech (CS)
+            20: Українська / Ukrainian (UK) - since GT6 20241018GT_KSW  GT7 20241019GT_KSW
+            21: Čeština / Czech (CS) - since GT6 20241129GT_KSW / GT7 20241214GT_KSW
         -->
         <languageSelection>2</languageSelection>
 
@@ -419,6 +418,7 @@
             1: Automatically synchronize GPS time
         -->
         <timeModeSelection>1</timeModeSelection>
+
         <!--
             Time format
             0: 12-hour system
@@ -429,10 +429,13 @@
         <!-- Volume setting -->
         <!-- Afterloading mode media volume 0~40 -->
         <androidMediaVolume>26</androidMediaVolume>
+
         <!-- After-installation mode call volume 0~40 -->
         <androidPhoneVolume>28</androidPhoneVolume>
+
         <!-- Original car mode call volume 0~40 -->
         <originalPhoneVolume>20</originalPhoneVolume>
+
         <!-- Original car mode navigation volume 0~40 -->
         <originalNaviVolume>20</originalNaviVolume>
 
@@ -447,23 +450,30 @@
             5: Dance
         -->
         <soundMode>0</soundMode>
+
         <!--
             Customized low, mid and treble, only effective in user mode,
-            other modes use the default -12~12 -->
+            other modes use the default -12~12
+        -->
         <userMode low = "0" middle = "0" high = "0" />
 
         <!-- System settings -->
         <!-- Reverse settings -->
         <!-- Front view mirror  0: Off  1: On -->
         <frontCameraMirror>0</frontCameraMirror>
+
         <!-- Reverse mirror  0: Off  1: On -->
         <rearCameraMirror>0</rearCameraMirror>
+
         <!-- Reverse track  0: Off  1: On -->
         <reversingTrack>1</reversingTrack>
+
         <!-- Reversing radar  0: Off  1: On -->
         <reversingRadar>1</reversingRadar>
+
         <!-- Reverse mute  0: Off  1: On -->
         <reversingMute>0</reversingMute>
+
         <!--
             Selection of reversing camera
             0: Aftermarket rear camera
@@ -472,12 +482,14 @@
             3: Android360 app
         -->
         <reversingCameraSelection>0</reversingCameraSelection>
+
         <!--
             Android camera selection
             0: 1080P
             1: 720P a13 and Android 360 optional, default 1080P
         -->
         <androidCameraSelection>0</androidCameraSelection>
+
         <!--
             Camera signal type
             0: Automatic detection
@@ -497,20 +509,24 @@
             1: Blocked
         -->
         <videoDrivingBan>0</videoDrivingBan>
+
         <!--
             Small light controls backlight brightness
             0: Control
             1: Not control
         -->
         <lightControlBrightness>0</lightControlBrightness>
+
         <!-- Backlight brightness 0~100 -->
         <backlightBrightness>70</backlightBrightness>
+
         <!--
             Night Backlight brightness UI setting enabed
             0: Disabled
             1: Enabled
         -->
         <backlightBrightnessNightShow>1</backlightBrightnessNightShow>
+
         <!-- Night Backlight brightness 0~100 -->
         <backlightBrightnessNight>70</backlightBrightnessNight>
 
@@ -521,8 +537,10 @@
             1: Original car Bluetooth
         -->
         <btSelection>0</btSelection>
+
         <!-- GT6 microphone gain -16~16 -->
         <micGainGT6>8</micGainGT6>
+
         <!-- GT7 microphone gain -16~16 -->
         <micGainGT7>6</micGainGT7>
 
@@ -533,6 +551,7 @@
             1: Imperial unit
         -->
         <unitDistance>0</unitDistance>
+
         <!--
             Oil quantity unit
             0: L
@@ -540,6 +559,7 @@
             2: gal(UK)
         -->
         <unitOil>0</unitOil>
+
         <!--
             Temperature unit (no need to configure this on ID8 theme)
             0: Celsius
@@ -555,6 +575,7 @@
             2: USB DVR
         -->
         <dvrSelection>1</dvrSelection>
+
         <!-- USB DVR APP -->
         <usbDvrApp>com.ankai.cardvr</usbDvrApp>
 
@@ -565,6 +586,7 @@
             1: On
         -->
         <autoAux>1</autoAux>
+
         <!--
             AUX switching plan
             1: Plan A
@@ -572,13 +594,16 @@
             3: Customized
         -->
         <auxProgram>2</auxProgram>
+
         <!-- Original car AUX item position 1 0~12 -->
         <auxPosition1>2</auxPosition1>
+
         <!-- Original car AUX item position 2 0~12 -->
         <auxPosition2>2</auxPosition2>
 
         <!-- Default music app -->
         <musicPlayer>com.szchoiceway.musicplayer</musicPlayer>
+
         <!-- Default video app -->
         <videoPlayer>com.szchoiceway.videoplayer</videoPlayer>
 
@@ -590,6 +615,7 @@
             2: Android interface
         -->
         <bootModeMemory>0</bootModeMemory>
+
         <!--
             Whether to use 8953 to replace the version number
             0: No
@@ -610,52 +636,70 @@
             1: Reading USB disk
         -->
         <usbHostMode>1</usbHostMode>
+
         <!-- CarAuto app visibility  0: Hide  1: Show -->
         <carAutoVisible>1</carAutoVisible>
+
         <!-- Huawei HiCar app visibility  0: Hide  1: Show -->
         <hicarVisible>0</hicarVisible>
+
         <!-- Google app visibility  0: Hide  1: Show -->
         <googleVisible>1</googleVisible>
+
         <!-- Aux app visibility  0: Hide  1: Show -->
         <auxVisible>0</auxVisible>
+
         <!-- DTV app visibility  0: Hide  1: Show -->
         <dtvVisible>0</dtvVisible>
+
         <!-- Wing Truck Network app visibility  0: Hide  1: Show -->
         <ecar>0</ecar>
+
         <!-- ES File Explorer app visibility  0: Hide  1: Show -->
         <esExplorer>1</esExplorer>
+
         <!-- User Manual app visibility  0: Hide  1: Show -->
         <userManual>0</userManual>
+
         <!-- Sound Effect app visibility  0: Hide  1: Show -->
         <eqVisible>1</eqVisible>
+
         <!-- Weather app visibility  0: Hide  1: Show -->
         <weatherVisible>1</weatherVisible>
+
         <!-- Forward view  0: Close  1: Open -->
         <frontCamera>0</frontCamera>
+
         <!-- Screencast MS9120 app visibility  0: Hide  1: Show -->
         <screenCastVisible>0</screenCastVisible>
+
         <!--
             Whether the Bentley background color is displayed in the application list
             0: Hide
             1: Show (only when theme KSW_AUDI_BENTLEY with ID 40 is activated)
         -->
         <bentleyBgVisible>0</bentleyBgVisible>
+
         <!-- Whether touch data is sent continuously  0: No  1: Yes -->
         <touchData>0</touchData>
+
         <!--
             Amplifier selection
             0: Original car amplifier
             1: External amplifier box
         -->
         <amplifierSelection>0</amplifierSelection>
+
         <!-- Whether to use the left front speaker  0: Use  1: Not use -->
         <useHorn>0</useHorn>
+
         <!--
             Whether the original car icon of Mercedes-Benz UI uses the SUV icon
             0: Do not use
             1: Use
         -->
         <benzOriginalCarIconSuv>0</benzOriginalCarIconSuv>
+
         <!--
             Dual Bluetooth machine Bluetooth transmission switch
             0: Close (use the car microphone)
@@ -663,6 +707,7 @@
             Default 0 Close
         -->
         <doubleBtTransmit>0</doubleBtTransmit>
+
         <!--
             Sound chip
             0: BD37033+Sound APP
@@ -670,12 +715,16 @@
             2: Audio DSP-A
         -->
         <soundProcessorChip>0</soundProcessorChip>
+
         <!-- Car KTV 0: Close 1: Open -->
         <carKTV>0</carKTV>
+
         <!-- Secondary screen application 0: Domestic 1: Overseas -->
         <sLauncherAppOverseas>0</sLauncherAppOverseas>
+
         <!-- Whether the external USB Bluetooth transmitter box App is displayed in the application list 0: Hide 1: Display -->
         <btTransmitVisible>0</btTransmitVisible>
+
         <!-- Automatically enter navigation when booting 0: Off 1: On -->
         <bootStartNavi>0</bootStartNavi>
 
@@ -686,12 +735,14 @@
             1: No display screen
         -->
         <notHaveScreen>0</notHaveScreen>
+
         <!--
             Knob type
             0: Knob A
             1: Knob B
         -->
         <iDriverType>0</iDriverType>
+
         <!--
             360 camera type
             0: CVBS camera
@@ -706,22 +757,27 @@
             2: Gear type 3
         -->
         <gearType>0</gearType>
+
         <!--
             Steering wheel track selection
             0: Track 1
             1: Track 2
         -->
         <wheelTrack>0</wheelTrack>
+
         <!--
             Reverse exit time
             0: Choose to exit according to the original vehicle agreement
             1: Customize the exit time (see next option)
         -->
         <backcarTimeSelection>0</backcarTimeSelection>
+
         <!-- Customized reversing exit time 0~10 -->
         <backcarTime>3</backcarTime>
+
         <!-- Driving position  0: Left  1: Right -->
         <driverSeat>0</driverSeat>
+
         <!--
             Number of doors
             0: 4 doors
@@ -729,12 +785,14 @@
             2: No doors shown
         -->
         <doorAmount>0</doorAmount>
+
         <!--
             Speed type selection
             0: Speed type 1
             1: Speed type 2
         -->
         <speedType>0</speedType>
+
         <!--
             360 startup camera
             0: Not using the camera
@@ -742,30 +800,35 @@
             2: Original car camera
         -->
         <bootCamera>0</bootCamera>
+
         <!--
             Turn signal control
             0: Uncontrolled
             1: Controlled
         -->
         <corneringLampControl>0</corneringLampControl>
+
         <!--
             MIC external and internal switching
             0: External
             1: Internal
         -->
         <micType>1</micType>
+
         <!--
             LCD LVDS mode
             0: VESA
             1: JEIDA Default VESA
         -->
         <lvdsMode>0</lvdsMode>
+
         <!-- LCD CLK polarity  0: L  1: H -->
         <lcdClkPolarity>0</lcdClkPolarity>
 
         <!-- Car settings are selected according to the car manufacturer -->
         <!-- Mercedes-Benz, Audi, Lexus air conditioning display  0: Hide  1: Show -->
         <airVisible>0</airVisible>
+
         <!--
             Mercedes-Benz control panel
             0: Off
@@ -773,6 +836,7 @@
             2: NTG3.0
         -->
         <benzControl>0</benzControl>
+
         <!--
             Audi homepage left widget
             0: Hide
@@ -787,6 +851,7 @@
             9: Q7
         -->
         <audiGt6LeftCarIcon>2</audiGt6LeftCarIcon>
+
         <!--
             Audi homepage right widget
             0: Hide
@@ -796,6 +861,7 @@
             4: Show music information
         -->
         <audiGt6RightWidget>1</audiGt6RightWidget>
+
         <!--
             Original car LVDS chip type Mercedes-Benz
             0: NTG5.0
@@ -804,14 +870,17 @@
             1: MIB_HIGHT
         -->
         <originalLvdsChipType>0</originalLvdsChipType>
+
         <!--
             Lexus air conditioning control
             0: Uncontrolled
             1: Controlled
         -->
         <lexusAirControl>0</lexusAirControl>
+
         <!-- Lexus original car FM  0: Hide  1: Show -->
         <lexusOriginFM>0</lexusOriginFM>
+
         <!--
             Land Rover host selection
             0: Bosch host capacitive screen
@@ -820,10 +889,13 @@
             3: Harman host
         -->
         <lrHostSelection>0</lrHostSelection>
+
         <!-- Land Rover square control type  0: Lin  1: ADC -->
         <lrWheelSelection>1</lrWheelSelection>
+
         <!-- Land Rover left button panel 0, 1, 2, 3, 4 -->
         <lrLeftPanelSelection>3</lrLeftPanelSelection>
+
         <!-- Land Rover right button panel 0, 1, 2 -->
         <lrRightPanelSelection>1</lrRightPanelSelection>
 
@@ -834,12 +906,14 @@
             1: Original car navigation
         -->
         <mapSelection>0</mapSelection>
+
         <!--
             MODE key selection
             0: effective
             1: ineffective
         -->
         <modeSelection>0</modeSelection>
+
         <!--
             Voice key selection
             0: No effect
@@ -849,6 +923,7 @@
             4: Hicar voice function button
         -->
         <voiceSelection>2</voiceSelection>
+
         <!--
             Phone button selection
             0: Original car function
@@ -856,6 +931,7 @@
             2: Undefined
         -->
         <phoneSelection>1</phoneSelection>
+
         <!--
             Dashboard selection
             0: Current UI dashboard
@@ -865,22 +941,27 @@
 
         <!-- Original car model display selection -->
         <carTypeSelection>8</carTypeSelection>
+
         <!-- Can protocol selection -->
         <canProtocolSelection>0</canProtocolSelection>
+
         <!-- Theme ID, use a value from `SupportUIList` -->
         <uiSelection>23</uiSelection>
+
         <!--
             Boot logo, whether to use the default boot logo
             0: Not used
             1: Used
         -->
         <bootLogoRestore>0</bootLogoRestore>
+
         <!--
             Whether to display the KSW logo on the first page of the car logo setting
             0: Hide the logo
             1: Show the logo
         -->
         <ksw_logo>0</ksw_logo>
+
         <!-- An offset (?) -->
         <AnOffset>0</AnOffset>
     </factory>

@@ -1,9 +1,13 @@
 ---
 id: ALS_ID6_UI
-display: "BMW ID6 ALS"
-tags: ["bmw", "bmw-id6", "bmw-evo", "als"]
+display: BMW ID6 ALS
+tags:
+  - bmw
+  - bmw-id6
+  - bmw-evo
+  - als
 images:
-  - "./home.png"
-  - "./settings.png"
+  - ./home.png
+  - ./settings.png
 since: "Ksw-Q-Userdebug_OS_v1.9.1-ota"
 ---

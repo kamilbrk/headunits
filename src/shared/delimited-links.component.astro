@@ -1,0 +1,27 @@
+---
+import type { LinkOrText } from './utilities';
+import LinkOrTextComponent from './link-or-text.component.astro';
+
+interface Props {
+    items: LinkOrText[];
+}
+
+const { items } = Astro.props;
+---
+<>
+    {items.length === 1 ? (
+        <LinkOrTextComponent item={items[0]!!} />
+    ) : items.length === 2 ? (
+        <><LinkOrTextComponent item={items[0]!!} /> and <LinkOrTextComponent item={items[1]!!} /></>
+    ) : (
+        <>
+            {items.slice(0, -1).map((item, index) => (
+                <>
+                    <LinkOrTextComponent item={item} />
+                    {index < items.length - 2 && ", "}
+                </>
+            ))}
+            and <LinkOrTextComponent item={items[items.length - 1]!!} />
+        </>
+    )}
+</>
