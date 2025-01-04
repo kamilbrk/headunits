@@ -1,13 +1,16 @@
 ---
 id: BMW_NBT_UI
-display: "BMW ID4 NBT"
-tags: ["bmw", "bmw-id4", "bmw-nbt"]
+display: BMW ID4 NBT
+tags:
+  - bmw
+  - bmw-id4
+  - bmw-nbt
 images:
-  - "./home.png"
-  - "./settings.png"
-  - "./settings-system.png"
-  - "./bt-music.png"
-  - "./system-info.png"
+  - ./home.png
+  - ./settings.png
+  - ./settings-system.png
+  - ./bt-music.png
+  - ./system-info.png
 since: "Ksw-Q-Userdebug_OS_v1.9.5-ota"
 ---
 Styled after 4th generation iDrive (Professional Navigation NBT), introduced in 2012.

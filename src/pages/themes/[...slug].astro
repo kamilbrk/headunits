@@ -1,11 +1,12 @@
 ---
-import { getEntry, render } from 'astro:content';
+import { getEntries, getEntry, render} from 'astro:content';
 import { Image } from 'astro:assets';
 import { Code } from 'astro:components';
 
 import { SHIKI_THEMES, URL_PREFIX } from "../../shared/config";
 import Layout from '../../shared/layout/base-layout.astro';
-import { getEntryStaticPathsFromCollection, getVendorSlug } from '../../shared/utilities';
+import DelimitedLinks from '../../shared/delimited-links.component.astro';
+import {getEntryStaticPathsFromCollection, getUpdateReferences, getVendorSlug} from '../../shared/utilities';
 
 export async function getStaticPaths() {
     return await getEntryStaticPathsFromCollection('themes');
@@ -14,6 +15,7 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', getVendorSlug(slug));
 const entry = await getEntry('themes', slug);
+const since = await getUpdateReferences(entry.data.since);
 const { Content } = await render(entry);
 ---
 <Layout title={`${entry.data.display || entry.data.id}`}>
@@ -27,11 +29,14 @@ const { Content } = await render(entry);
 
     <div class="prose dark:prose-invert break-words">
         {entry.data.invalid && (
-                <p>This theme appears to be invalid, so we do not recommend activating it.</p>
+            <p>This theme appears to be invalid, so we do not recommend activating it.</p>
         )}
 
-        {entry.data.since && (
-            <p>This theme was introduced in update <code>{entry.data.since}</code>, therefore it might not be available to activate on older firmwares.</p>
+        {since.length > 0 && (
+            <p>
+                This theme was introduced in {since.length === 1 ? "update" : "updates"}
+                <DelimitedLinks items={since} />, therefore it might not be available to activate on earlier firmwares.
+            </p>
         )}
 
         {entry.data.client && (
@@ -46,6 +51,6 @@ const { Content } = await render(entry);
 
         <Content />
 
-        <a href={`${URL_PREFIX}themes/${vendor.id}`}>Back to all {vendor.data.name} themes</a>
+        <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`}>Back to all {vendor.data.name} themes</a>
     </div>
 </Layout>

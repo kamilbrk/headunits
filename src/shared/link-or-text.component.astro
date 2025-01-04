@@ -1,0 +1,16 @@
+---
+import type { LinkOrText } from "./utilities";
+
+interface Props {
+    item: LinkOrText;
+}
+
+const { item } = Astro.props;
+---
+<>
+    {typeof item === 'string' ? (
+        item
+    ) : (
+        <a href={item.href}>{item.text}</a>
+    )}
+</>

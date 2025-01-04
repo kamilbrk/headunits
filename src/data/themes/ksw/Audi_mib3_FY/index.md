@@ -1,10 +1,12 @@
 ---
 id: Audi_mib3_FY
-display: "Audi MIB3 FY"
-tags: ["audi", "audi-mib3"]
+display: Audi MIB3 FY
+tags:
+  - audi
+  - audi-mib3
 images:
-  - "./home.png"
-  - "./settings.png"
+  - ./home.png
+  - ./settings.png
 since: "Ksw-Q-Userdebug_OS_v3.4.7-ota"
-client: "ALS_6208"
+client: ALS_6208
 ---

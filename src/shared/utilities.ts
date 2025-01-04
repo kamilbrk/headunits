@@ -1,15 +1,16 @@
-import { type CollectionEntry, type CollectionKey, getCollection } from 'astro:content';
+import {type CollectionEntry, type CollectionKey, getCollection, getEntry } from 'astro:content';
+import {URL_PREFIX} from "@shared/config.ts";
 
 export const ANDROID_VERSIONS: Record<string, number> = {
-  N: 7,
-  O: 8,
-  P: 9,
-  Q: 10,
-  R: 11,
-  S: 12,
-  T: 13,
-  U: 14,
-  V: 15
+  N: 7, // Nougat, New York Cheesecake
+  O: 8, // Oreo, Oatmeal Cookie
+  P: 9, // Pie, Pistachio Ice Cream
+  Q: 10, // Quince Tart
+  R: 11, // Red Velvet Cake
+  S: 12, // Snow Cone
+  T: 13, // Tiramisu
+  U: 14, // Upside Down Cake
+  V: 15, // Vanilla Ice Cream
 };
 
 export type EntryStaticPath<C extends CollectionKey> = {
@@ -24,6 +25,10 @@ type CollectionTree<C extends CollectionKey> = {
 type CollectionEntryWithEntries<P extends CollectionKey, C extends CollectionKey> = CollectionEntry<P> & {
   entries: CollectionEntry<C>[];
 };
+
+export type ReferenceOrString = Array<{ collection: string, id: string } | string>;
+
+export type LinkOrText = ({ href: string; text: string }) | string;
 
 export function getTreeFromCollection<C extends CollectionKey>(collection: CollectionEntry<C>[]) {
   const tree: CollectionTree<C> = {};
@@ -126,4 +131,18 @@ export function getVendorSlug(slug: string) {
 
 export function getPlatformSlug(slug: string) {
   return slug.slice(0, slug.lastIndexOf('/'));
+}
+
+export async function getUpdateReferences(since: ReferenceOrString = []) {
+  return await Promise.all(since.filter(Boolean).map(async ref => {
+    const id = typeof ref === 'string' ? ref : ref.id;
+    if (!id.includes('/')) return id;
+
+    const entry = await getEntry('updates', id);
+
+    return {
+      href: `${URL_PREFIX}updates/${entry.id}`,
+      text: `${entry.data.vendor === 'zxw' ? `${entry.data.platform.toUpperCase()} ` : ''}${entry.data.id}`
+    };
+  }));
 }

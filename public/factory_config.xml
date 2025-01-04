@@ -7,8 +7,9 @@
         more information. Never use this entire file as-is. Instead, you should
         use parts of this example file to adjust and maintain your own version.
 
-        Last updated on 2024-11-24 by kamilbrk
-        https://kamilbrk.github.io/headunits/factory-settings/ksw/
+        Last updated on 2025-01-04 by kamilbrk
+        https://kamilbrk.github.io/headunits/factory-settings/ksw
+
         Originally based on Kri's versions for A10 3.9.4
         https://f30.bimmerpost.com/forums/showthread.php?t=1699764
     -->
@@ -231,18 +232,18 @@
         <Item id="1" name="Audi_MMI_4G" display="Audi MMI 4G" />
         <Item id="1" name="Audi_mib3" display="Audi MIB3" />
         <Item id="1" name="UI_mib3_V2"  display="Audi MIB3 V2" />
-        <Item id="1" name="Audi_mib3_ty" display="Audi MIB3 TY" /><!-- requires client set to ALS_6208 -->
-        <Item id="1" name="Audi_mib3_FY" display="Audi MIB3 FY" /><!-- requires client set to ALS_6208 -->
-        <Item id="1" name="Audi_mib3_FY_V2" display="Audi MIB3 FY V2" /><!-- requires client set to ALS_6208 -->
+        <Item id="1" name="Audi_mib3_ty" display="Audi MIB3 TY" /><!-- requires client ALS_6208 -->
+        <Item id="1" name="Audi_mib3_FY" display="Audi MIB3 FY" /><!-- requires client ALS_6208 -->
+        <Item id="1" name="Audi_mib3_FY_V2" display="Audi MIB3 FY V2" /><!-- requires client ALS_6208 -->
 
         <Item id="1" name="BMW_NBT_UI" display="BMW ID4 NBT" />
         <Item id="1" name="BMW_EVO_ID5" display="BMW ID5 EVO" />
         <Item id="1" name="BMW_EVO_ID6" display="BMW ID6 EVO" />
-        <Item id="1" name="BMW_EVO_ID6_CUSP" display="BMW ID6 EVO CUSP" />
+        <Item id="1" name="BMW_EVO_ID6_CUSP" display="BMW ID6 EVO CUSP" /><!-- requires client CUSP_210407 -->
         <Item id="1" name="BMW_EVO_ID6_GS" display="BMW ID6 EVO GS" />
         <Item id="1" name="ALS_ID6_UI" display="BMW ID6 ALS" />
         <Item id="1" name="BMW_EVO_ID7" display="BMW ID7 EVO" />
-        <Item id="1" name="BMW_EVO_ID7_V2" display="BMW ID7 EVO V2" /><!-- requires client set to ALS_6208 -->
+        <Item id="1" name="BMW_EVO_ID7_V2" display="BMW ID7 EVO V2" /><!-- requires client ALS_6208 -->
         <Item id="1" name="BMW_EVO_ID7_HiCar" display="BMW ID7 EVO HiCar" />
         <Item id="1" name="UI_KSW_ID7" display="BMW ID7 KSW" />
         <Item id="1" name="ALS_ID7_UI" display="BMW ID7 ALS" />
@@ -266,7 +267,7 @@
         <Item id="1" name="Benz_NTG5" display="Benz NTG5" />
         <Item id="1" name="Benz_NTG6" display="Benz NTG6 (AVIN8)" />
         <Item id="1" name="Benz_NTG6_FY" display="Benz NTG6 FY" />
-        <Item id="1" name="UI_NTG6_FY_V2" display="Benz NTG6 FY V2" /><!-- requires client set to ALS_6208 -->
+        <Item id="1" name="UI_NTG6_FY_V2" display="Benz NTG6 FY V2" /><!-- requires client ALS_6208 -->
         <Item id="1" name="UI_NTG6_FY_V3" display="Benz NTG6 FY V3" />
 
         <Item id="1" name="Common_UI_GS" display="Common GS (AVIN8)" />

@@ -1,8 +1,10 @@
 ---
 id: Audi_MMI_4G
-display: "Audi MMI 4G"
-tags: ["audi", "audi-mmi"]
+display: Audi MMI 4G
+tags:
+  - audi
+  - audi-mmi
 images:
-  - "./home.png"
-  - "./settings.png"
+  - ./home.png
+  - ./settings.png
 ---
