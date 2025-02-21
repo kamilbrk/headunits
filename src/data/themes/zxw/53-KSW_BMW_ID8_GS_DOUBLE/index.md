@@ -6,6 +6,7 @@ tags:
   - bmw
   - bmw-id8
   - bmw-gs
+client: GS
 since:
   - zxw/gt6/20241129gt_ksw
   - zxw/gt7/20241214gt_ksw
