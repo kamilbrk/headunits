@@ -4,7 +4,7 @@ import { getCollection, getEntry } from 'astro:content';
 
 import { SHIKI_THEMES, URL_PREFIX } from "../../shared/config";
 import Layout from '../../shared/layout/base-layout.astro';
-import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
+import { getFirstLevelStaticPathsFromCollection, sortEntriesById } from '../../shared/utilities';
 import FactorySettingsSection from './_section.component.astro';
 
 export async function getStaticPaths() {
@@ -20,7 +20,7 @@ const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
 ---
 <Layout title=`Factory settings for ${vendor.data.name}`>
     <article class="prose dark:prose-invert">
-        {entries.length ? entries.map(entry => (
+        {entries.length ? entries.sort(sortEntriesById).map(entry => (
             <FactorySettingsSection slug={entry.id} />
         )) : (
             <p>We don't have any descriptions for factory settings for this vendor yet.</p>

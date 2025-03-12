@@ -1,5 +1,7 @@
 ---
+import './tailwind.css'
 import './global.scss';
+
 import Navigation from './navigation.component.astro';
 import { DEFAULT_PAGE_TITLE, DEFAULT_PAGE_DESCRIPTION } from "../config";
 
@@ -34,7 +36,7 @@ const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
   <body x-data="{ sidebar: false }" class="bg-white dark:bg-gray-900">
     <Navigation title={title} />
 
-    <main class="py-8 lg:pl-72 max-w-screen-2xl">
+    <main class="py-8 lg:pl-72 max-w-(--breakpoint-2xl)">
       <div class="px-4 sm:px-6 lg:px-8">
         {title !== DEFAULT_PAGE_TITLE && (
           <h2 class="pb-8 text-gray-900 dark:text-white leading-7 font-bold text-2xl sm:tracking-tight sm:text-3xl">{title}</h2>
@@ -44,7 +46,7 @@ const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
     </main>
 
     <div class="fixed inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]" aria-hidden="true">
-      <div class="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"></div>
+      <div class="relative left-[calc(50%+3rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"></div>
     </div>
   </body>
 </html>

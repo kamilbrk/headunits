@@ -14,7 +14,6 @@
     ".astro/types.d.ts",
     "astro.config.ts",
     ".eslintrc.cjs",
-    "tailwind.config.ts",
     "src"
   ],
   "exclude": ["dist"]

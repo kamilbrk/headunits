@@ -97,6 +97,14 @@ export function sortEntriesByDate<E extends CollectionKey>(entryA: CollectionEnt
   return +new Date(entryB.data.date) - +new Date(entryA.data.date);
 }
 
+export function sortEntriesById<E extends CollectionKey>(entryA: CollectionEntry<E>, entryB: CollectionEntry<E>) {
+  return entryA.id.localeCompare(entryB.id);
+}
+
+export function sortEntriesByDataId<E extends CollectionKey>(entryA: CollectionEntry<E>, entryB: CollectionEntry<E>) {
+  return entryA.data.id.localeCompare(entryB.data.id);
+}
+
 const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-.+v(.+)-ota/;
 const REGEX_ZXW = /(\d{8})GT_KSW/;
 

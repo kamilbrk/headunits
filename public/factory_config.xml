@@ -400,7 +400,11 @@
         -->
         <UI_type>BMW_EVO_ID7_V2</UI_type>
 
-        <!-- Original display style  0：full screen display  1：Half screen display, driving computer information on the right -->
+        <!--
+            Original display style
+            0：full screen display
+            1：Half screen display, driving computer information on the right
+        -->
         <CarVideoDisplayStyle>0</CarVideoDisplayStyle>
 
         <!--

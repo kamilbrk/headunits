@@ -722,7 +722,12 @@
         <!-- Secondary screen application 0: Domestic 1: Overseas -->
         <sLauncherAppOverseas>0</sLauncherAppOverseas>
 
-        <!-- Whether the external USB Bluetooth transmitter box App is displayed in the application list 0: Hide 1: Display -->
+        <!--
+            Whether the external USB Bluetooth transmitter box App is displayed
+            in the application list
+            0: Hide
+            1: Display
+        -->
         <btTransmitVisible>0</btTransmitVisible>
 
         <!-- Automatically enter navigation when booting 0: Off 1: On -->
@@ -826,7 +831,11 @@
         <lcdClkPolarity>0</lcdClkPolarity>
 
         <!-- Car settings are selected according to the car manufacturer -->
-        <!-- Mercedes-Benz, Audi, Lexus air conditioning display  0: Hide  1: Show -->
+        <!--
+            Mercedes-Benz, Audi, Lexus air conditioning display
+            0: Hide
+            1: Show
+        -->
         <airVisible>0</airVisible>
 
         <!--

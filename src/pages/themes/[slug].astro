@@ -2,7 +2,7 @@
 import { getCollection, getEntry } from 'astro:content';
 
 import Layout from '../../shared/layout/base-layout.astro';
-import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
+import { getFirstLevelStaticPathsFromCollection, sortEntriesByDataId } from '../../shared/utilities';
 import ThemesListItem from "./_list-item.component.astro";
 
 export async function getStaticPaths() {
@@ -12,13 +12,12 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', slug);
 const entries = await getCollection('themes', entry => entry.id.startsWith(slug))
-entries.sort((a, b) => a.data.id.localeCompare(b.data.id));
 ---
 <Layout title=`Themes for ${vendor.data.name}`>
     {entries.length ? (
         <div class="lg:col-span-3">
             <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 xl:gap-x-8 xl:grid-cols-3">
-                {entries.map(entry => (
+                {entries.sort(sortEntriesByDataId).map(entry => (
                     <ThemesListItem theme={entry}></ThemesListItem>
                 ))}
             </div>
