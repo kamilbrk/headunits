@@ -1,9 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 body {
-  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 [x-cloak] { display: none !important; }
@@ -11,34 +7,9 @@ body {
 //noinspection CssUnusedSymbol
 html.dark .astro-code,
 html.dark .astro-code span {
-  color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
-  font-style: var(--shiki-dark-font-style) !important;
-  font-weight: var(--shiki-dark-font-weight) !important;
-  text-decoration: var(--shiki-dark-text-decoration) !important;
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
 }
-
-:root {
-  /*
-    https://tailwindcss.com/docs/customizing-colors
-  */
-  //--primary: #262626; // neutral-800
-  //--secondary: #171717; // neutral-900
-  //--tertiary: #404040; // neutral-700
-  //--color-dark: #303030;
-  //--color-light: #f3f3f3;
-  //--accent-primary: #2563eb; // blue-600
-  //--accent-primary-state: #1e40af; // blue-800
-}
-
-
-//@layer base {
-//  html,
-//  body {
-//    @apply h-full w-full;
-//  }
-//
-//  body {
-//    @apply bg-primary text-color-light;
-//  }
-//}

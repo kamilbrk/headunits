@@ -31,14 +31,14 @@ const { Content } = await render(entry);
     {(previous || next) && (
         <div class="flex max-sm:justify-between mb-4 select-none">
             {previous && (
-                <a href={`${URL_PREFIX}${entry.collection}/${previous.id}`} class="self-start bg-slate-800 text-white py-2 pl-2 pr-4 rounded inline-flex items-center">
+                <a href={`${URL_PREFIX}${entry.collection}/${previous.id}`} class="self-start bg-slate-800 text-white py-2 pl-2 pr-4 rounded-sm inline-flex items-center">
                     <ChevronLeft class="w-6 h-6" />
                     {getUpdateVersion(previous)}
                 </a>
             )}
 
             {next && (
-                <a href={`${URL_PREFIX}${entry.collection}/${next.id}`} class="self-end bg-slate-800 text-white ml-4 py-2 pr-2 pl-4 rounded inline-flex items-center first:last:ml-0">
+                <a href={`${URL_PREFIX}${entry.collection}/${next.id}`} class="self-end bg-slate-800 text-white ml-4 py-2 pr-2 pl-4 rounded-sm inline-flex items-center first:last:ml-0">
                     {getUpdateVersion(next)}
                     <ChevronRight class="w-6 h-6" />
                 </a>
