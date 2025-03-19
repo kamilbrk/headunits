@@ -148,8 +148,8 @@
 
     <!-- Types of OEM screens - example values for BMW -->
     <CarDisplayParam>
-        <model id = "1">[01]NBT_F30/F20/F15/F22/F48(6.5″,HalfScreen)</model>
-        <model id = "7">[02]NBT_F30/F20/F15/F22/F48(6.5″,FullScreen)</model>
+        <model id = "1">[01]NBT_F30/F20/F15/F22/F48/F49(6.5″,HalfScreen)</model>
+        <model id = "7">[02]NBT_F30/F20/F15/F22/F48/F49(6.5″,FullScreen)</model>
         <model id = "9">[03]NBT_F30/F20/F15/F22/F48(8.8″,10.25″)</model>
 
         <model id = "4">[04]CIC_E60/E90(2012)/E83(6.5,HalfScreen)</model>
@@ -163,12 +163,19 @@
         <model id = "3">[11]CCC_E60/E90(8.8″,FullScreen)</model>
         <model id = "14">[12]CCC_E60/E90(2010)(8.8″,FullScreen)</model>
         <model id = "18">[13]CCC_E60/E90(2008)(6.5″,FullScreen)</model>
+        <model id = "33">[14]CCC_E60(2004)_JP(8.8″,FullScreen)</model>
 
-        <model id = "15">[14]CCC_E65/E66_7Series(2005)(8.8″)</model>
-        <model id = "16">[15]CCC_E65/E66_7Series(2005)(6.5″,FullScreen)</model>
-        <model id = "17">[16]CCC_E65/E66_7Series(2005)(6.5″,HalfScreen)</model>
+        <model id = "15">[15]CCC_E65/E66_7Series(2005)(8.8″)</model>
+        <model id = "16">[16]CCC_E65/E66_7Series(2005)(6.5″,FullScreen)</model>
+        <model id = "17">[17]CCC_E65/E66_7Series(2005)(6.5″,HalfScreen)</model>
 
-        <model id = "32">[17]05_E83(VGA,FullScreen)</model>
+        <model id = "32">[18]05_E83(VGA,FullScreen)</model>
+
+        <model id = "13">[19]18_EVO(6.5,HalfScreen)</model>
+        <model id = "19">[20]18_EVO(6.5,FullScreen)</model>
+        <model id = "20">[21]18_EVO(8.8)</model>
+        <model id = "21">[22]18_EVO_X1(8.8,1280x480)</model>
+        <model id = "22">[23]19_EVO_X3(10.25, 1440x540)</model>
     </CarDisplayParam>
 
     <!-- Types of OEM screens - example values for Benz
