@@ -20,5 +20,8 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()]
+  },
+  experimental: {
+    preserveScriptOrder: true
   }
 });
