@@ -359,6 +359,8 @@
         <Item id="33" ui="KSW_MBUX_1024" />
         <Item id="51" ui="KSW_BENZ_NTG7" /><!-- requires GT6-20241129 / GT7-20241214 -->
         <Item id="52" ui="KSW_BENZ_VITO" /><!-- requires GT6-20241129 / GT7-20241214 -->
+        <Item id="54" ui="KSW_BENZ_GLC" /><!-- requires GT6-20250307 / GT7-20250104 -->
+        <Item id="55" ui="KSW_BENZ_FY3" /><!-- requires GT6-20250307 / GT7-20250325  -->
 
         <Item id="42" ui="KSW_BMW_ID6" />
 
@@ -372,7 +374,8 @@
         <Item id="41" ui="KSW_BMW_ID8_COPILOT" />
         <Item id="47" ui="KSW_BMW_ID8_KJD" /><!-- requires GT6-20240919 / GT7-20241019 -->
         <Item id="49" ui="KSW_BMW_ID8_BFD" /><!-- requires GT6-20241018 / GT7-20241019 -->
-        <!-- <Item id="53" ui="KSW_BMW_ID8_GS_DOUBLE" /> not yet -->
+        <Item id="53" ui="KSW_BMW_ID8_GS_DOUBLE" /><!-- requires GT6-20250307 / GT7-20241214 -->
+        <!-- <Item id="56" ui="KSW_BMW_ID9" /> not yet -->
 
         <Item id="26" ui="COMMON_GS" /><!-- requires client GS -->
         <Item id="34" ui="KSW_Common_UI_GS_UG" /><!-- requires client GS -->
