@@ -24,7 +24,7 @@ const { Content } = await render(entry);
             <Image src={image} alt="" layout="responsive" />
         </div>
     )) : (
-        <p class="prose dark:prose-invert mb-4">We don't have any screenshots of this theme yet.</p>
+        <p class="prose dark:prose-invert mb-4">We don't have any screenshots of this theme yet. You can try to activate this theme, take some screenshots and contribute!</p>
     )}
 
     <div class="prose dark:prose-invert break-words">
@@ -40,7 +40,7 @@ const { Content } = await render(entry);
         )}
 
         {entry.data.client && (
-            <p>This theme requires client <code>{entry.data.client}</code> set in your factory config file. See the factory settings section for more information.</p>
+            <p>This theme requires client <code>{entry.data.client}</code> set in your factory config file. See the <a href={`${URL_PREFIX}factory-settings/${vendor.id}`}>factory settings</a> section for more information.</p>
         )}
 
         <p>To make this theme available for selection in your factory settings, you might need to modify your <code>{vendor.data.factoryConfigFileName}</code> file. Find the <Code lang="xml" code={`<SupportUIList />`} inline themes={SHIKI_THEMES} /> section and add the following line: {entry.data.number ? (

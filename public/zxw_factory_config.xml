@@ -339,51 +339,51 @@
         You can set theme by its ID with the `uiSelection` setting later
     -->
     <SupportUIList>
-        <Item id="45" ui="KSW_ALFA_ROMEO" /><!-- requires GT6-20240613 / GT7-20240525 -->
+        <Item id="45" ui="KSW_ALFA_ROMEO" /><!-- GT6-20240613 / GT7-20240525 -->
 
         <Item id="23" ui="KSW_AUDI" />
         <Item id="24" ui="KSW_AUDI_FY" />
         <Item id="27" ui="KSW_AUDI_TY" />
-        <Item id="29" ui="KSW_AUDI_CADILLAC" /><!-- requires client LHX2306 -->
+        <Item id="29" ui="KSW_AUDI_CADILLAC" /><!-- client LHX2306 -->
         <Item id="38" ui="KSW_GT6_AUDI" />
-        <Item id="40" ui="KSW_AUDI_BENTLEY" /><!-- requires client CK -->
+        <Item id="40" ui="KSW_AUDI_BENTLEY" /><!-- client CK -->
         <Item id="43" ui="KSW_AUDI_PORSCHE" />
 
-        <Item id="18" ui="KSW_BENZ" /><!-- UI_NTG6 -->
-        <Item id="21" ui="KSW_BENZ_NTG6_0_2021" /><!-- UI_NTG6_3 -->
+        <Item id="18" ui="KSW_BENZ" />
+        <Item id="21" ui="KSW_BENZ_NTG6_0_2021" />
         <Item id="22" ui="KSW_BENZ_FY" />
-        <Item id="46" ui="KSW_BENZ_FY_WITHOUT_WEATHER" /><!-- requires GT6-20240801 / GT7-20240812 -->
+        <Item id="46" ui="KSW_BENZ_FY_WITHOUT_WEATHER" /><!-- GT6-20240801 / GT7-20240812 -->
         <Item id="30" ui="KSW_BENZ_V1" />
-        <Item id="48" ui="KSW_BENZ_LS" /><!-- requires GT6-20240919 / GT7-20241019 -->
+        <Item id="48" ui="KSW_BENZ_LS" /><!-- GT6-20240919 / GT7-20241019 -->
         <Item id="31" ui="KSW_BENZ_NTG6_0_2021_V1" />
         <Item id="33" ui="KSW_MBUX_1024" />
-        <Item id="51" ui="KSW_BENZ_NTG7" /><!-- requires GT6-20241129 / GT7-20241214 -->
-        <Item id="52" ui="KSW_BENZ_VITO" /><!-- requires GT6-20241129 / GT7-20241214 -->
-        <Item id="54" ui="KSW_BENZ_GLC" /><!-- requires GT6-20250307 / GT7-20250104 -->
-        <Item id="55" ui="KSW_BENZ_FY3" /><!-- requires GT6-20250307 / GT7-20250325  -->
+        <Item id="51" ui="KSW_BENZ_NTG7" /><!-- GT6-20241129 / GT7-20241214 -->
+        <Item id="52" ui="KSW_BENZ_VITO" /><!-- GT6-20241129 / GT7-20241214, client QWST1127 -->
+        <Item id="54" ui="KSW_BENZ_GLC" /><!-- GT6-20250331 / GT7-20250104 -->
+        <Item id="55" ui="KSW_BENZ_FY3" /><!-- GT6-20250331 / GT7-20250325, client ALS_6208 -->
 
         <Item id="42" ui="KSW_BMW_ID6" />
 
         <Item id="16" ui="KSW_BMW_ID7" />
-        <Item id="50" ui="KSW_BMW_ID7_800" /><!-- requires GT6-20241018 / GT7-20241019 -->
-        <Item id="44" ui="KSW_COMMON_ID7" /><!-- requires GT6-20240613 / GT7-20240525 -->
-        <Item id="19" ui="KSW_PEMP_BMW_ID7" /><!-- requires client ALS_6208 -->
+        <Item id="50" ui="KSW_BMW_ID7_800" /><!-- GT6-20241018 / GT7-20241019 -->
+        <Item id="44" ui="KSW_COMMON_ID7" /><!-- GT6-20240613 / GT7-20240525 -->
+        <Item id="19" ui="KSW_PEMP_BMW_ID7" /><!-- client ALS_6208 -->
 
         <Item id="17" ui="KSW_BMW_ID8" />
-        <Item id="20" ui="KSW_PEMP_BMW_ID8" /><!-- requires client ALS_6208 -->
+        <Item id="20" ui="KSW_PEMP_BMW_ID8" /><!-- client ALS_6208 -->
         <Item id="41" ui="KSW_BMW_ID8_COPILOT" />
-        <Item id="47" ui="KSW_BMW_ID8_KJD" /><!-- requires GT6-20240919 / GT7-20241019 -->
-        <Item id="49" ui="KSW_BMW_ID8_BFD" /><!-- requires GT6-20241018 / GT7-20241019 -->
-        <Item id="53" ui="KSW_BMW_ID8_GS_DOUBLE" /><!-- requires GT6-20250307 / GT7-20241214 -->
-        <!-- <Item id="56" ui="KSW_BMW_ID9" /> not yet -->
+        <Item id="47" ui="KSW_BMW_ID8_KJD" /><!-- GT6-20240919 / GT7-20241019 -->
+        <Item id="49" ui="KSW_BMW_ID8_BFD" /><!-- GT6-20241018 / GT7-20241019 -->
+        <Item id="53" ui="KSW_BMW_ID8_GS_DOUBLE" /><!-- GT6-20250331 / GT7-20241214, client GS -->
+        <!-- <Item id="56" ui="KSW_BMW_ID9" /> GT6-20250331 / GT7-20250325, not ready yet -->
 
-        <Item id="26" ui="COMMON_GS" /><!-- requires client GS -->
-        <Item id="34" ui="KSW_Common_UI_GS_UG" /><!-- requires client GS -->
-        <Item id="35" ui="KSW_Common_UI_GS_UG_1024" /><!-- requires client GS -->
+        <Item id="26" ui="COMMON_GS" /><!-- client GS -->
+        <Item id="34" ui="KSW_Common_UI_GS_UG" /><!-- client GS -->
+        <Item id="35" ui="KSW_Common_UI_GS_UG_1024" /><!-- client GS -->
 
         <Item id="25" ui="KSW_LANDROVER" />
         <Item id="32" ui="KSW_LANDROVER_BLUE_WHITE" />
-        <Item id="39" ui="KSW_LANDROVER_COPILOT" /><!-- requires client LS2682 -->
+        <Item id="39" ui="KSW_LANDROVER_COPILOT" /><!-- client LS2682 -->
 
         <Item id="36" ui="LEXUS_UI" />
         <Item id="37" ui="LEXUS_LS_UI" />

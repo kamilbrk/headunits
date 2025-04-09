@@ -6,5 +6,6 @@ tags:
   - bmw
   - bmw-id9
 since:
+  - zxw/gt6/20250331gt_ksw
   - zxw/gt7/20250325gt_ksw
 ---
