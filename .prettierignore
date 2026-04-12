@@ -1,7 +1,5 @@
 # dependencies
 node_modules/
-.pnp
-.pnp.js
 
 # testing
 coverage/
@@ -20,9 +18,5 @@ npm-debug.log*
 # local env files
 .env*.local
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
-next-env.d.ts

@@ -4,10 +4,13 @@
     "type": "git",
     "url": "https://github.com/kamilbrk/headunits"
   },
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
-    "prettier": "prettier --write **/**/*.{astro,css,scss,js,cjs,mjs,ts,tsx}",
+    "prettier": "prettier --write **/*.{astro,css,js,ts,tsx}",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
@@ -18,7 +21,6 @@
     "@astrojs/check": "^0.9.8",
     "@astrojs/mdx": "^5.0.3",
     "@tailwindcss/vite": "^4.2.2",
-    "@types/alpinejs": "^3.13.11",
     "alpinejs": "^3.15.11",
     "astro": "^6.1.5",
     "astro-heroicons": "^2.1.5",
@@ -42,7 +44,6 @@
     "prettier": "^3.8.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "sass": "^1.99.0",
     "tailwindcss": "^4.2.2",
     "typescript-eslint": "^8.58.1"
   }
