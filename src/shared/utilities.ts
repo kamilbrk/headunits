@@ -1,5 +1,7 @@
-import {type CollectionEntry, type CollectionKey, getCollection, getEntry } from 'astro:content';
-import {URL_PREFIX} from "@shared/config.ts";
+import type { CollectionEntry, CollectionKey } from 'astro:content';
+
+import { URL_PREFIX } from '@shared/config.ts';
+import { getCollection, getEntry } from 'astro:content';
 
 export const ANDROID_VERSIONS: Record<string, number> = {
   N: 7, // Nougat, New York Cheesecake
@@ -10,25 +12,28 @@ export const ANDROID_VERSIONS: Record<string, number> = {
   S: 12, // Snow Cone
   T: 13, // Tiramisu
   U: 14, // Upside Down Cake
-  V: 15, // Vanilla Ice Cream
+  V: 15 // Vanilla Ice Cream
 };
 
 export type EntryStaticPath<C extends CollectionKey> = {
-  params: { slug: CollectionEntry<C>['id'] },
-  props: { entry: CollectionEntry<C> }
-}
+  params: { slug: CollectionEntry<C>['id'] };
+  props: { entry: CollectionEntry<C> };
+};
 
 type CollectionTree<C extends CollectionKey> = {
   [key: string]: CollectionTree<C> | CollectionEntry<C>;
-}
+};
 
-type CollectionEntryWithEntries<P extends CollectionKey, C extends CollectionKey> = CollectionEntry<P> & {
+type CollectionEntryWithEntries<
+  P extends CollectionKey,
+  C extends CollectionKey
+> = CollectionEntry<P> & {
   entries: CollectionEntry<C>[];
 };
 
-export type ReferenceOrString = Array<{ collection: string, id: string } | string>;
+export type ReferenceOrString = Array<{ collection: string; id: string } | string>;
 
-export type LinkOrText = ({ href: string; text: string }) | string;
+export type LinkOrText = { href: string; text: string } | string;
 
 export function getTreeFromCollection<C extends CollectionKey>(collection: CollectionEntry<C>[]) {
   const tree: CollectionTree<C> = {};
@@ -54,27 +59,34 @@ export function getTreeFromCollection<C extends CollectionKey>(collection: Colle
   return tree;
 }
 
-export async function getEntryStaticPathsFromCollection<C extends CollectionKey>(collectionKey: C): Promise<EntryStaticPath<C>[]> {
+export async function getEntryStaticPathsFromCollection<C extends CollectionKey>(
+  collectionKey: C
+): Promise<EntryStaticPath<C>[]> {
   const collection = await getCollection(collectionKey);
 
-  return collection.map(entry => ({
+  return collection.map((entry) => ({
     params: { slug: entry.id },
     props: { entry }
   }));
 }
 
-export async function getFirstLevelStaticPathsFromCollection<C extends CollectionKey>(collectionKey: C) {
+export async function getFirstLevelStaticPathsFromCollection<C extends CollectionKey>(
+  collectionKey: C
+) {
   const collection = await getCollection(collectionKey);
-  const firstLevelSlugs = collection.map(x => x.id.split('/')[0] as string);
+  const firstLevelSlugs = collection.map((x) => x.id.split('/')[0] as string);
   const unique = new Set(firstLevelSlugs);
 
-  return [...unique].map(folder => ({
+  return [...unique].map((folder) => ({
     params: { slug: folder },
     props: {}
   }));
 }
 
-export async function getCollectionGroupedByCollection<C extends CollectionKey, P extends CollectionKey>(
+export async function getCollectionGroupedByCollection<
+  C extends CollectionKey,
+  P extends CollectionKey
+>(
   childrenCollectionKey: C,
   parentsCollectionKey: P,
   filterFn?: (parent: CollectionEntryWithEntries<P, C>) => boolean
@@ -83,25 +95,34 @@ export async function getCollectionGroupedByCollection<C extends CollectionKey, 
   const parents: CollectionEntryWithEntries<P, C>[] = await getCollection(parentsCollectionKey);
 
   for (const parent of parents) {
-    parent.entries = children.filter(entry => entry.id.startsWith(parent.id));
+    parent.entries = children.filter((entry) => entry.id.startsWith(parent.id));
   }
-  
+
   if (filterFn) {
-    return parents.reverse().filter(x => filterFn(x));
+    return parents.reverse().filter((x) => filterFn(x));
   }
 
   return parents;
 }
 
-export function sortEntriesByDate<E extends CollectionKey>(entryA: CollectionEntry<E>, entryB: CollectionEntry<E>) {
+export function sortEntriesByDate<E extends CollectionKey>(
+  entryA: CollectionEntry<E>,
+  entryB: CollectionEntry<E>
+) {
   return +new Date(entryB.data.date) - +new Date(entryA.data.date);
 }
 
-export function sortEntriesById<E extends CollectionKey>(entryA: CollectionEntry<E>, entryB: CollectionEntry<E>) {
+export function sortEntriesById<E extends CollectionKey>(
+  entryA: CollectionEntry<E>,
+  entryB: CollectionEntry<E>
+) {
   return entryA.id.localeCompare(entryB.id);
 }
 
-export function sortEntriesByDataId<E extends CollectionKey>(entryA: CollectionEntry<E>, entryB: CollectionEntry<E>) {
+export function sortEntriesByDataId<E extends CollectionKey>(
+  entryA: CollectionEntry<E>,
+  entryB: CollectionEntry<E>
+) {
   return entryA.data.id.localeCompare(entryB.data.id);
 }
 
@@ -113,18 +134,27 @@ export function getAndroidVersion<E extends CollectionKey>(entry: CollectionEntr
 }
 
 export function getUpdateVersion<E extends CollectionKey>(entry: CollectionEntry<E>) {
-  return entry.data.version || entry.data.id?.match(REGEX_KSW)?.[2] || entry.data.id?.match(REGEX_ZXW)?.[1] || '?';
+  return (
+    entry.data.version ||
+    entry.data.id?.match(REGEX_KSW)?.[2] ||
+    entry.data.id?.match(REGEX_ZXW)?.[1] ||
+    '?'
+  );
 }
 
 type CollectionEntryWithPrevNext<C extends CollectionKey> = {
   entry: CollectionEntry<C> | undefined;
   previous: CollectionEntry<C> | undefined;
   next: CollectionEntry<C> | undefined;
-}
+};
 
-export async function getEntryWithPrevNext<C extends CollectionKey>(collectionKey: C, slug: string, filter?: (entry: CollectionEntry<C>) => boolean): Promise<CollectionEntryWithPrevNext<C>> {
+export async function getEntryWithPrevNext<C extends CollectionKey>(
+  collectionKey: C,
+  slug: string,
+  filter?: (entry: CollectionEntry<C>) => boolean
+): Promise<CollectionEntryWithPrevNext<C>> {
   const entries = await getCollection(collectionKey, filter);
-  const entry = entries.sort(sortEntriesByDate).find(entry => entry.id === slug);
+  const entry = entries.sort(sortEntriesByDate).find((entry) => entry.id === slug);
   if (!entry) return { entry: undefined, previous: undefined, next: undefined };
 
   const index = entries.indexOf(entry);
@@ -142,15 +172,17 @@ export function getPlatformSlug(slug: string) {
 }
 
 export async function getUpdateReferences(since: ReferenceOrString = []) {
-  return await Promise.all(since.filter(Boolean).map(async ref => {
-    const id = typeof ref === 'string' ? ref : ref.id;
-    if (!id.includes('/')) return id;
+  return await Promise.all(
+    since.filter(Boolean).map(async (ref) => {
+      const id = typeof ref === 'string' ? ref : ref.id;
+      if (!id.includes('/')) return id;
 
-    const entry = await getEntry('updates', id);
+      const entry = await getEntry('updates', id);
 
-    return {
-      href: `${URL_PREFIX}updates/${entry.id}`,
-      text: `${entry.data.vendor === 'zxw' ? `${entry.data.platform.toUpperCase()} ` : ''}${entry.data.id}`
-    };
-  }));
+      return {
+        href: `${URL_PREFIX}updates/${entry.id}`,
+        text: `${entry.data.vendor === 'zxw' ? `${entry.data.platform.toUpperCase()} ` : ''}${entry.data.id}`
+      };
+    })
+  );
 }

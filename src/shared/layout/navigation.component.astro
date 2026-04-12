@@ -1,11 +1,5 @@
 ---
-import { DEFAULT_PAGE_TITLE, ROOT, URL_PREFIX } from "../config";
-
-const { title } = Astro.props;
-const { vendor } = Astro.params;
-
 import Bars3 from 'astro-heroicons/outline/Bars3.astro';
-import BuildingStorefront from 'astro-heroicons/outline/BuildingStorefront.astro';
 import ChatBubbleLeftRight from 'astro-heroicons/outline/ChatBubbleLeftRight.astro';
 import Cog6Tooth from 'astro-heroicons/outline/Cog6Tooth.astro';
 import Folder from 'astro-heroicons/outline/Folder.astro';
@@ -13,118 +7,136 @@ import Home from 'astro-heroicons/outline/Home.astro';
 import QuestionMarkCircle from 'astro-heroicons/outline/QuestionMarkCircle.astro';
 import Swatch from 'astro-heroicons/outline/Swatch.astro';
 import XMark from 'astro-heroicons/outline/XMark.astro';
+
+import { DEFAULT_PAGE_TITLE, ROOT, URL_PREFIX } from '../config';
 import ColorSchemeSwitch from './color-scheme.component.astro';
 
+const { title } = Astro.props;
+const { vendor } = Astro.params;
+
 const menu = [
-    {
-        name: 'General',
-        children: [
-            { name: 'Home', path: '', icon: Home },
-            { name: 'Discord', path: 'https://discord.gg/Ex8e6qE2eR', icon: ChatBubbleLeftRight },
-            // { name: 'Apps', path: 'apps', icon: BuildingStorefront }
-        ]
-    },
-    {
-        name: 'KSW',
-        children: [
-            { name: 'Updates', path: 'updates/ksw', icon: Folder },
-            { name: 'Themes', path: 'themes/ksw', icon: Swatch },
-            { name: 'Factory settings', path: 'factory-settings/ksw', icon: Cog6Tooth },
-            { name: 'FAQ', path: 'faq/ksw', icon: QuestionMarkCircle },
-        ]
-    },
-    {
-        name: 'ZXW',
-        children: [
-            { name: 'Updates', path: 'updates/zxw', icon: Folder },
-            { name: 'Themes', path: 'themes/zxw', icon: Swatch },
-            { name: 'Factory settings', path: 'factory-settings/zxw', icon: Cog6Tooth },
-            { name: 'FAQ', path: 'faq/zxw', icon: QuestionMarkCircle },
-        ]
-    }
+  {
+    name: 'General',
+    children: [
+      { name: 'Home', path: '', icon: Home },
+      { name: 'Discord', path: 'https://discord.gg/Ex8e6qE2eR', icon: ChatBubbleLeftRight }
+      // { name: 'Apps', path: 'apps', icon: BuildingStorefront }
+    ]
+  },
+  {
+    name: 'KSW',
+    children: [
+      { name: 'Updates', path: 'updates/ksw', icon: Folder },
+      { name: 'Themes', path: 'themes/ksw', icon: Swatch },
+      { name: 'Factory settings', path: 'factory-settings/ksw', icon: Cog6Tooth },
+      { name: 'FAQ', path: 'faq/ksw', icon: QuestionMarkCircle }
+    ]
+  },
+  {
+    name: 'ZXW',
+    children: [
+      { name: 'Updates', path: 'updates/zxw', icon: Folder },
+      { name: 'Themes', path: 'themes/zxw', icon: Swatch },
+      { name: 'Factory settings', path: 'factory-settings/zxw', icon: Cog6Tooth },
+      { name: 'FAQ', path: 'faq/zxw', icon: QuestionMarkCircle }
+    ]
+  }
 ];
 
-const getLink = (path: string) => path.startsWith('http') ? path : `${URL_PREFIX}${path}`;
-const getTarget = (path: string) => path.startsWith('http') ? '_blank' : undefined;
+const getLink = (path: string) => (path.startsWith('http') ? path : `${URL_PREFIX}${path}`);
+const getTarget = (path: string) => (path.startsWith('http') ? '_blank' : undefined);
 const prefix = 'flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6';
 const suffixes = {
-    current: 'bg-gray-800 text-white',
-    default: 'text-gray-400 hover:bg-gray-800 hover:text-white'
+  current: 'bg-gray-800 text-white',
+  default: 'text-gray-400 hover:bg-gray-800 hover:text-white'
 };
 
 const isActive = (href: string) => {
-    return href === URL_PREFIX ?
-        Astro.url.pathname === URL_PREFIX :
-        Astro.url.pathname.startsWith(href)
+  return href === URL_PREFIX
+    ? Astro.url.pathname === URL_PREFIX
+    : Astro.url.pathname.startsWith(href);
 };
 
 const getClassName = (href: string) => {
-    const state = isActive(href) ? 'current' : 'default';
-    return `${prefix} ${suffixes[state]}`;
+  const state = isActive(href) ? 'current' : 'default';
+  return `${prefix} ${suffixes[state]}`;
 };
 
 const getAriaCurrent = (href: string) => {
-    return isActive(href) ? 'page' : undefined;
+  return isActive(href) ? 'page' : undefined;
 };
-
 ---
-<div class="fixed inset-0 w-72 z-10 flex lg:flex lg:inset-y-0 lg:w-72 lg:flex-col" :class="sidebar ? '' : 'hidden'">
-    <div class="flex grow flex-col gap-y-5 bg-gray-900 px-4 sm:px-6 overflow-y-auto">
-        <div class="flex h-14 shrink-0 items-center">
-            <button type="button" class="p-2.5 -m-2.5 mr-0.5 text-gray-400 lg:hidden" x-on:click="sidebar = !sidebar">
-                <span class="sr-only">Open sidebar</span>
-                <XMark class="w-6 h-6"></XMark>
-            </button>
-            <h1 class="text-white text-xl">
-                <a href={ROOT}>{DEFAULT_PAGE_TITLE}</a>
-            </h1>
-        </div>
-        <nav class="flex flex-1 flex-col" id="sidebar">
-            <ul role="list" class="flex flex-1 flex-col gap-y-7">
 
-                {menu.map(section => (
-                    <li>
-                        {section.name && (
-                            <div class="text-xs leading-6 font-semibold text-gray-400">{section.name}</div>
-                        )}
-                        <ul role="list" class:list={['-mx-2 space-y-1', { 'mt-2': section.name }]}>
-                            {section.children.map(({ name, path, icon: NavIcon }) => (
-                                <li>
-                                    <a
-                                        href={getLink(path)}
-                                        class={getClassName(getLink(path))}
-                                        aria-current={getAriaCurrent(getLink(path))}
-                                        target={getTarget(getLink(path))}
-                                    >
-                                        <NavIcon class="w-6 h-6 shrink-0" />
-                                        {name}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </li>
-                ))}
-
-                <li class="mt-auto mb-4">
-                    <ul role="list" class="-mx-2 space-y-1 mt-2">
-                        <li>
-                            <ColorSchemeSwitch></ColorSchemeSwitch>
-                        </li>
-                    </ul>
-                </li>
-
-            </ul>
-        </nav>
+<div
+  class="fixed inset-0 z-10 flex w-72 lg:inset-y-0 lg:flex lg:w-72 lg:flex-col"
+  :class="sidebar ? '' : 'hidden'"
+>
+  <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-4 sm:px-6">
+    <div class="flex h-14 shrink-0 items-center">
+      <button
+        type="button"
+        class="-m-2.5 mr-0.5 p-2.5 text-gray-400 lg:hidden"
+        x-on:click="sidebar = !sidebar"
+      >
+        <span class="sr-only">Open sidebar</span>
+        <XMark class="h-6 w-6" />
+      </button>
+      <h1 class="text-xl text-white">
+        <a href={ROOT}>{DEFAULT_PAGE_TITLE}</a>
+      </h1>
     </div>
+    <nav class="flex flex-1 flex-col" id="sidebar">
+      <ul role="list" class="flex flex-1 flex-col gap-y-7">
+        {
+          menu.map((section) => (
+            <li>
+              {section.name && (
+                <div class="text-xs leading-6 font-semibold text-gray-400">{section.name}</div>
+              )}
+              <ul role="list" class:list={['-mx-2 space-y-1', { 'mt-2': section.name }]}>
+                {section.children.map(({ name, path, icon: NavIcon }) => (
+                  <li>
+                    <a
+                      href={getLink(path)}
+                      class={getClassName(getLink(path))}
+                      aria-current={getAriaCurrent(getLink(path))}
+                      target={getTarget(getLink(path))}
+                    >
+                      <NavIcon class="h-6 w-6 shrink-0" />
+                      {name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+
+        <li class="mt-auto mb-4">
+          <ul role="list" class="-mx-2 mt-2 space-y-1">
+            <li>
+              <ColorSchemeSwitch />
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
 </div>
 
-<div class="sticky top-0 flex items-center gap-x-6 px-4 py-4 shadow-xs bg-gray-900 sm:px-6 lg:pl-72 lg:hidden z-10">
-    <button type="button" class="p-2.5 -m-2.5 text-gray-400 lg:hidden" x-on:click="sidebar = !sidebar">
-        <span class="sr-only">Open sidebar</span>
-        <Bars3 class="w-6 h-6"></Bars3>
-    </button>
-    <div class="flex-1 text-sm font-semibold leading-6 text-white">
-        {DEFAULT_PAGE_TITLE}
-        <!-- {title} -->
-    </div>
+<div
+  class="sticky top-0 z-10 flex items-center gap-x-6 bg-gray-900 px-4 py-4 shadow-xs sm:px-6 lg:hidden lg:pl-72"
+>
+  <button
+    type="button"
+    class="-m-2.5 p-2.5 text-gray-400 lg:hidden"
+    x-on:click="sidebar = !sidebar"
+  >
+    <span class="sr-only">Open sidebar</span>
+    <Bars3 class="h-6 w-6" />
+  </button>
+  <div class="flex-1 text-sm leading-6 font-semibold text-white">
+    {DEFAULT_PAGE_TITLE}
+    <!-- {title} -->
+  </div>
 </div>

@@ -5,8 +5,8 @@
     "url": "https://github.com/kamilbrk/headunits"
   },
   "scripts": {
-    "lint": "eslint src/**/*.{astro,js,jsx,ts,tsx}",
-    "lint:fix": "eslint --fix",
+    "lint": "eslint src/",
+    "lint:fix": "eslint --fix src/",
     "prettier": "prettier --write **/**/*.{astro,css,scss,js,cjs,mjs,ts,tsx}",
     "dev": "astro dev",
     "build": "astro build",
@@ -28,23 +28,20 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@tailwindcss/postcss": "^4.2.2",
     "@tailwindcss/typography": "^0.5.19",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
     "cssnano": "^7.1.4",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-astro": "^0.34.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint": "^10.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^1.7.0",
     "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-promise": "^6.6.0",
-    "eslint-plugin-sonarjs": "^0.25.1",
-    "eslint-plugin-unicorn": "^56.0.1",
+    "eslint-plugin-sonarjs": "^4.0.2",
+    "eslint-plugin-unicorn": "^64.0.0",
     "github-slugger": "^2.0.0",
     "postcss": "^8.5.9",
     "prettier": "^3.8.2",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sass": "^1.99.0",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "typescript-eslint": "^8.58.1"
   }
 }

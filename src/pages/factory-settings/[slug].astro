@@ -20,7 +20,7 @@ const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
 ---
 <Layout title=`Factory settings for ${vendor.data.name}`>
     <article class="prose dark:prose-invert">
-        {entries.length ? entries.sort(sortEntriesById).map(entry => (
+        {entries.length > 0 ? entries.sort(sortEntriesById).map(entry => (
             <FactorySettingsSection slug={entry.id} />
         )) : (
             <p>We don't have any descriptions for factory settings for this vendor yet.</p>

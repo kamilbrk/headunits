@@ -1,22 +1,26 @@
 ---
 import { getCollection } from 'astro:content';
+
 import { URL_PREFIX } from './config';
 
 interface Props {
-    route: string;
-    name: string;
+  route: string;
+  name: string;
 }
 
 const { route, name } = Astro.props;
 const vendors = await getCollection('vendors');
 ---
+
 <div class="prose dark:prose-invert">
-    Choose vendor to see {name}:
-    <ul>
-        {vendors.map(vendor => (
-            <li>
-                <a href={`${URL_PREFIX}${route}/${vendor.id}`}>{vendor.data.name}</a>
-            </li>
-        ))}
-    </ul>
+  Choose vendor to see {name}:
+  <ul>
+    {
+      vendors.map((vendor) => (
+        <li>
+          <a href={`${URL_PREFIX}${route}/${vendor.id}`}>{vendor.data.name}</a>
+        </li>
+      ))
+    }
+  </ul>
 </div>
