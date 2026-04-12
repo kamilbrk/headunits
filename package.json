@@ -24,6 +24,11 @@
     "astro-heroicons": "^2.1.5",
     "typescript": "^5.9.3"
   },
+  "overrides": {
+    "yaml-language-server": {
+      "yaml": "^2.8.3"
+    }
+  },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
     "@tailwindcss/postcss": "^4.2.2",
