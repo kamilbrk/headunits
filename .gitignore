@@ -337,6 +337,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Claude Code
+.claude/settings.local.json
+
 # End of https://www.toptal.com/developers/gitignore/api/astro,intellij,visualstudiocode,macos,windows,node
 
 # OTA updates, zips and folders

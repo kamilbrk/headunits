@@ -11,7 +11,7 @@ export default defineConfig({
   site: DOMAIN,
   base: BASE,
   image: {
-    layout: 'responsive'
+    layout: 'constrained'
   },
   markdown: {
     shikiConfig: {
@@ -20,8 +20,5 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()]
-  },
-  experimental: {
-    preserveScriptOrder: true
   }
 });
