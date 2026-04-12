@@ -13,7 +13,7 @@
   "include": [
     ".astro/types.d.ts",
     "astro.config.ts",
-    ".eslintrc.cjs",
+    "eslint.config.js",
     "src"
   ],
   "exclude": ["dist"]
