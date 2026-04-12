@@ -2,7 +2,7 @@
 import './tailwind.css';
 import './global.css';
 
-import { DEFAULT_PAGE_DESCRIPTION, DEFAULT_PAGE_TITLE } from '../config';
+import { DEFAULT_PAGE_DESCRIPTION, DEFAULT_PAGE_TITLE, DOMAIN, URL_PREFIX } from '../config';
 import Navigation from './navigation.component.astro';
 
 export interface Props {
@@ -13,25 +13,33 @@ export interface Props {
 const { title: pageTitle, description: pageDescription } = Astro.props;
 const title = pageTitle || DEFAULT_PAGE_TITLE;
 const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
+const canonicalUrl = new URL(Astro.url.pathname, DOMAIN);
 ---
 
 <!doctype html>
 <html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>{title}</title>
-    <meta name="title" content={title} />
     <meta name="description" content={description} />
-    <meta name="keywords" content="ksw zxw android head units factory config" />
-
-    <!--<link rel="icon" type="image/svg+xml" href="/favicon.svg" />-->
-    <!--<link rel="manifest" href="/app.webmanifest" />-->
+    <link rel="canonical" href={canonicalUrl.href} />
+    <link rel="sitemap" type="application/xml" href={`${URL_PREFIX}sitemap-index.xml`} />
     <meta name="theme-color" content="#111827" />
-    <link rel="robots" href="/robots.txt" />
-    <!--<link rel="sitemap" type="application/xml" href="/sitemap.xml" />-->
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl.href} />
+    <meta property="og:site_name" content={DEFAULT_PAGE_TITLE} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
     <script
       defer
       src="https://cloud.umami.is/script.js"

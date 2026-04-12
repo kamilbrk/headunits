@@ -15,7 +15,8 @@ export const ROOT = BASE || '/';
 export const URL_PREFIX = BASE ? `${BASE}/` : '/';
 
 export const DEFAULT_PAGE_TITLE = 'Android Head Units';
-export const DEFAULT_PAGE_DESCRIPTION = '';
+export const DEFAULT_PAGE_DESCRIPTION =
+  'Community-driven information about KSW and ZXW Android head units — firmware updates, themes, factory settings and more.';
 
 export const SHIKI_THEMES = {
   light: 'github-light',
