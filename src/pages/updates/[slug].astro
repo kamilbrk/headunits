@@ -27,7 +27,7 @@ const platformsWithEntries = await getCollectionGroupedByCollection(
         {platformsWithEntries.map(group => (
             <h3>{group.data.name}</h3>
             <ul>
-                {group.entries.length ? group.entries.sort(sortEntriesByDate).map(entry => (
+                {group.entries.length > 0 ? group.entries.sort(sortEntriesByDate).map(entry => (
                     <li>
                         <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>
                         <span>(A{getAndroidVersion(entry)})</span>

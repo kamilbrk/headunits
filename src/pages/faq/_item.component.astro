@@ -1,26 +1,27 @@
 ---
-import { getEntry, render } from "astro:content";
-import { URL_PREFIX } from "../../shared/config";
-
 import QuestionMarkCircle from 'astro-heroicons/outline/QuestionMarkCircle.astro';
+import { getEntry, render } from 'astro:content';
+
+import { URL_PREFIX } from '../../shared/config';
 
 interface Props {
-    slug: string;
+  slug: string;
 }
 
 const { slug } = Astro.props;
 const entry = await getEntry('faq', slug);
 const { Content } = await render(entry);
 ---
+
 <article class="prose dark:prose-invert prose-pre:my-1 max-w-none">
-    <h3 class="flex items-center relative">
-        <QuestionMarkCircle class="w-6 h-6 mr-2" />
-        <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>
-            <span aria-hidden="true" class="absolute inset-0"></span>
-            {entry.data.question}
-        </a>
-    </h3>
-    <div>
-        <Content />
-    </div>
+  <h3 class="relative flex items-center">
+    <QuestionMarkCircle class="mr-2 h-6 w-6" />
+    <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>
+      <span aria-hidden="true" class="absolute inset-0"></span>
+      {entry.data.question}
+    </a>
+  </h3>
+  <div>
+    <Content />
+  </div>
 </article>

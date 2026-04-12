@@ -1,53 +1,58 @@
 ---
-import Sun from 'astro-heroicons/outline/Sun.astro';
 import Moon from 'astro-heroicons/outline/Moon.astro';
+import Sun from 'astro-heroicons/outline/Sun.astro';
 ---
 
-<button id="color-scheme-switch" type="button" class="w-full flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white">
-    <Sun class="w-6 h-6 shrink-0 hidden dark:inline" aria-hidden="true"></Sun>
-    <Moon class="w-6 h-6 shrink-0 dark:hidden" aria-hidden="true"></Moon>
-    <span>Switch to <span class="dark:hidden">dark</span><span class="hidden dark:inline">light</span> mode</span>
+<button
+  id="color-scheme-switch"
+  type="button"
+  class="flex w-full gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+>
+  <Sun class="hidden h-6 w-6 shrink-0 dark:inline" aria-hidden="true" />
+  <Moon class="h-6 w-6 shrink-0 dark:hidden" aria-hidden="true" />
+  <span
+    >Switch to <span class="dark:hidden">dark</span><span class="hidden dark:inline">light</span> mode</span
+  >
 </button>
 
 <style>
-    :global(.dark) {
-        color-scheme: dark;
-    }
+  :global(.dark) {
+    color-scheme: dark;
+  }
 </style>
 
 <script>
-    const button: HTMLButtonElement = document.querySelector('#color-scheme-switch');
-    const localTheme = localStorage.getItem("theme");
-    const matcher = window.matchMedia("(prefers-color-scheme: dark)");
-    let systemTheme = matcher.matches ? "dark" : "light";
+  const button: HTMLButtonElement = document.querySelector('#color-scheme-switch');
+  const localTheme = localStorage.getItem('theme');
+  const matcher = globalThis.matchMedia('(prefers-color-scheme: dark)');
+  let systemTheme = matcher.matches ? 'dark' : 'light';
 
-    const updateDocument = value => {
-        document.documentElement.classList.remove("light", "dark");
-        document.documentElement.classList.add(value);
-        document.documentElement.setAttribute("data-theme", value);
-    };
+  const updateDocument = (value) => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(value);
+    document.documentElement.dataset.theme = value;
+  };
 
-    const updateTheme = value => {
-        const theme = value === "system" ? systemTheme : value;
-        updateDocument(theme);
-        localStorage.setItem("theme", value);
-    };
+  const updateTheme = (value) => {
+    const theme = value === 'system' ? systemTheme : value;
+    updateDocument(theme);
+    localStorage.setItem('theme', value);
+  };
 
-    matcher.addEventListener("change", (event) => {
-        const theme = event.matches ? "dark" : "light";
-        systemTheme = theme;
-        if (localStorage.getItem("theme") === "system") {
-            updateDocument(theme);
-        }
-    });
+  matcher.addEventListener('change', (event) => {
+    const theme = event.matches ? 'dark' : 'light';
+    systemTheme = theme;
+    if (localStorage.getItem('theme') === 'system') {
+      updateDocument(theme);
+    }
+  });
 
-    button.value = localTheme || systemTheme;
-    updateTheme(button.value);
+  button.value = localTheme || systemTheme;
+  updateTheme(button.value);
 
-    button.addEventListener('click', event => {
-        const target = event.target;
-        const setTheme = button.value === 'dark' ? 'light' : 'dark';
-        button.value = setTheme;
-        updateTheme(setTheme);
-    });
+  button.addEventListener('click', () => {
+    const setTheme = button.value === 'dark' ? 'light' : 'dark';
+    button.value = setTheme;
+    updateTheme(setTheme);
+  });
 </script>

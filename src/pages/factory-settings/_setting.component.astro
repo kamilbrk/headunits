@@ -11,12 +11,12 @@ interface Props {
 
 const { section, setting, parent } = Astro.props;
 
-const uniqueId = slug([section, parent, setting.name].filter(x => x).join(' '));
-const parentId = parent ? slug([section, parent].filter(x => x).join(' ')) : undefined;
+const uniqueId = slug([section, parent, setting.name].filter(Boolean).join(' '));
+const parentId = parent ? slug([section, parent].filter(Boolean).join(' ')) : undefined;
 
-let configXmlRef = undefined;
+let configXmlRef;
 
-if (typeof setting.configValue !== "undefined") {
+if (setting.configValue !== undefined) {
     configXmlRef = `Value for the setting above in factory config file should be "${setting.configValue}"`;
 } else if (setting.configKey) {
     configXmlRef = `This setting can be found and set in factory config file file with key "${setting.configKey}"`;

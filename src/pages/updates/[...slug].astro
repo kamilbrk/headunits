@@ -1,64 +1,84 @@
 ---
-import { getEntry, render } from 'astro:content';
 import ChevronLeft from 'astro-heroicons/outline/ChevronLeft.astro';
 import ChevronRight from 'astro-heroicons/outline/ChevronRight.astro';
+import { getEntry, render } from 'astro:content';
 
-import { URL_PREFIX } from "../../shared/config";
-import Layout from '../../shared/layout/base-layout.astro';
+import { URL_PREFIX } from '../../shared/config';
 import DateTime from '../../shared/date-time.component.astro';
+import Layout from '../../shared/layout/base-layout.astro';
 import {
-    getAndroidVersion,
-    getEntryStaticPathsFromCollection,
-    getEntryWithPrevNext,
-    getPlatformSlug,
-    getUpdateVersion,
-    getVendorSlug
+  getAndroidVersion,
+  getEntryStaticPathsFromCollection,
+  getEntryWithPrevNext,
+  getPlatformSlug,
+  getUpdateVersion,
+  getVendorSlug
 } from '../../shared/utilities';
 import FileSignatures from './_file-signatures.component.astro';
 
 export async function getStaticPaths() {
-    return await getEntryStaticPathsFromCollection('updates');
+  return await getEntryStaticPathsFromCollection('updates');
 }
 
 const { slug } = Astro.params;
 const platformSlug = getPlatformSlug(slug);
 const vendor = await getEntry('vendors', getVendorSlug(slug));
 const platform = await getEntry('platforms', platformSlug);
-const { entry, previous, next } = await getEntryWithPrevNext('updates', slug, entry => entry.id.startsWith(platformSlug));
+const { entry, previous, next } = await getEntryWithPrevNext('updates', slug, (entry) =>
+  entry.id.startsWith(platformSlug)
+);
 const { Content } = await render(entry);
 ---
-<Layout title={`${entry.data.vendor === 'zxw' ? `ZXW ${entry.data.platform.toUpperCase()} ` : ''}${entry.data.id}`}>
-    {(previous || next) && (
-        <div class="flex max-sm:justify-between mb-4 select-none">
-            {previous && (
-                <a href={`${URL_PREFIX}${entry.collection}/${previous.id}`} class="self-start bg-slate-800 text-white py-2 pl-2 pr-4 rounded-sm inline-flex items-center">
-                    <ChevronLeft class="w-6 h-6" />
-                    {getUpdateVersion(previous)}
-                </a>
-            )}
 
-            {next && (
-                <a href={`${URL_PREFIX}${entry.collection}/${next.id}`} class="self-end bg-slate-800 text-white ml-4 py-2 pr-2 pl-4 rounded-sm inline-flex items-center first:last:ml-0">
-                    {getUpdateVersion(next)}
-                    <ChevronRight class="w-6 h-6" />
-                </a>
-            )}
-        </div>
-    )}
-
-    <div class="prose dark:prose-invert break-words">
-        <p>Version <strong>{getUpdateVersion(entry)}</strong> based on Android {getAndroidVersion(entry)} for {vendor.data.name} devices running on {platform.data.name} platform, built on <strong><DateTime date={entry.data.date} /></strong>.</p>
-
-        {entry.body ? (
-            <Content />
-        ) : (
-            <p>We do not have any information about what's new in this update.</p>
+<Layout
+  title={`${entry.data.vendor === 'zxw' ? `ZXW ${entry.data.platform.toUpperCase()} ` : ''}${entry.data.id}`}
+>
+  {
+    (previous || next) && (
+      <div class="mb-4 flex select-none max-sm:justify-between">
+        {previous && (
+          <a
+            href={`${URL_PREFIX}${entry.collection}/${previous.id}`}
+            class="inline-flex items-center self-start rounded-sm bg-slate-800 py-2 pr-4 pl-2 text-white"
+          >
+            <ChevronLeft class="h-6 w-6" />
+            {getUpdateVersion(previous)}
+          </a>
         )}
 
-        {entry.data.signatures && (
-            <FileSignatures signatures={entry.data.signatures} />
+        {next && (
+          <a
+            href={`${URL_PREFIX}${entry.collection}/${next.id}`}
+            class="ml-4 inline-flex items-center self-end rounded-sm bg-slate-800 py-2 pr-2 pl-4 text-white first:last:ml-0"
+          >
+            {getUpdateVersion(next)}
+            <ChevronRight class="h-6 w-6" />
+          </a>
         )}
+      </div>
+    )
+  }
 
-        <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`}>Back to all {vendor.data.name} updates</a>
-    </div>
+  <div class="prose dark:prose-invert break-words">
+    <p>
+      Version <strong>{getUpdateVersion(entry)}</strong> based on Android {getAndroidVersion(entry)} for
+      {vendor.data.name} devices running on {platform.data.name} platform, built on <strong
+        ><DateTime date={entry.data.date} /></strong
+      >.
+    </p>
+
+    {
+      entry.body ? (
+        <Content />
+      ) : (
+        <p>We do not have any information about what's new in this update.</p>
+      )
+    }
+
+    {entry.data.signatures && <FileSignatures signatures={entry.data.signatures} />}
+
+    <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`}
+      >Back to all {vendor.data.name} updates</a
+    >
+  </div>
 </Layout>

@@ -2,28 +2,33 @@
 import { getCollection, getEntry } from 'astro:content';
 
 import Layout from '../../shared/layout/base-layout.astro';
-import { getFirstLevelStaticPathsFromCollection, sortEntriesByDataId } from '../../shared/utilities';
-import ThemesListItem from "./_list-item.component.astro";
+import {
+  getFirstLevelStaticPathsFromCollection,
+  sortEntriesByDataId
+} from '../../shared/utilities';
+import ThemesListItem from './_list-item.component.astro';
 
 export async function getStaticPaths() {
-    return await getFirstLevelStaticPathsFromCollection('updates');
+  return await getFirstLevelStaticPathsFromCollection('updates');
 }
 
 const { slug } = Astro.params;
 const vendor = await getEntry('vendors', slug);
-const entries = await getCollection('themes', entry => entry.id.startsWith(slug))
+const entries = await getCollection('themes', (entry) => entry.id.startsWith(slug));
 ---
-<Layout title=`Themes for ${vendor.data.name}`>
-    {entries.length ? (
-        <div class="lg:col-span-3">
-            <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 xl:gap-x-8 xl:grid-cols-3">
-                {entries.sort(sortEntriesByDataId).map(entry => (
-                    <ThemesListItem theme={entry}></ThemesListItem>
-                ))}
-            </div>
-        </div>
-    ) : (
-        <p>We don't have any themes for this {vendor.data.name} vendor yet.</p>
-    )}
-</Layout>
 
+<Layout title=`Themes for ${vendor.data.name}`>
+  {
+    entries.length > 0 ? (
+      <div class="lg:col-span-3">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3 xl:gap-x-8">
+          {entries.sort(sortEntriesByDataId).map((entry) => (
+            <ThemesListItem theme={entry} />
+          ))}
+        </div>
+      </div>
+    ) : (
+      <p>We don't have any themes for this {vendor.data.name} vendor yet.</p>
+    )
+  }
+</Layout>

@@ -1,27 +1,31 @@
 ---
-import { getEntry, render } from "astro:content";
+import { getEntry, render } from 'astro:content';
+
 import FactorySettingsSetting from './_setting.component.astro';
 
 interface Props {
-    id: string;
+  id: string;
 }
 
 const { slug } = Astro.props;
 const entry = await getEntry('factory-settings', slug);
 const { Content } = await render(entry);
 ---
+
 <div class="mb-5">
-    <h3 class="flex items-center relative">
-        {entry.data.section}
-    </h3>
+  <h3 class="relative flex items-center">
+    {entry.data.section}
+  </h3>
 
-    {entry.data.settings && (
-        <div>
-            {entry.data.settings?.map(setting => (
-                <FactorySettingsSetting section={entry.data.section} setting={setting}></FactorySettingsSetting>
-            ))}
-        </div>
-    )}
+  {
+    entry.data.settings && (
+      <div>
+        {entry.data.settings?.map((setting) => (
+          <FactorySettingsSetting section={entry.data.section} setting={setting} />
+        ))}
+      </div>
+    )
+  }
 
-    <Content />
+  <Content />
 </div>

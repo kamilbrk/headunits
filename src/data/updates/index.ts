@@ -1,6 +1,6 @@
 import { defineCollection } from 'astro:content';
-import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
 export const signaturesSchema = z.object({
   md5: z.string().optional(),

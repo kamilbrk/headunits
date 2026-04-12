@@ -1,15 +1,19 @@
 ---
-import { getEntries, getEntry, render} from 'astro:content';
 import { Image } from 'astro:assets';
 import { Code } from 'astro:components';
+import { getEntry, render } from 'astro:content';
 
-import { SHIKI_THEMES, URL_PREFIX } from "../../shared/config";
-import Layout from '../../shared/layout/base-layout.astro';
+import { SHIKI_THEMES, URL_PREFIX } from '../../shared/config';
 import DelimitedLinks from '../../shared/delimited-links.component.astro';
-import {getEntryStaticPathsFromCollection, getUpdateReferences, getVendorSlug} from '../../shared/utilities';
+import Layout from '../../shared/layout/base-layout.astro';
+import {
+  getEntryStaticPathsFromCollection,
+  getUpdateReferences,
+  getVendorSlug
+} from '../../shared/utilities';
 
 export async function getStaticPaths() {
-    return await getEntryStaticPathsFromCollection('themes');
+  return await getEntryStaticPathsFromCollection('themes');
 }
 
 const { slug } = Astro.params;
@@ -18,39 +22,82 @@ const entry = await getEntry('themes', slug);
 const since = await getUpdateReferences(entry.data.since);
 const { Content } = await render(entry);
 ---
+
 <Layout title={`${entry.data.display || entry.data.id}`}>
-    {entry.data.images?.length ? entry.data.images.map(image => (
+  {
+    entry.data.images?.length ? (
+      entry.data.images.map((image) => (
         <div class="mb-5">
-            <Image src={image} alt="" layout="responsive" />
+          <Image src={image} alt="" layout="responsive" />
         </div>
-    )) : (
-        <p class="prose dark:prose-invert mb-4">We don't have any screenshots of this theme yet. You can try to activate this theme, take some screenshots and contribute!</p>
-    )}
+      ))
+    ) : (
+      <p class="prose dark:prose-invert mb-4">
+        We don't have any screenshots of this theme yet. You can try to activate this theme, take
+        some screenshots and contribute!
+      </p>
+    )
+  }
 
-    <div class="prose dark:prose-invert break-words">
-        {entry.data.invalid && (
-            <p>This theme appears to be invalid, so we do not recommend activating it.</p>
-        )}
+  <div class="prose dark:prose-invert break-words">
+    {
+      entry.data.invalid && (
+        <p>This theme appears to be invalid, so we do not recommend activating it.</p>
+      )
+    }
 
-        {since.length > 0 && (
-            <p>
-                This theme was introduced in {since.length === 1 ? "update" : "updates"}
-                <DelimitedLinks items={since} />, therefore it might not be available to activate on earlier firmwares.
-            </p>
-        )}
+    {
+      since.length > 0 && (
+        <p>
+          This theme was introduced in {since.length === 1 ? 'update' : 'updates'}
+          <DelimitedLinks items={since} />, therefore it might not be available to activate on
+          earlier firmwares.
+        </p>
+      )
+    }
 
-        {entry.data.client && (
-            <p>This theme requires client <code>{entry.data.client}</code> set in your factory config file. See the <a href={`${URL_PREFIX}factory-settings/${vendor.id}`}>factory settings</a> section for more information.</p>
-        )}
+    {
+      entry.data.client && (
+        <p>
+          This theme requires client <code>{entry.data.client}</code> set in your factory config
+          file. See the <a href={`${URL_PREFIX}factory-settings/${vendor.id}`}>factory settings</a>{' '}
+          section for more information.
+        </p>
+      )
+    }
 
-        <p>To make this theme available for selection in your factory settings, you might need to modify your <code>{vendor.data.factoryConfigFileName}</code> file. Find the <Code lang="xml" code={`<SupportUIList />`} inline themes={SHIKI_THEMES} /> section and add the following line: {entry.data.number ? (
-                <Code lang="xml" code={`<Item id="${entry.data.number}" ui="${entry.data.id}" />`} inline themes={SHIKI_THEMES} />
+    <p>
+      To make this theme available for selection in your factory settings, you might need to modify
+      your <code>{vendor.data.factoryConfigFileName}</code> file. Find the <Code
+        lang="xml"
+        code={`<SupportUIList />`}
+        inline
+        themes={SHIKI_THEMES}
+      /> section and add the following line: {
+        entry.data.number ? (
+          <Code
+            lang="xml"
+            code={`<Item id="${entry.data.number}" ui="${entry.data.id}" />`}
+            inline
+            themes={SHIKI_THEMES}
+          />
         ) : (
-                <Code lang="xml" code={`<Item id="1" name="${entry.data.id}" display="${entry.data.display}" />`} inline themes={SHIKI_THEMES} />
-        )}. More information and examples can be found in <a href={`${URL_PREFIX}factory-settings/${vendor.id}`}>factory settings</a> section.</p>
+          <Code
+            lang="xml"
+            code={`<Item id="1" name="${entry.data.id}" display="${entry.data.display}" />`}
+            inline
+            themes={SHIKI_THEMES}
+          />
+        )
+      }. More information and examples can be found in <a
+        href={`${URL_PREFIX}factory-settings/${vendor.id}`}>factory settings</a
+      > section.
+    </p>
 
-        <Content />
+    <Content />
 
-        <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`}>Back to all {vendor.data.name} themes</a>
-    </div>
+    <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`}
+      >Back to all {vendor.data.name} themes</a
+    >
+  </div>
 </Layout>
