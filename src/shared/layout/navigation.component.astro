@@ -65,17 +65,13 @@ const getAriaCurrent = (href: string) => {
 ---
 
 <div
-  class="fixed inset-0 z-10 flex w-72 lg:inset-y-0 lg:flex lg:w-72 lg:flex-col"
-  :class="sidebar ? '' : 'hidden'"
+  id="primary-nav"
+  class="fixed inset-0 z-10 hidden w-72 lg:inset-y-0 lg:flex lg:w-72 lg:flex-col"
 >
   <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-4 sm:px-6">
     <div class="flex h-14 shrink-0 items-center">
-      <button
-        type="button"
-        class="-m-2.5 mr-0.5 p-2.5 text-gray-400 lg:hidden"
-        x-on:click="sidebar = !sidebar"
-      >
-        <span class="sr-only">Open sidebar</span>
+      <button type="button" class="-m-2.5 mr-0.5 p-2.5 text-gray-400 lg:hidden" data-sidebar-toggle>
+        <span class="sr-only">Close sidebar</span>
         <XMark class="h-6 w-6" />
       </button>
       <h1 class="text-xl text-white">
@@ -124,11 +120,7 @@ const getAriaCurrent = (href: string) => {
 <div
   class="sticky top-0 z-10 flex items-center gap-x-6 bg-gray-900 px-4 py-4 shadow-xs sm:px-6 lg:hidden lg:pl-72"
 >
-  <button
-    type="button"
-    class="-m-2.5 p-2.5 text-gray-400 lg:hidden"
-    x-on:click="sidebar = !sidebar"
-  >
+  <button type="button" class="-m-2.5 p-2.5 text-gray-400 lg:hidden" data-sidebar-toggle>
     <span class="sr-only">Open sidebar</span>
     <Bars3 class="h-6 w-6" />
   </button>
@@ -136,3 +128,16 @@ const getAriaCurrent = (href: string) => {
     {DEFAULT_PAGE_TITLE}
   </div>
 </div>
+
+<script>
+  const setup = () => {
+    const nav = document.querySelector('#primary-nav');
+    if (!nav) return;
+    for (const toggle of document.querySelectorAll('[data-sidebar-toggle]')) {
+      toggle.addEventListener('click', () => nav.classList.toggle('hidden'));
+    }
+  };
+
+  setup();
+  document.addEventListener('astro:page-load', setup);
+</script>
