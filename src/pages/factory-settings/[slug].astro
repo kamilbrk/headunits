@@ -2,39 +2,67 @@
 import { Code } from 'astro:components';
 import { getCollection, getEntry } from 'astro:content';
 
-import { SHIKI_THEMES, URL_PREFIX } from "../../shared/config";
+import { SHIKI_THEMES, URL_PREFIX } from '../../shared/config';
 import Layout from '../../shared/layout/base-layout.astro';
 import { getFirstLevelStaticPathsFromCollection, sortEntriesById } from '../../shared/utilities';
 import FactorySettingsSection from './_section.component.astro';
 
 export async function getStaticPaths() {
-    return await getFirstLevelStaticPathsFromCollection('updates');
+  return await getFirstLevelStaticPathsFromCollection('updates');
 }
 
 const { slug } = Astro.params;
 if (!slug) throw new Error('Missing slug param');
 const vendor = await getEntry('vendors', slug);
 if (!vendor) throw new Error(`Missing vendor: ${slug}`);
-const entries = await getCollection('factory-settings', entry => entry.id.startsWith(slug))
+const entries = await getCollection('factory-settings', (entry) => entry.id.startsWith(slug));
 
-const xmls = import.meta.glob<string>('/public/*.xml', { query: '?raw', import: 'default', eager: true });
+const xmls = import.meta.glob<string>('/public/*.xml', {
+  query: '?raw',
+  import: 'default',
+  eager: true
+});
 const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
 ---
+
 <Layout title=`Factory settings for ${vendor.data.name}`>
-    <article class="prose dark:prose-invert">
-        {entries.length > 0 ? entries.sort(sortEntriesById).map(entry => (
-            <FactorySettingsSection slug={entry.id} />
-        )) : (
-            <p>We don't have any descriptions for factory settings for this vendor yet.</p>
-        )}
-    </article>
+  <article class="prose dark:prose-invert">
+    {
+      entries.length > 0 ? (
+        entries.sort(sortEntriesById).map((entry) => <FactorySettingsSection slug={entry.id} />)
+      ) : (
+        <p>We don't have any descriptions for factory settings for this vendor yet.</p>
+      )
+    }
+  </article>
 
-    {xml && (
+  {
+    xml && (
+      <>
         <article class="prose dark:prose-invert">
-            <h3>An example <code>{vendor.data.factoryConfigFileName}</code> file</h3>
-            <p>Please <a href={`${URL_PREFIX}faq/${vendor.id}/pull-factory-config`}>make a backup for your original file</a> first. Then make adjustments to your own file with parts from the following example and finally follow <a href={`${URL_PREFIX}faq/${vendor.id}/apply-factory-config`}>instructions to import it to your Head Unit</a>.</p>
+          <h3>
+            An example <code>{vendor.data.factoryConfigFileName}</code> file
+          </h3>
+          <p>
+            Please{' '}
+            <a href={`${URL_PREFIX}faq/${vendor.id}/pull-factory-config`}>
+              make a backup for your original file
+            </a>{' '}
+            first. Then make adjustments to your own file with parts from the following example and
+            finally follow{' '}
+            <a href={`${URL_PREFIX}faq/${vendor.id}/apply-factory-config`}>
+              instructions to import it to your Head Unit
+            </a>
+            .
+          </p>
         </article>
-        <Code class="-m-4 sm:-m-6 lg:-m-8 mt-4 sm:mt-6 lg:mt-8 p-4 sm:p-6 lg:p-8" lang="xml" code={xml} themes={SHIKI_THEMES} />
-    )}
+        <Code
+          class="-m-4 mt-4 p-4 sm:-m-6 sm:mt-6 sm:p-6 lg:-m-8 lg:mt-8 lg:p-8"
+          lang="xml"
+          code={xml}
+          themes={SHIKI_THEMES}
+        />
+      </>
+    )
+  }
 </Layout>
-

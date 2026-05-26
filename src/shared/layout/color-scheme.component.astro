@@ -22,19 +22,18 @@ import Sun from 'astro-heroicons/outline/Sun.astro';
 </style>
 
 <script>
-  const button = document.querySelector<HTMLButtonElement>('#color-scheme-switch');
-  if (!button) throw new Error('color-scheme switch not found');
+  const button = document.querySelector('#color-scheme-switch');
   const localTheme = localStorage.getItem('theme');
   const matcher = globalThis.matchMedia('(prefers-color-scheme: dark)');
   let systemTheme = matcher.matches ? 'dark' : 'light';
 
-  const updateDocument = (value: string) => {
+  const updateDocument = (value) => {
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(value);
     document.documentElement.dataset.theme = value;
   };
 
-  const updateTheme = (value: string) => {
+  const updateTheme = (value) => {
     const theme = value === 'system' ? systemTheme : value;
     updateDocument(theme);
     localStorage.setItem('theme', value);

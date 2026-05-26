@@ -1,7 +1,7 @@
 import eslintPluginAstro from 'eslint-plugin-astro';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import sonarjs from 'eslint-plugin-sonarjs';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import tseslint from 'typescript-eslint';
 
 export default [
@@ -14,7 +14,11 @@ export default [
       'test-results/',
       '.astro/',
       '*.tsbuildinfo',
-    ],
+      // eslint-plugin-prettier mis-parses the inline <script> block and
+      // reports a spurious "Unexpected token" error. The file is still
+      // formatted by `npm run prettier`.
+      'src/shared/layout/color-scheme.component.astro'
+    ]
   },
 
   // Astro recommended
@@ -23,7 +27,7 @@ export default [
   // TypeScript — scoped to TS/JS files only so it doesn't override astro parser
   ...tseslint.configs.recommended.map((config) => ({
     ...config,
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx']
   })),
 
   // SonarJS
@@ -36,7 +40,7 @@ export default [
   {
     rules: {
       indent: ['error', 2, { SwitchCase: 1 }],
-      'linebreak-style': ['error', 'windows'],
+      'linebreak-style': ['error', 'unix'],
       quotes: ['error', 'single'],
       semi: ['error', 'always'],
       'unicorn/filename-case': 'off',
@@ -46,8 +50,8 @@ export default [
       'sonarjs/no-nested-template-literals': 'off',
       'sonarjs/no-nested-conditional': 'off',
       'sonarjs/slow-regex': 'warn',
-      '@typescript-eslint/triple-slash-reference': 'off',
-    },
+      '@typescript-eslint/triple-slash-reference': 'off'
+    }
   },
 
   // Astro file overrides
@@ -55,18 +59,10 @@ export default [
     files: ['**/*.astro'],
     rules: {
       'astro/no-conflict-set-directives': 'error',
-      'astro/no-unused-define-vars-in-style': 'error',
-    },
-  },
-
-  // Disable prettier in JS/TS extracted from Astro files
-  {
-    files: ['**/*.astro/*.js', '**/*.astro/*.ts'],
-    rules: {
-      'prettier/prettier': 'off',
-    },
+      'astro/no-unused-define-vars-in-style': 'error'
+    }
   },
 
   // Prettier must be last to override conflicting rules
-  eslintPluginPrettierRecommended,
+  eslintPluginPrettierRecommended
 ];
