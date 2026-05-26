@@ -3,7 +3,7 @@ import ChevronLeft from 'astro-heroicons/outline/ChevronLeft.astro';
 import ChevronRight from 'astro-heroicons/outline/ChevronRight.astro';
 import { getEntry, render } from 'astro:content';
 
-import { URL_PREFIX } from '../../shared/config';
+import { DOMAIN, URL_PREFIX } from '../../shared/config';
 import DateTime from '../../shared/date-time.component.astro';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
@@ -32,11 +32,21 @@ const { entry, previous, next } = await getEntryWithPrevNext('updates', slug, (e
 );
 if (!entry) throw new Error(`Missing updates entry: ${slug}`);
 const { Content } = await render(entry);
+
+const pageTitle = `${entry.data.vendor === 'zxw' ? `ZXW ${entry.data.platform.toUpperCase()} ` : ''}${entry.data.id}`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: pageTitle,
+  datePublished: entry.data.date.toISOString(),
+  inLanguage: 'en',
+  url: new URL(`${URL_PREFIX}${entry.collection}/${entry.id}`, DOMAIN).href,
+  about: `${vendor.data.name} ${platform.data.name} firmware update`,
+  ...(getUpdateVersion(entry) !== '?' && { softwareVersion: getUpdateVersion(entry) })
+};
 ---
 
-<Layout
-  title={`${entry.data.vendor === 'zxw' ? `ZXW ${entry.data.platform.toUpperCase()} ` : ''}${entry.data.id}`}
->
+<Layout title={pageTitle} jsonLd={jsonLd}>
   {
     (previous || next) && (
       <div class="mb-4 flex select-none max-sm:justify-between">
