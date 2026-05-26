@@ -16,7 +16,7 @@ permissions:
 # single-flight GitHub Pages deploy. `cancel-in-progress: false` means
 # new runs queue behind any deploy already in flight.
 concurrency:
-  group: pages
+  group: github-pages-deploy
   cancel-in-progress: false
 
 jobs:
