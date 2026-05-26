@@ -14,11 +14,9 @@ const BaseSettingItemSchema = z.object({
   max: z.number().optional()
 });
 
-export type SettingItem = z.infer<
-  typeof BaseSettingItemSchema & {
-    children?: SettingItem[];
-  }
->;
+export type SettingItem = z.infer<typeof BaseSettingItemSchema> & {
+  children?: SettingItem[] | undefined;
+};
 
 const SettingItemSchema: z.ZodType<SettingItem> = BaseSettingItemSchema.extend({
   children: z.lazy(() => SettingItemSchema.array().optional())

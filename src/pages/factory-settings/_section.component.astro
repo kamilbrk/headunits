@@ -4,11 +4,12 @@ import { getEntry, render } from 'astro:content';
 import FactorySettingsSetting from './_setting.component.astro';
 
 interface Props {
-  id: string;
+  slug: string;
 }
 
 const { slug } = Astro.props;
 const entry = await getEntry('factory-settings', slug);
+if (!entry) throw new Error(`Missing factory-settings entry: ${slug}`);
 const { Content } = await render(entry);
 ---
 
