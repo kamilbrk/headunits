@@ -31,7 +31,7 @@ const { Content } = await render(entry);
     entry.data.images?.length ? (
       entry.data.images.map((image) => (
         <div class="mb-5">
-          <Image src={image} alt="" layout="responsive" />
+          <Image src={image} alt="" layout="constrained" />
         </div>
       ))
     ) : (
