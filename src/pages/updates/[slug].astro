@@ -4,14 +4,14 @@ import { getEntry } from 'astro:content';
 import { URL_PREFIX } from '../../shared/config';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
-    getFirstLevelStaticPathsFromCollection,
-    getCollectionGroupedByCollection,
-    getAndroidVersion,
-    sortEntriesByDate
+  getAndroidVersion,
+  getCollectionGroupedByCollection,
+  getFirstLevelStaticPathsFromCollection,
+  sortEntriesByDate
 } from '../../shared/utilities';
 
 export async function getStaticPaths() {
-    return await getFirstLevelStaticPathsFromCollection('updates');
+  return await getFirstLevelStaticPathsFromCollection('updates');
 }
 
 const { slug } = Astro.params;
@@ -19,28 +19,35 @@ if (!slug) throw new Error('Missing slug param');
 const vendor = await getEntry('vendors', slug);
 if (!vendor) throw new Error(`Missing vendor: ${slug}`);
 const platformsWithEntries = await getCollectionGroupedByCollection(
-    'updates',
-    'platforms',
-    entry => entry.id.startsWith(slug)
+  'updates',
+  'platforms',
+  (entry) => entry.id.startsWith(slug)
 );
 ---
+
 <Layout title=`Updates for ${vendor.data.name}`>
-    <div class="prose dark:prose-invert break-words">
-        {platformsWithEntries.map(group => (
-            <h3>{group.data.name}</h3>
-            <ul>
-                {group.entries.length > 0 ? group.entries.sort(sortEntriesByDate).map(entry => (
-                    <li>
-                        <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>
-                        <span>(A{getAndroidVersion(entry)})</span>
-                        <time datetime={entry.data.date.toISOString()}>{entry.data.date.toISOString().slice(0,10)}</time>
-                    </li>
-                )) : (
-                    <li>
-                        We don't have information about updates for this platform yet.
-                    </li>
-                )}
-            </ul>
-        ))}
-    </div>
+  <div class="prose dark:prose-invert break-words">
+    {
+      platformsWithEntries.map((group) => (
+        <>
+          <h3>{group.data.name}</h3>
+          <ul>
+            {group.entries.length > 0 ? (
+              group.entries.sort(sortEntriesByDate).map((entry) => (
+                <li>
+                  <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>
+                  <span>(A{getAndroidVersion(entry)})</span>
+                  <time datetime={entry.data.date.toISOString()}>
+                    {entry.data.date.toISOString().slice(0, 10)}
+                  </time>
+                </li>
+              ))
+            ) : (
+              <li>We don't have information about updates for this platform yet.</li>
+            )}
+          </ul>
+        </>
+      ))
+    }
+  </div>
 </Layout>

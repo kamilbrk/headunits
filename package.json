@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
-    "prettier": "prettier --write **/*.{astro,css,js,ts,tsx}",
+    "prettier": "prettier --write **/*.{astro,css,js,ts}",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
