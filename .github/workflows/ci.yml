@@ -36,6 +36,8 @@ jobs:
           set -e
           for path in \
             dist/index.html \
+            dist/404.html \
+            dist/search/index.html \
             dist/themes/ksw/index.html \
             dist/themes/zxw/index.html \
             dist/updates/ksw/index.html \
@@ -45,7 +47,9 @@ jobs:
             dist/faq/ksw/index.html \
             dist/faq/zxw/index.html \
             dist/sitemap-index.xml \
-            dist/og-image.jpg
+            dist/og-image.jpg \
+            dist/pagefind/pagefind-ui.js \
+            dist/pagefind/pagefind-ui.css
           do
             test -s "$path" || { echo "Missing or empty: $path"; exit 1; }
           done

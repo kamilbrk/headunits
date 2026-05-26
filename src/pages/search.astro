@@ -1,0 +1,66 @@
+---
+import { URL_PREFIX } from '../shared/config';
+import Layout from '../shared/layout/base-layout.astro';
+---
+
+<Layout title="Search">
+  <link rel="stylesheet" href={`${URL_PREFIX}pagefind/pagefind-ui.css`} />
+  <div id="search" class="pagefind-ui"></div>
+
+  <script is:inline src={`${URL_PREFIX}pagefind/pagefind-ui.js`}></script>
+  <script is:inline>
+    const initPagefind = () => {
+      const el = document.querySelector('#search');
+      const PagefindUI = globalThis.PagefindUI;
+      if (!el || PagefindUI === undefined) return;
+      el.innerHTML = '';
+      const ui = new PagefindUI({
+        element: '#search',
+        showSubResults: false,
+        showImages: false,
+        resetStyles: false
+      });
+
+      const input = el.querySelector('input[type="text"]');
+      if (!input) return;
+
+      const initial = new URLSearchParams(globalThis.location.search).get('q');
+      if (initial) {
+        ui.triggerSearch(initial);
+      }
+
+      input.addEventListener('input', () => {
+        const params = new URLSearchParams(globalThis.location.search);
+        if (input.value) {
+          params.set('q', input.value);
+        } else {
+          params.delete('q');
+        }
+        const query = params.toString();
+        const url = `${globalThis.location.pathname}${query ? `?${query}` : ''}`;
+        globalThis.history.replaceState(null, '', url);
+      });
+    };
+    initPagefind();
+    document.addEventListener('astro:page-load', initPagefind);
+  </script>
+
+  <style is:global>
+    .pagefind-ui {
+      --pagefind-ui-primary: oklch(0.21 0.034 264.665);
+      --pagefind-ui-text: oklch(0.21 0.034 264.665);
+      --pagefind-ui-background: transparent;
+      --pagefind-ui-border: oklch(0.872 0.01 258.338);
+      --pagefind-ui-tag: oklch(0.928 0.006 264.531);
+      --pagefind-ui-border-width: 1px;
+      --pagefind-ui-border-radius: 0.375rem;
+      --pagefind-ui-font: inherit;
+    }
+    html.dark .pagefind-ui {
+      --pagefind-ui-primary: oklch(0.985 0 0);
+      --pagefind-ui-text: oklch(0.985 0 0);
+      --pagefind-ui-border: oklch(0.21 0.034 264.665);
+      --pagefind-ui-tag: oklch(0.21 0.034 264.665);
+    }
+  </style>
+</Layout>
