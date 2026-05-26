@@ -20,13 +20,15 @@ const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 const calculate = (from: string, to?: string) => {
   const dateFrom = new Date(from);
   const dateTo = to ? new Date(to) : new Date();
-  const elapsed = dateFrom - dateTo;
+  const elapsed = +dateFrom - +dateTo;
 
-  for (let u in UNITS) {
-    if (Math.abs(elapsed) > UNITS[u] || u === 'second') {
-      return rtf.format(Math.round(elapsed / UNITS[u]), u as Intl.RelativeTimeFormatUnit);
+  for (const u of Object.keys(UNITS) as Intl.RelativeTimeFormatUnit[]) {
+    const ms = UNITS[u]!;
+    if (Math.abs(elapsed) > ms || u === 'second') {
+      return rtf.format(Math.round(elapsed / ms), u);
     }
   }
+  return '';
 };
 
 const value = calculate(from, to);

@@ -15,7 +15,7 @@ export default defineCollection({
       since: z
         .union([z.array(z.string()), z.string()])
         .optional()
-        .transform((val) => (Array.isArray(val) ? val : [val])),
+        .transform((val) => (Array.isArray(val) ? val : val ? [val] : [])),
       invalid: z.string().optional()
     })
 });
