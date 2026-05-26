@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import { Code } from 'astro:components';
 import { getEntry, render } from 'astro:content';
 
-import { SHIKI_THEMES, URL_PREFIX } from '../../shared/config';
+import { DOMAIN, SHIKI_THEMES, URL_PREFIX } from '../../shared/config';
 import DelimitedLinks from '../../shared/delimited-links.component.astro';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
@@ -24,9 +24,19 @@ const entry = await getEntry('themes', slug);
 if (!entry) throw new Error(`Missing themes entry: ${slug}`);
 const since = await getUpdateReferences(entry.data.since);
 const { Content } = await render(entry);
+
+const pageTitle = entry.data.display || entry.data.id;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: pageTitle,
+  url: new URL(`${URL_PREFIX}${entry.collection}/${entry.id}`, DOMAIN).href,
+  about: `Theme for ${vendor.data.name} Android head units`,
+  ...(entry.data.tags && { keywords: entry.data.tags.join(', ') })
+};
 ---
 
-<Layout title={`${entry.data.display || entry.data.id}`}>
+<Layout title={pageTitle} jsonLd={jsonLd}>
   {
     entry.data.images?.length ? (
       entry.data.images.map((image) => (

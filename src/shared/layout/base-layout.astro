@@ -10,21 +10,26 @@ import Navigation from './navigation.component.astro';
 export interface Props {
   title?: string;
   description?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title: pageTitle, description: pageDescription } = Astro.props;
+const { title: pageTitle, description: pageDescription, jsonLd: pageJsonLd } = Astro.props;
 const title = pageTitle || DEFAULT_PAGE_TITLE;
 const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
 const canonicalUrl = new URL(Astro.url.pathname, DOMAIN);
 const ogImageUrl = new URL(`${URL_PREFIX}og-image.jpg`, DOMAIN).href;
 
-const jsonLd = {
+const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: DEFAULT_PAGE_TITLE,
   url: new URL(URL_PREFIX, DOMAIN).href,
   description: DEFAULT_PAGE_DESCRIPTION
 };
+const jsonLdBlocks = [
+  websiteJsonLd,
+  ...(Array.isArray(pageJsonLd) ? pageJsonLd : pageJsonLd ? [pageJsonLd] : [])
+];
 ---
 
 <!doctype html>
@@ -56,7 +61,11 @@ const jsonLd = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {
+      jsonLdBlocks.map((block) => (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />
+      ))
+    }
 
     <ClientRouter />
 
