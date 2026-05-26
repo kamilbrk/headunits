@@ -21,6 +21,8 @@ const tagClassNames = theme.data.tags?.map((x) => `tag--${x}`).join(' ');
           src={theme.data.images[0]}
           alt={theme.data.display}
           layout="constrained"
+          widths={[400, 800, 1200]}
+          sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
           transition:name={`theme-${theme.id}`}
         />
       ) : (
@@ -30,6 +32,8 @@ const tagClassNames = theme.data.tags?.map((x) => `tag--${x}`).join(' ');
           layout="constrained"
           width={1920}
           height={720}
+          widths={[400, 800, 1200]}
+          sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
         />
       )
     }
