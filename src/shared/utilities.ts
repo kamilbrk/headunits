@@ -126,7 +126,7 @@ export function sortEntriesByDataId(
   return entryA.data.id.localeCompare(entryB.data.id);
 }
 
-const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-.+v(.+)-ota/;
+const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-\w+_v([\d.]+)-ota/;
 const REGEX_ZXW = /(\d{8})GT_KSW/;
 
 export function getAndroidVersion(entry: CollectionEntry<'updates'>) {
