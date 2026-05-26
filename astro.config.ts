@@ -10,6 +10,9 @@ export default defineConfig({
   output: 'static',
   site: DOMAIN,
   base: BASE,
+  prefetch: {
+    defaultStrategy: 'hover'
+  },
   image: {
     layout: 'constrained'
   },
