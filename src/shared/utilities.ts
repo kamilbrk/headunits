@@ -105,9 +105,9 @@ export async function getCollectionGroupedByCollection<
   return parents;
 }
 
-export function sortEntriesByDate<E extends CollectionKey>(
-  entryA: CollectionEntry<E>,
-  entryB: CollectionEntry<E>
+export function sortEntriesByDate(
+  entryA: CollectionEntry<'updates'>,
+  entryB: CollectionEntry<'updates'>
 ) {
   return +new Date(entryB.data.date) - +new Date(entryA.data.date);
 }
@@ -119,9 +119,9 @@ export function sortEntriesById<E extends CollectionKey>(
   return entryA.id.localeCompare(entryB.id);
 }
 
-export function sortEntriesByDataId<E extends CollectionKey>(
-  entryA: CollectionEntry<E>,
-  entryB: CollectionEntry<E>
+export function sortEntriesByDataId(
+  entryA: CollectionEntry<'themes'>,
+  entryB: CollectionEntry<'themes'>
 ) {
   return entryA.data.id.localeCompare(entryB.data.id);
 }
@@ -129,11 +129,12 @@ export function sortEntriesByDataId<E extends CollectionKey>(
 const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-.+v(.+)-ota/;
 const REGEX_ZXW = /(\d{8})GT_KSW/;
 
-export function getAndroidVersion<E extends CollectionKey>(entry: CollectionEntry<E>) {
-  return entry.data.android || ANDROID_VERSIONS[entry.data.id?.match(REGEX_KSW)?.[1]] || '?';
+export function getAndroidVersion(entry: CollectionEntry<'updates'>) {
+  const letter = entry.data.id?.match(REGEX_KSW)?.[1];
+  return entry.data.android || (letter && ANDROID_VERSIONS[letter]) || '?';
 }
 
-export function getUpdateVersion<E extends CollectionKey>(entry: CollectionEntry<E>) {
+export function getUpdateVersion(entry: CollectionEntry<'updates'>) {
   return (
     entry.data.version ||
     entry.data.id?.match(REGEX_KSW)?.[2] ||
@@ -142,17 +143,17 @@ export function getUpdateVersion<E extends CollectionKey>(entry: CollectionEntry
   );
 }
 
-type CollectionEntryWithPrevNext<C extends CollectionKey> = {
-  entry: CollectionEntry<C> | undefined;
-  previous: CollectionEntry<C> | undefined;
-  next: CollectionEntry<C> | undefined;
+type UpdatesEntryWithPrevNext = {
+  entry: CollectionEntry<'updates'> | undefined;
+  previous: CollectionEntry<'updates'> | undefined;
+  next: CollectionEntry<'updates'> | undefined;
 };
 
-export async function getEntryWithPrevNext<C extends CollectionKey>(
-  collectionKey: C,
+export async function getEntryWithPrevNext(
+  collectionKey: 'updates',
   slug: string,
-  filter?: (entry: CollectionEntry<C>) => boolean
-): Promise<CollectionEntryWithPrevNext<C>> {
+  filter?: (entry: CollectionEntry<'updates'>) => boolean
+): Promise<UpdatesEntryWithPrevNext> {
   const entries = await getCollection(collectionKey, filter);
   const entry = entries.sort(sortEntriesByDate).find((entry) => entry.id === slug);
   if (!entry) return { entry: undefined, previous: undefined, next: undefined };
