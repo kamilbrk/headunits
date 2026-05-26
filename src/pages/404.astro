@@ -1,0 +1,16 @@
+---
+import { ROOT } from '../shared/config';
+import Layout from '../shared/layout/base-layout.astro';
+---
+
+<Layout title="Page not found">
+  <div class="prose dark:prose-invert break-words">
+    <p class="text-lg leading-8">
+      The page you're looking for doesn't exist — it may have been renamed, removed, or never
+      existed in the first place.
+    </p>
+    <p>
+      <a href={ROOT}>Go back to the home page</a>, or pick a section from the menu.
+    </p>
+  </div>
+</Layout>
