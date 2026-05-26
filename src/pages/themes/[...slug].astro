@@ -39,15 +39,26 @@ const jsonLd = {
 <Layout title={pageTitle} jsonLd={jsonLd}>
   {
     entry.data.images?.length ? (
-      entry.data.images.map((image) => (
-        <div class="mb-5">
-          <Image
-            src={image}
-            alt={`Screenshot of the ${entry.data.display || entry.data.id} theme`}
-            layout="constrained"
-          />
-        </div>
-      ))
+      entry.data.images.map((image, index) =>
+        index === 0 ? (
+          <div class="mb-5">
+            <Image
+              src={image}
+              alt={`Screenshot of the ${entry.data.display || entry.data.id} theme`}
+              layout="constrained"
+              transition:name={`theme-${entry.id}`}
+            />
+          </div>
+        ) : (
+          <div class="mb-5">
+            <Image
+              src={image}
+              alt={`Screenshot of the ${entry.data.display || entry.data.id} theme`}
+              layout="constrained"
+            />
+          </div>
+        )
+      )
     ) : (
       <p class="prose dark:prose-invert mb-4">
         We don't have any screenshots of this theme yet. You can try to activate this theme, take
