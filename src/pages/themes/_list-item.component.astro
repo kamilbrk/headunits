@@ -17,7 +17,12 @@ const tagClassNames = theme.data.tags?.map((x) => `tag--${x}`).join(' ');
   <div class="w-full overflow-hidden rounded-md group-hover:opacity-75">
     {
       theme.data.images?.[0] ? (
-        <Image src={theme.data.images[0]} alt={theme.data.display} layout="constrained" />
+        <Image
+          src={theme.data.images[0]}
+          alt={theme.data.display}
+          layout="constrained"
+          transition:name={`theme-${theme.id}`}
+        />
       ) : (
         <Image
           src={`https://placehold.co/1920x720?text=${theme.data.id}`}

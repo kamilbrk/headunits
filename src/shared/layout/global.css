@@ -8,6 +8,13 @@ body {
   display: none !important;
 }
 
+/* Snappier view transitions — Astro's default ~0.25s feels sluggish. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.15s;
+}
+
 /* noinspection CssUnusedSymbol */
 html.dark .astro-code,
 html.dark .astro-code span {
