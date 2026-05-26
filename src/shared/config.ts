@@ -21,4 +21,4 @@ export const DEFAULT_PAGE_DESCRIPTION =
 export const SHIKI_THEMES = {
   light: 'github-light',
   dark: 'github-dark'
-};
+} as const;
