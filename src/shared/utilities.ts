@@ -178,6 +178,7 @@ export async function getUpdateReferences(since: ReferenceOrString = []) {
       if (!id.includes('/')) return id;
 
       const entry = await getEntry('updates', id);
+      if (!entry) throw new Error(`Missing updates entry: ${id}`);
 
       return {
         href: `${URL_PREFIX}updates/${entry.id}`,

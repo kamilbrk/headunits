@@ -10,7 +10,9 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
+if (!slug) throw new Error('Missing slug param');
 const vendor = await getEntry('vendors', slug);
+if (!vendor) throw new Error(`Missing vendor: ${slug}`);
 const entries = await getCollection('faq', (entry) => entry.id.startsWith(slug));
 ---
 
