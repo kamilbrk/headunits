@@ -78,11 +78,15 @@ const jsonLdBlocks = [
   <body class="bg-white dark:bg-gray-900">
     <Navigation title={title} />
 
-    <main class="max-w-(--breakpoint-2xl) py-8 lg:pl-72">
+    <main class="max-w-(--breakpoint-2xl) py-8 lg:pl-72" data-pagefind-body>
       <div class="px-4 sm:px-6 lg:px-8">
         {
           title !== DEFAULT_PAGE_TITLE && (
-            <h2 class="pb-8 text-2xl leading-7 font-bold text-gray-900 sm:text-3xl sm:tracking-tight dark:text-white">
+            <h2
+              class="pb-8 text-2xl leading-7 font-bold text-gray-900 sm:text-3xl sm:tracking-tight dark:text-white"
+              data-pagefind-meta="title"
+              data-pagefind-weight="100"
+            >
               {title}
             </h2>
           )

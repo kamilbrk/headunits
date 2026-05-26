@@ -49,7 +49,7 @@ const jsonLd = {
 <Layout title={pageTitle} jsonLd={jsonLd}>
   {
     (previous || next) && (
-      <div class="mb-4 flex select-none max-sm:justify-between">
+      <div class="mb-4 flex select-none max-sm:justify-between" data-pagefind-ignore>
         {previous && (
           <a
             href={`${URL_PREFIX}${entry.collection}/${previous.id}`}
@@ -91,7 +91,7 @@ const jsonLd = {
 
     {entry.data.signatures && <FileSignatures signatures={entry.data.signatures} />}
 
-    <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`}
+    <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`} data-pagefind-ignore
       >Back to all {vendor.data.name} updates</a
     >
   </div>
