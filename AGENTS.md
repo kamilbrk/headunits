@@ -39,13 +39,18 @@ must pass before build/deploy. Don't merge if either is red.
 - **Vite override** in `package.json` pins transitive Vite to `^7` because
   `@tailwindcss/vite@4.3` accepts Vite 8 in its peer range but the runtime
   isn't compatible (see withastro/astro#16542). Don't remove it.
-- **Two `.astro` files (`navigation.component.astro`,
-  `color-scheme.component.astro`) are ignored by ESLint.**
-  `eslint-plugin-prettier` mis-parses inline `<script>` blocks and reports
-  spurious "Unexpected token" errors. Plain `prettier-plugin-astro` still
-  formats them via `npm run prettier`. If you add a third `<script>` block
-  that trips the same parser bug, add it to the ignore list rather than
-  fighting it.
+- **Three `.astro` files are ignored by ESLint**
+  (`navigation.component.astro`, `color-scheme.component.astro`,
+  `pages/search.astro`). `eslint-plugin-prettier` mis-parses inline
+  `<script>` blocks and reports spurious "Unexpected token" errors.
+  Plain `prettier-plugin-astro` still formats them via `npm run
+  prettier`. If you add another `<script>` block that trips the same
+  parser bug, add it to the ignore list rather than fighting it.
+- **Search is provided by Pagefind.** `npm run build` runs
+  `astro build && pagefind --site dist`, which indexes the built site
+  into `dist/pagefind/`. The `/search` page loads the Default UI at
+  runtime. Don't drop the `pagefind` step from the build script or
+  `/search` becomes inert.
 - **`getEntry` returns `T | undefined`** under Astro 6. Pages use a
   `if (!x) throw new Error(...)` narrow after each lookup — keep that
   pattern; don't sprinkle non-null assertions.
