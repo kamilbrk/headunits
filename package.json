@@ -17,35 +17,36 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/alpinejs": "^0.5.0",
-    "@astrojs/check": "^0.9.8",
-    "@astrojs/mdx": "^5.0.3",
-    "@astrojs/sitemap": "^3.7.2",
-    "@tailwindcss/vite": "^4.2.2",
-    "alpinejs": "^3.15.11",
-    "astro": "^6.1.5",
-    "astro-heroicons": "^2.1.5",
-    "typescript": "^5.9.3"
+    "@astrojs/alpinejs": "0.5.0",
+    "@astrojs/check": "0.9.9",
+    "@astrojs/mdx": "5.0.6",
+    "@astrojs/sitemap": "3.7.2",
+    "@tailwindcss/vite": "4.3.0",
+    "alpinejs": "3.15.12",
+    "astro": "6.3.7",
+    "astro-heroicons": "2.1.5",
+    "typescript": "6.0.3"
   },
   "overrides": {
     "yaml-language-server": {
-      "yaml": "^2.8.3"
-    }
+      "yaml": "2.8.3"
+    },
+    "vite": "^7"
   },
   "devDependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "@tailwindcss/typography": "^0.5.19",
-    "eslint": "^10.2.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-astro": "^1.7.0",
-    "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-sonarjs": "^4.0.2",
-    "eslint-plugin-unicorn": "^64.0.0",
-    "github-slugger": "^2.0.0",
-    "prettier": "^3.8.2",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.7.2",
-    "tailwindcss": "^4.2.2",
-    "typescript-eslint": "^8.58.1"
+    "@ianvs/prettier-plugin-sort-imports": "4.7.1",
+    "@tailwindcss/typography": "0.5.19",
+    "eslint": "10.4.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-astro": "1.7.0",
+    "eslint-plugin-prettier": "5.5.5",
+    "eslint-plugin-sonarjs": "4.0.3",
+    "eslint-plugin-unicorn": "64.0.0",
+    "github-slugger": "2.0.0",
+    "prettier": "3.8.3",
+    "prettier-plugin-astro": "0.14.1",
+    "prettier-plugin-tailwindcss": "0.8.0",
+    "tailwindcss": "4.3.0",
+    "typescript-eslint": "8.60.0"
   }
 }
