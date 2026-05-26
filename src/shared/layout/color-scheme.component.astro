@@ -22,18 +22,20 @@ import Sun from 'astro-heroicons/outline/Sun.astro';
 </style>
 
 <script>
-  const button = document.querySelector('#color-scheme-switch');
+  const button = document.getElementById('color-scheme-switch');
+  if (!button) throw new Error('Missing #color-scheme-switch');
+
   const localTheme = localStorage.getItem('theme');
   const matcher = globalThis.matchMedia('(prefers-color-scheme: dark)');
   let systemTheme = matcher.matches ? 'dark' : 'light';
 
-  const updateDocument = (value) => {
+  const updateDocument = (value: string) => {
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(value);
     document.documentElement.dataset.theme = value;
   };
 
-  const updateTheme = (value) => {
+  const updateTheme = (value: string) => {
     const theme = value === 'system' ? systemTheme : value;
     updateDocument(theme);
     localStorage.setItem('theme', value);
@@ -47,12 +49,13 @@ import Sun from 'astro-heroicons/outline/Sun.astro';
     }
   });
 
-  button.value = localTheme || systemTheme;
-  updateTheme(button.value);
+  const initial = localTheme || systemTheme;
+  button.dataset.theme = initial;
+  updateTheme(initial);
 
   button.addEventListener('click', () => {
-    const setTheme = button.value === 'dark' ? 'light' : 'dark';
-    button.value = setTheme;
-    updateTheme(setTheme);
+    const next = button.dataset.theme === 'dark' ? 'light' : 'dark';
+    button.dataset.theme = next;
+    updateTheme(next);
   });
 </script>

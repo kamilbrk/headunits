@@ -14,9 +14,9 @@ export default [
       'test-results/',
       '.astro/',
       '*.tsbuildinfo',
-      // eslint-plugin-prettier mis-parses the inline <script> block and
-      // reports a spurious "Unexpected token" error. The file is still
-      // formatted by `npm run prettier`.
+      // eslint-plugin-prettier mis-parses inline <script> content and
+      // reports a spurious "Unexpected token" error. `npm run prettier`
+      // still formats this file via plain prettier-plugin-astro.
       'src/shared/layout/color-scheme.component.astro'
     ]
   },
