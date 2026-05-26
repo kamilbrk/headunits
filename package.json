@@ -19,9 +19,9 @@
   "dependencies": {
     "@astrojs/check": "0.9.9",
     "@astrojs/mdx": "5.0.6",
-    "@astrojs/sitemap": "3.7.2",
+    "@astrojs/sitemap": "3.7.3",
     "@tailwindcss/vite": "4.3.0",
-    "astro": "6.3.7",
+    "astro": "6.3.8",
     "astro-heroicons": "2.1.5",
     "astro-pagefind": "2.0.0",
     "typescript": "6.0.3"
