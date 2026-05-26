@@ -22,40 +22,30 @@ import Sun from 'astro-heroicons/outline/Sun.astro';
 </style>
 
 <script>
-  const button = document.getElementById('color-scheme-switch');
-  if (!button) throw new Error('Missing #color-scheme-switch');
-
-  const localTheme = localStorage.getItem('theme');
   const matcher = globalThis.matchMedia('(prefers-color-scheme: dark)');
-  let systemTheme = matcher.matches ? 'dark' : 'light';
+  const systemTheme = () => (matcher.matches ? 'dark' : 'light');
 
-  const updateDocument = (value: string) => {
+  const applyTheme = (value: string) => {
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(value);
     document.documentElement.dataset.theme = value;
   };
 
-  const updateTheme = (value: string) => {
-    const theme = value === 'system' ? systemTheme : value;
-    updateDocument(theme);
-    localStorage.setItem('theme', value);
-  };
+  const currentTheme = () => localStorage.getItem('theme') || systemTheme();
 
-  matcher.addEventListener('change', (event) => {
-    const theme = event.matches ? 'dark' : 'light';
-    systemTheme = theme;
-    if (localStorage.getItem('theme') === 'system') {
-      updateDocument(theme);
-    }
+  applyTheme(currentTheme());
+
+  matcher.addEventListener('change', () => {
+    if (!localStorage.getItem('theme')) applyTheme(systemTheme());
   });
 
-  const initial = localTheme || systemTheme;
-  button.dataset.theme = initial;
-  updateTheme(initial);
+  document.addEventListener('astro:after-swap', () => applyTheme(currentTheme()));
 
-  button.addEventListener('click', () => {
-    const next = button.dataset.theme === 'dark' ? 'light' : 'dark';
-    button.dataset.theme = next;
-    updateTheme(next);
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (!event.target.closest('#color-scheme-switch')) return;
+    const next = currentTheme() === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', next);
+    applyTheme(next);
   });
 </script>

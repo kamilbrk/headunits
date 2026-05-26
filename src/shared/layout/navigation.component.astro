@@ -132,9 +132,20 @@ const getAriaCurrent = (href: string) => {
 </div>
 
 <script>
+  const mobile = globalThis.matchMedia('(max-width: 1023px)');
+
   document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) return;
-    if (!event.target.closest('[data-sidebar-toggle]')) return;
-    document.querySelector('#primary-nav')?.classList.toggle('hidden');
+    const nav = document.querySelector('#primary-nav');
+    if (!nav) return;
+
+    if (event.target.closest('[data-sidebar-toggle]')) {
+      nav.classList.toggle('hidden');
+      return;
+    }
+
+    if (mobile.matches && !nav.classList.contains('hidden') && !nav.contains(event.target)) {
+      nav.classList.add('hidden');
+    }
   });
 </script>

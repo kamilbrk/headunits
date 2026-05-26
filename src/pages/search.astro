@@ -59,8 +59,12 @@ import Layout from '../shared/layout/base-layout.astro';
     html.dark .pagefind-ui {
       --pagefind-ui-primary: oklch(0.985 0 0);
       --pagefind-ui-text: oklch(0.985 0 0);
-      --pagefind-ui-border: oklch(0.21 0.034 264.665);
+      --pagefind-ui-border: oklch(0.446 0.03 256.802);
       --pagefind-ui-tag: oklch(0.21 0.034 264.665);
+    }
+    .pagefind-ui__search-input::placeholder {
+      color: var(--pagefind-ui-text);
+      opacity: 0.6;
     }
   </style>
 </Layout>
