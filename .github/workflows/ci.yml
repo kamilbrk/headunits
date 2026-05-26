@@ -29,24 +29,35 @@ jobs:
         run: npm run lint
       - name: Type check
         run: npx astro check
-
-  build:
-    needs: verify
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Build
+        run: npm run build
+      - name: Smoke test built artifacts
+        run: |
+          set -e
+          for path in \
+            dist/index.html \
+            dist/themes/ksw/index.html \
+            dist/themes/zxw/index.html \
+            dist/updates/ksw/index.html \
+            dist/updates/zxw/index.html \
+            dist/factory-settings/ksw/index.html \
+            dist/factory-settings/zxw/index.html \
+            dist/faq/ksw/index.html \
+            dist/faq/zxw/index.html \
+            dist/sitemap-index.xml \
+            dist/og-image.jpg
+          do
+            test -s "$path" || { echo "Missing or empty: $path"; exit 1; }
+          done
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
         with:
-          node-version-file: .nvmrc
-          cache: npm
-      - name: Build and upload site
-        uses: withastro/action@v6
+          path: ./dist
 
   deploy:
-    needs: build
+    needs: verify
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     # Serialize Pages deploys so rapid pushes don't collide on the
     # single-flight GitHub Pages deploy endpoint.
