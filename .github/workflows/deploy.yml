@@ -12,6 +12,13 @@ permissions:
   pages: write
   id-token: write
 
+# Serialize pages workflow runs so rapid pushes don't collide on the
+# single-flight GitHub Pages deploy. `cancel-in-progress: false` means
+# new runs queue behind any deploy already in flight.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   verify:
     runs-on: ubuntu-latest
