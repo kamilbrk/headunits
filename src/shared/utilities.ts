@@ -74,7 +74,7 @@ export async function getFirstLevelStaticPathsFromCollection<C extends Collectio
   collectionKey: C
 ) {
   const collection = await getCollection(collectionKey);
-  const firstLevelSlugs = collection.map((x) => x.id.split('/')[0] as string);
+  const firstLevelSlugs = collection.map((x) => x.id.split('/', 1)[0] as string);
   const unique = new Set(firstLevelSlugs);
 
   return [...unique].map((folder) => ({
