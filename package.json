@@ -18,10 +18,10 @@
   },
   "dependencies": {
     "@astrojs/check": "0.9.9",
-    "@astrojs/mdx": "6.0.2",
+    "@astrojs/mdx": "6.0.3",
     "@astrojs/sitemap": "3.7.3",
     "@tailwindcss/vite": "4.3.0",
-    "astro": "6.4.4",
+    "astro": "6.4.6",
     "astro-heroicons": "2.1.5",
     "astro-pagefind": "2.0.0",
     "typescript": "6.0.3"
@@ -42,7 +42,7 @@
     "eslint-plugin-sonarjs": "4.0.3",
     "eslint-plugin-unicorn": "65.0.1",
     "github-slugger": "2.0.0",
-    "prettier": "3.8.3",
+    "prettier": "3.8.4",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "0.8.0",
     "tailwindcss": "4.3.0",
