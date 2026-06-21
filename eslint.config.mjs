@@ -49,6 +49,16 @@ export default [
       'unicorn/prevent-abbreviations': 'off',
       'unicorn/no-array-sort': 'off',
       'unicorn/no-array-reverse': 'off',
+      // unicorn 68 naming rules conflict with project conventions
+      // (e.g. Astro's `Props` interface) — same opinionated family as
+      // the disabled `prevent-abbreviations`.
+      'unicorn/name-replacements': 'off',
+      'unicorn/consistent-boolean-name': 'off',
+      'unicorn/prefer-type-literal-last': 'off',
+      'unicorn/max-nested-calls': 'off',
+      // `exactOptionalPropertyTypes` makes `?` + `| undefined` meaningful,
+      // not redundant — required for zod `.optional()` output types.
+      'sonarjs/no-redundant-optional': 'off',
       'sonarjs/no-nested-template-literals': 'off',
       'sonarjs/no-nested-conditional': 'off',
       'sonarjs/slow-regex': 'warn',

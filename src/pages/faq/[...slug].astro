@@ -18,7 +18,7 @@ if (!entry) throw new Error(`Missing faq entry: ${slug}`);
 const { Content } = await render(entry);
 ---
 
-<Layout title={`${entry.data.question}`}>
+<Layout title={entry.data.question}>
   <div class="prose dark:prose-invert break-words">
     <Content />
     <a href={`${URL_PREFIX}${entry.collection}/${vendor.id}`} data-pagefind-ignore
