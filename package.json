@@ -20,7 +20,7 @@
     "@astrojs/check": "0.9.9",
     "@astrojs/mdx": "6.0.3",
     "@astrojs/sitemap": "3.7.3",
-    "@tailwindcss/vite": "4.3.1",
+    "@tailwindcss/vite": "4.3.2",
     "astro": "6.4.8",
     "astro-heroicons": "2.1.5-1",
     "astro-pagefind": "2.0.0",
@@ -46,7 +46,7 @@
     "prettier": "3.8.4",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "0.8.0",
-    "tailwindcss": "4.3.1",
+    "tailwindcss": "4.3.2",
     "typescript-eslint": "8.61.1"
   }
 }
