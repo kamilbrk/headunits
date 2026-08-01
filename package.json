@@ -17,13 +17,13 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "0.9.9",
-    "@astrojs/mdx": "6.0.3",
+    "@astrojs/check": "0.9.10",
+    "@astrojs/mdx": "7.0.5",
     "@astrojs/sitemap": "3.7.3",
     "@tailwindcss/vite": "4.3.1",
-    "astro": "6.4.8",
+    "astro": "7.1.5",
     "astro-heroicons": "2.1.5-1",
-    "astro-pagefind": "2.0.0",
+    "astro-pagefind": "2.0.1",
     "typescript": "6.0.3"
   },
   "overrides": {
