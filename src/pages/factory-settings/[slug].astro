@@ -6,6 +6,7 @@ import { SHIKI_THEMES, URL_PREFIX } from '../../shared/config';
 import { validateConfigKeys } from '../../shared/factory-config/validate-keys';
 import Layout from '../../shared/layout/base-layout.astro';
 import { getFirstLevelStaticPathsFromCollection, sortEntriesById } from '../../shared/utilities';
+import FactoryConfigBuilder from './_builder.component.astro';
 import FactorySettingsSection from './_section.component.astro';
 
 export async function getStaticPaths() {
@@ -37,6 +38,12 @@ if (xml) {
 
 <Layout title=`Factory settings for ${vendor.data.name}`>
   <article class="prose dark:prose-invert">
+    {
+      vendor.data.factoryConfigFileName && (
+        <FactoryConfigBuilder vendor={vendor.id} fileName={vendor.data.factoryConfigFileName} />
+      )
+    }
+
     {
       entries.length > 0 ? (
         entries.sort(sortEntriesById).map((entry) => <FactorySettingsSection slug={entry.id} />)

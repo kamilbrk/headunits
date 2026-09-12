@@ -175,6 +175,14 @@ check. All must pass before deploy. Don't merge if any is red.
   utility's name adds that utility to the built CSS and changes its hash. It is
   harmless, and it is the answer when the stylesheet moves and nobody touched a
   class.
+- **The factory-settings pages can read a reader's own config file.**
+  `_builder.component.astro` holds the panel and the only client script;
+  `_setting.component.astro` emits the `data-config-key` / `data-control` /
+  `data-on-value` / `data-config-value` attributes it reads. The file never
+  leaves the browser and there is no server to send it to — keep it that way.
+  The panel is server-rendered `hidden` and unhidden by the script, so with
+  JavaScript off the page is exactly what it was before. Like the other files
+  with an inline `<script>`, it is in the ESLint ignore list.
 - **Controls on the factory-settings pages are decorative.** They mirror
   what the car screen looks like and serve no form purpose, so they carry
   `disabled`, `tabindex="-1"` and `aria-hidden="true"` and deliberately have

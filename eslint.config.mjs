@@ -20,6 +20,7 @@ export default [
       'src/shared/layout/color-scheme-bootstrap.component.astro',
       'src/shared/layout/color-scheme.component.astro',
       'src/shared/layout/navigation.component.astro',
+      'src/pages/factory-settings/_builder.component.astro',
       'src/pages/search.astro'
     ]
   },
