@@ -11,7 +11,7 @@ signatures:
 ---
 #### Summary
 - Zlink updated to `5.4.54`
-- New [`EVOID9_ALS`](/themes/ksw/evoid9_als) and [`EVOID8_UG_2mode`](/themes/ksw/evoid8_ug_2mode) themes
+- New `EVOID9_ALS` and `EVOID8_UG_2mode` themes
 
 #### Changes
 - For detailed changes, see [M700 1.3.8](/updates/ksw/m700/ksw-t-m700_os_v138-ota), [M700 1.3.9](/updates/ksw/m700/ksw-t-m700_os_v139-ota) and [M700 1.4.0](/updates/ksw/m700/ksw-t-m700_os_v140-ota) updates.

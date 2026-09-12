@@ -16,8 +16,8 @@ signatures:
 #### Changes
 - New factory setting `<custom_bt_name>` to set Bluetooth device name
 - New events to handle swiping from left and right edges of the screen
-- Free window on [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme can be now hidden/shown
-- Memory management optimisations on [`EVOID8_UG_2mode`](/themes/ksw/evoid8_ug_2mode) theme
+- Free window on `EVOID9_ALS` theme can be now hidden/shown
+- Memory management optimisations on `EVOID8_UG_2mode` theme
 - Updated English translations (mostly spelling and grammar) across main launcher, media apps, factory settings, etc.
 - Added Ukrainian language option
 - Ksw360Camera app: changes to limit the amount of "open" cameras to three
