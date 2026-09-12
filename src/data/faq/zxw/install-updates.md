@@ -1,6 +1,10 @@
 ---
 question: 'How to install OTA firmware updates?'
 ---
+Installing an OTA that was not built for your platform can leave the unit stuck at boot with
+no user-accessible recovery. Check [which platform you have](/platforms/zxw) before copying
+anything to the USB drive, and read [before you change anything](/safety).
+
 1. Download suitable firmware OTA update. Check Discord or forums for links.
 2. Compare file signatures with values from [Updates](/updates/zxw) page (if available) to make sure file is not corrupted.
 3. Copy the `update[...].zip` archive directly to the root of the USB drive.
