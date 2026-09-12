@@ -4,12 +4,18 @@ settings:
   - name: "USB HOST"
     configKey: usbHostMode
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Hicar"
     configKey: hicarVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Google Apps"
     configKey: googleVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   # - name: "Google Voice"
   #   configKey: googleVoiceSwitch
   #   control: checkbox
@@ -17,37 +23,59 @@ settings:
   - name: "AUX"
     configKey: auxVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "DTV"
     configKey: dtvVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "F_CAM"
     configKey: frontCamera
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "screen cast-MS9120"
     configKey: screenCastVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "The original car host supports touch"
     nameOld: "Touch data continuously sent"
     configKey: touchData
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Sound APK"
     configKey: eqVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Weather APK"
     configKey: weatherVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Bluetooth transmitter switch"
     configKey: doubleBtTransmit
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "USB BT transmit"
     configKey: btTransmitVisible
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Automatically enter navigation upon startup"
     configKey: bootStartNavi
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Night brightness bar"
     configKey: backlightBrightnessNightShow
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Amplifier Selection"
     configKey: amplifierSelection
     children:

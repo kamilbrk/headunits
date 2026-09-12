@@ -5,6 +5,10 @@ settings:
     nameOld: "Car Without OEM Monitor"
     configKey: CarDisplay
     control: checkbox
+    onValue: 1
+    offValue: 0
+    editable: false
+    warning: "Which way round this value goes is not confirmed. ZXW calls the same setting `notHaveScreen`, which reads as the opposite of `CarDisplay`, and neither file carries a comment saying which is which. Change it by hand if you need it."
     description: "Selecting the \"CAR\" menu option will display a clock instead of OEM system. Choose this option on cars without OEM screen, e.g. old BMW X1."
   - name: "AUX Switching Modes"
     configKey: CarAux_Operate
@@ -62,6 +66,8 @@ settings:
       control: radio
   - name: "Speedometer Selection"
     configKey: Dashboard_MaxSpeed # UnitImperial+Value1=160mph, UnitImperial+Value3=180mph, UnitMetric+Value1=280kmph, UnitMetric+Value3=280kmph, UnitMetric+Value2+Vendor3Audi=300kmph, ELSE=Value1=260kmph
+    editable: false
+    warning: "What this writes depends on more than one element — the unit combination and the vendor both change the result, per the comment above. Not enough is known to change it safely from here."
     children:
     - name: "260km/h"
       control: radio
@@ -110,6 +116,7 @@ settings:
       control: radio
   - name: "Speed Type Selection"
     configKey: Speed_type
+    unverified: true
     children:
     - name: "Speed Type 1"
       configValue: 0
@@ -157,6 +164,8 @@ settings:
   - name: "CAN Bus Data Acquisition"
     nameOld: "Collect CAN Bus Data"
     control: checkbox
+    onValue: 1
+    offValue: 0
     children:
       - name: "Can1"
         control: radio
@@ -164,6 +173,7 @@ settings:
         control: radio
   - name: "Steering wheel track selection" # drive_track_selected in strings, rdg_track for radios
     configKey: DirtTravelSelection # KeyConfig.DRIVE_TRACK
+    unverified: true
     children:
     - name: "track1" # 0
       control: radio
@@ -171,6 +181,7 @@ settings:
       control: radio
   - name: "360 boot up camera"
     configKey: BootUpCamera
+    unverified: true
     children:
     - name: "No camera use"
       control: radio
@@ -186,6 +197,7 @@ settings:
       control: radio
   - name: "MIC external built-in toggle switch"
     configKey: MicControl
+    unverified: true
     children:
     - name: "External"
       control: radio
