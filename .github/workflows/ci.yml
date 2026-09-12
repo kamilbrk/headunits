@@ -47,12 +47,17 @@ jobs:
             dist/faq/ksw/index.html \
             dist/faq/zxw/index.html \
             dist/sitemap-index.xml \
+            dist/rss.xml \
             dist/og-image.jpg \
             dist/pagefind/pagefind-ui.js \
             dist/pagefind/pagefind-ui.css
           do
             test -s "$path" || { echo "Missing or empty: $path"; exit 1; }
           done
+      - name: Validate built HTML
+        run: npm run check:html
+      - name: Check internal links
+        run: npm run check:links
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5

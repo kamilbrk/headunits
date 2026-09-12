@@ -92,17 +92,21 @@ export async function getCollectionGroupedByCollection<
   filterFn?: (parent: CollectionEntryWithEntries<P, C>) => boolean
 ) {
   const children = await getCollection(childrenCollectionKey);
-  const parents: CollectionEntryWithEntries<P, C>[] = await getCollection(parentsCollectionKey);
+  const parents = await getCollection(parentsCollectionKey);
 
-  for (const parent of parents) {
-    parent.entries = children.filter((entry) => entry.id.startsWith(parent.id));
-  }
+  // Copied rather than mutated so the returned shape is built here rather than
+  // bolted onto entries the caller also holds a reference to.
+  const grouped: CollectionEntryWithEntries<P, C>[] = parents.map((parent) => ({
+    ...parent,
+    entries: children.filter((entry) => entry.id.startsWith(parent.id))
+  }));
 
-  if (filterFn) {
-    return parents.reverse().filter((x) => filterFn(x));
-  }
+  // Newest hardware first (m700, m600, m501), regardless of whether a filter
+  // was passed — the ordering used to depend on that and silently differed
+  // between call sites.
+  grouped.sort((entryA, entryB) => entryB.id.localeCompare(entryA.id));
 
-  return parents;
+  return filterFn ? grouped.filter((entry) => filterFn(entry)) : grouped;
 }
 
 export function sortEntriesByDate(

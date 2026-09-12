@@ -11,7 +11,7 @@ signatures:
 ---
 Summary:
 - Mostly internal changes, nothing to see here
-- Due to `Witstek-` file name prefix, you need to either upgrade from at least [M700 1.4.2](/headunits/updates/ksw/m700/ksw-t-m700_os_v142-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.
+- Due to `Witstek-` file name prefix, you need to either upgrade from at least [M700 1.4.2](/updates/ksw/m700/ksw-t-m700_os_v142-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.
 
 Changes since `Ksw-T-M700_OS_v1.5.5-ota` built 22 days earlier:
 - Ksw360Camera: New "Function button display" setting with "Left and right ends" and "Bottom" options

@@ -3,7 +3,7 @@ import { URL_PREFIX } from '../shared/config';
 import Layout from '../shared/layout/base-layout.astro';
 ---
 
-<Layout title="Search">
+<Layout title="Search" indexed={false}>
   <link rel="stylesheet" href={`${URL_PREFIX}pagefind/pagefind-ui.css`} />
   <div id="search" class="pagefind-ui"></div>
 
@@ -18,7 +18,8 @@ import Layout from '../shared/layout/base-layout.astro';
         element: '#search',
         showSubResults: false,
         showImages: false,
-        resetStyles: false
+        resetStyles: false,
+        showEmptyFilters: false
       });
 
       const input = el.querySelector('input[type="text"]');

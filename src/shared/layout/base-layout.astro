@@ -5,18 +5,43 @@ import './global.css';
 import { ClientRouter } from 'astro:transitions';
 
 import { DEFAULT_PAGE_DESCRIPTION, DEFAULT_PAGE_TITLE, DOMAIN, URL_PREFIX } from '../config';
+import ColorSchemeBootstrap from './color-scheme-bootstrap.component.astro';
 import Navigation from './navigation.component.astro';
 
 export interface Props {
   title?: string;
   description?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /**
+   * Extra Pagefind facets for this page, on top of the ones read from the URL.
+   */
+  filters?: Record<string, string | number | undefined>;
+  /**
+   * Whether this page belongs in the search index. The 404 and search pages
+   * have no content worth returning, and indexing them puts `404` and
+   * `search` into the section facet as selectable values.
+   */
+  indexed?: boolean;
 }
 
-const { title: pageTitle, description: pageDescription, jsonLd: pageJsonLd } = Astro.props;
+const {
+  title: pageTitle,
+  description: pageDescription,
+  jsonLd: pageJsonLd,
+  filters: pageFilters,
+  indexed = true
+} = Astro.props;
 const title = pageTitle || DEFAULT_PAGE_TITLE;
 const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
 const canonicalUrl = new URL(Astro.url.pathname, DOMAIN);
+const rssUrl = new URL(`${URL_PREFIX}rss.xml`, DOMAIN).href;
+
+// Section and vendor come straight from the route, so every page is filterable
+// in search without each one having to declare them.
+const [section, vendor] = Astro.url.pathname.slice(URL_PREFIX.length).split('/', 2);
+const pagefindFilters = Object.entries({ section, vendor, ...pageFilters }).filter(
+  ([, value]) => value !== undefined && value !== ''
+);
 const ogImageUrl = new URL(`${URL_PREFIX}og-image.jpg`, DOMAIN).href;
 
 const websiteJsonLd = {
@@ -33,16 +58,26 @@ const jsonLdBlocks = [
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <ColorSchemeBootstrap />
 
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl.href} />
     <link rel="sitemap" type="application/xml" href={`${URL_PREFIX}sitemap-index.xml`} />
-    <meta name="theme-color" content="#111827" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${DEFAULT_PAGE_TITLE} — firmware updates`}
+      href={rssUrl}
+    />
+    <link rel="preconnect" href="https://cloud.umami.is" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -78,7 +113,15 @@ const jsonLdBlocks = [
   <body class="bg-white dark:bg-gray-900">
     <Navigation title={title} />
 
-    <main class="max-w-(--breakpoint-2xl) py-8 lg:pl-72" data-pagefind-body>
+    <main class="max-w-(--breakpoint-2xl) py-8 lg:pl-72" data-pagefind-body={indexed || undefined}>
+      {
+        /* One element per facet: Pagefind reads a single `key:value` per
+           attribute and treats a comma-separated list as one literal value. */
+        indexed &&
+          pagefindFilters.map(([key, value]) => (
+            <div hidden data-pagefind-filter={`${key}:${value}`} />
+          ))
+      }
       <div class="px-4 sm:px-6 lg:px-8">
         {
           title !== DEFAULT_PAGE_TITLE && (

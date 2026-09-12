@@ -11,7 +11,7 @@ signatures:
 ---
 Summary:
 - Mostly internal changes, nothing to see here
-- Due to `Witstek-` file name prefix, you need to either upgrade from at least [M600 1.6.9](/headunits/updates/ksw/m600/ksw-t-m600_os_v169-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.
+- Due to `Witstek-` file name prefix, you need to either upgrade from at least [M600 1.6.9](/updates/ksw/m600/ksw-t-m600_os_v169-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.
 
 Changes since `Ksw-T-M600_OS_v1.7.6-ota` built 22 days earlier:
-- See [M700 1.5.6](/headunits/updates/ksw/m700/witstek-t-m700_os_v156-ota) update, as they were built from the same source and at the same time.
+- See [M700 1.5.6](/updates/ksw/m700/witstek-t-m700_os_v156-ota) update, as they were built from the same source and at the same time.

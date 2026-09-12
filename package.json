@@ -1,5 +1,6 @@
 {
   "license": "MIT",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/kamilbrk/headunits"
@@ -9,6 +10,8 @@
   },
   "scripts": {
     "lint": "eslint src/",
+    "check:html": "html-validate \"dist/**/*.html\"",
+    "check:links": "node scripts/check-links.mjs",
     "lint:fix": "eslint --fix src/",
     "prettier": "prettier --write **/*.{astro,css,js,ts}",
     "dev": "astro dev",
@@ -18,12 +21,15 @@
   },
   "dependencies": {
     "@astrojs/check": "0.9.10",
+    "@astrojs/markdown-satteri": "0.4.1",
     "@astrojs/mdx": "8.0.1",
+    "@astrojs/rss": "4.0.19",
     "@astrojs/sitemap": "3.7.4",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.3.2",
     "astro-heroicons": "2.1.5-1",
     "astro-pagefind": "2.0.1",
+    "satteri": "0.10.5",
     "typescript": "6.0.3"
   },
   "overrides": {
@@ -43,6 +49,7 @@
     "eslint-plugin-sonarjs": "4.2.0",
     "eslint-plugin-unicorn": "74.0.0",
     "github-slugger": "2.0.0",
+    "html-validate": "11.15.0",
     "prettier": "3.9.6",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "0.8.1",
