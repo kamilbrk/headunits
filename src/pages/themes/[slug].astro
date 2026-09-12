@@ -9,7 +9,7 @@ import {
 import ThemesListItem from './_list-item.component.astro';
 
 export async function getStaticPaths() {
-  return await getFirstLevelStaticPathsFromCollection('updates');
+  return await getFirstLevelStaticPathsFromCollection('vendors');
 }
 
 const { slug } = Astro.params;

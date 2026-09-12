@@ -8,26 +8,17 @@ interface Props {
 }
 
 const { items } = Astro.props;
+const head = items.slice(0, -1);
+const last = items.at(-1);
 ---
 
 <>
   {
-    items.length === 1 ? (
-      <LinkOrTextComponent item={items[0]!!} />
-    ) : items.length === 2 ? (
+    head.map((item, index) => (
       <>
-        <LinkOrTextComponent item={items[0]!!} /> and <LinkOrTextComponent item={items[1]!!} />
+        <LinkOrTextComponent item={item} />
+        {index < head.length - 1 && ', '}
       </>
-    ) : (
-      <>
-        {items.slice(0, -1).map((item, index) => (
-          <>
-            <LinkOrTextComponent item={item} />
-            {index < items.length - 2 && ', '}
-          </>
-        ))}{' '}
-        and <LinkOrTextComponent item={items.at(-1)!!} />
-      </>
-    )
-  }
+    ))
+  }{head.length > 0 && ' and '}{last !== undefined && <LinkOrTextComponent item={last} />}
 </>

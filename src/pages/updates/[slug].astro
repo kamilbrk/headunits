@@ -11,7 +11,7 @@ import {
 } from '../../shared/utilities';
 
 export async function getStaticPaths() {
-  return await getFirstLevelStaticPathsFromCollection('updates');
+  return await getFirstLevelStaticPathsFromCollection('vendors');
 }
 
 const { slug } = Astro.params;
