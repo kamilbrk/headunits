@@ -1,0 +1,56 @@
+---
+import { getCollection, render } from 'astro:content';
+import { slug } from 'github-slugger';
+
+import Layout from '../shared/layout/base-layout.astro';
+
+const entries = await getCollection('glossary');
+const rendered = await Promise.all(
+  entries
+    .toSorted((entryA, entryB) =>
+      entryA.data.term.localeCompare(entryB.data.term, 'en', { sensitivity: 'base' })
+    )
+    .map(async (entry) => {
+      const { Content } = await render(entry);
+      return { entry, anchor: slug(entry.data.term), Content };
+    })
+);
+---
+
+<Layout
+  title="Glossary"
+  description="What Zlink, MCU, OTA, CAN and the other terms used across this site actually mean."
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    <p>
+      Terms that turn up across this site and in firmware changelogs, in the sense they are used
+      here.
+    </p>
+
+    <ul class="not-prose flex flex-wrap gap-x-3 gap-y-1 text-sm">
+      {
+        rendered.map(({ entry, anchor }) => (
+          <li>
+            <a class="text-indigo-600 hover:underline dark:text-indigo-400" href={`#${anchor}`}>
+              {entry.data.term}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      rendered.map(({ entry, anchor, Content }) => (
+        <section>
+          <h3 id={anchor}>{entry.data.term}</h3>
+          {entry.data.aliases && (
+            <p class="-mt-4 text-sm text-gray-500 dark:text-gray-400">
+              Also written {entry.data.aliases.join(', ')}
+            </p>
+          )}
+          <Content />
+        </section>
+      ))
+    }
+  </div>
+</Layout>
