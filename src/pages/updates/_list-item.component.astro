@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { getEntry } from 'astro:content';
+
+import { URL_PREFIX } from '../../shared/config';
+import { getAndroidVersion } from '../../shared/utilities';
+
+interface Props {
+  entry: CollectionEntry<'updates'>;
+  /**
+  Show which vendor and platform the update belongs to, for mixed lists.
+  */
+  showPlatform?: boolean;
+}
+
+const { entry, showPlatform = false } = Astro.props;
+
+const platform = showPlatform
+  ? await getEntry('platforms', `${entry.data.vendor}/${entry.data.platform}`)
+  : undefined;
+---
+
+<li>
+  <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>{' '}
+  <span>(A{getAndroidVersion(entry)})</span>{' '}
+  <time datetime={entry.data.date.toISOString()}>
+    {entry.data.date.toISOString().slice(0, 10)}
+  </time>
+  {
+    platform && (
+      <>
+        {' — '}
+        <a href={`${URL_PREFIX}${platform.collection}/${platform.id}`}>{platform.data.name}</a>
+      </>
+    )
+  }
+</li>
