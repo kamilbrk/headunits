@@ -24,7 +24,7 @@ const calculate = (from: string, to?: string) => {
 
   for (const u of Object.keys(UNITS) as Intl.RelativeTimeFormatUnit[]) {
     const ms = UNITS[u]!;
-    if (Math.abs(elapsed) > ms || u === 'second') {
+    if (u === 'second' || Math.abs(elapsed) > ms) {
       return rtf.format(Math.round(elapsed / ms), u);
     }
   }
