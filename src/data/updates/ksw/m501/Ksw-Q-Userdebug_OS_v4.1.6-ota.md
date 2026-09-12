@@ -5,7 +5,7 @@ platform: m501
 android: 10
 date: 2023-07-17T05:58:17Z
 ---
-Changes since `Ksw-Q-Userdebug_OS_v4.0.7-ota`
+#### Changes
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.3.24` to `5.4.2`
     - Added labels for "Echo cancellation" (with 3 algorithms to choose from), "Noise reduction" and "Ring volume adjustment"
 - APKInstaller (`com.wits.apk`) app updated from `1.0_20221126` to `1.0_20230710`

@@ -4,8 +4,10 @@ vendor: ksw
 platform: m600
 android: 12
 date: 2023-07-01T01:10:14Z
+comparedTo:
+  - ksw/m600/ksw-s-m600_os_v121nexai-ota
 ---
-Changes since `Ksw-S-M600_OS_v1.2.1NEXAI-ota`:
+#### Changes
 - Added Croatian language option (`hr`)
 - Added "MCU restart" option
 - KswPLauncher (`com.wits.ksw`) app updated from `1.20_230129` to `1.20_230727`

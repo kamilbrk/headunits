@@ -9,8 +9,8 @@ signatures:
   sha1: 165399c8da9587e9dfc85eb11e5ef4185dee5707
   sha256: 0bbeb82b8831664dbef221a1aea4785a0e960e7e1a720cf2309601b76382b75f
 ---
-Summary:
+#### Summary
 - Minor fixes for ID8 theme
 
-Changes since `Ksw-T-M600_OS_v1.6.9-ota` built 7 days earlier:
+#### Changes
 - For further changes, see [M700 1.4.4](/updates/ksw/m700/ksw-t-m700_os_v144-ota) update, as they were built from the same source and at the same time.

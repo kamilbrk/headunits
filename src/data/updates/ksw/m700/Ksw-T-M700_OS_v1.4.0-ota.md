@@ -9,8 +9,8 @@ signatures:
   sha1: 10be7f2a4a0f6440fe77304a3e18b4da18ca77e1
   sha256: c276aa10144d32992d28dcc869433e17efb70f921c45a2bf9b8a31b30d3fb588
 ---
-Summary:
+#### Summary
 - Minor updates to the new [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme
 
-Changes since `Ksw-T-M700_OS_v1.3.9-ota` built 3 days earlier:
+#### Changes
 - Further additions for [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme including "one-click access to original car interface" option, updated graphics, music observer/controls functionality, new "app" option, fixes for Bluetooth calling

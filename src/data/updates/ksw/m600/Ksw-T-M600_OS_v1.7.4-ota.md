@@ -9,10 +9,10 @@ signatures:
   sha1: 47e917938d80c8d4b6c9513e669b3feb8c0bf2e6
   sha256: 6e3d7436611145b7b9a33b480c7044ed3a65e753ebc8a87f268156eaa7f24784
 ---
-Summary:
+#### Summary
 - Zlink app updated `5.4.63`
 - Lots of updated English labels and translations, fixing spelling, etc.
 - Added Ukrainian translations
 
-Changes since `Ksw-T-M600_OS_v1.7.1-ota` built 35 days earlier:
+#### Changes
 - See both [M700 1.4.5](/updates/ksw/m700/ksw-t-m700_os_v145-ota) and [M700 1.5.0](/updates/ksw/m700/ksw-t-m700_os_v150-ota) updates, as they were built from the same source and at the same time.

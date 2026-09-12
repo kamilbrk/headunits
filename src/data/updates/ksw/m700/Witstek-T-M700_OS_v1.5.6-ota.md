@@ -9,11 +9,11 @@ signatures:
   sha1: fd98944197dd7b3bf2fbf4b06f15429b80f64f1b
   sha256: da90042237e3776611a27e5ffb531f6576e53107f9fcb78b91530e0b04331096
 ---
-Summary:
+#### Summary
 - Mostly internal changes, nothing to see here
 - Due to `Witstek-` file name prefix, you need to either upgrade from at least [M700 1.4.2](/updates/ksw/m700/ksw-t-m700_os_v142-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.
 
-Changes since `Ksw-T-M700_OS_v1.5.5-ota` built 22 days earlier:
+#### Changes
 - Ksw360Camera: New "Function button display" setting with "Left and right ends" and "Bottom" options
 - Fixed missing version information display on Audi theme
 - New `witssudo` service with a corresponding `/system/bin/wits_sudo.sh` script that can swap some files via `getprop wits.logo1` (splash), `getprop wits.logo2` (bootlogo and bootanimation) and `getprop wits.item` (?)

@@ -171,7 +171,10 @@ export function sortEntriesByThemeNumber(
   return sortEntriesByDataId(entryA, entryB);
 }
 
-const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-\w+_v([\d.]+)-ota/;
+// The version may carry a build-flavour suffix before `-ota`, as in
+// `Ksw-S-M600_OS_v1.5.4NEXAI-ota`, which is why the suffix is matched and
+// discarded rather than assumed absent.
+const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-\w+_v([\d.]+)[A-Za-z]*-ota/;
 const REGEX_ZXW = /(\d{8})GT_KSW/;
 
 export function getAndroidVersion(entry: CollectionEntry<'updates'>) {

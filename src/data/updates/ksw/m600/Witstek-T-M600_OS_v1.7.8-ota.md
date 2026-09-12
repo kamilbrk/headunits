@@ -9,9 +9,9 @@ signatures:
   sha1: 4673184c80db29fdd9c937afb5cd4a82257e2cdd
   sha256: b32e17053607e523ba403cff72d8733de7542120a345bcec38dde4b95ed3dbb9
 ---
-Summary:
+#### Summary
 - Mostly internal changes, nothing to see here
 - Due to `Witstek-` file name prefix, you need to either upgrade from at least [M600 1.6.9](/updates/ksw/m600/ksw-t-m600_os_v169-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.
 
-Changes since `Ksw-T-M600_OS_v1.7.6-ota` built 22 days earlier:
+#### Changes
 - See [M700 1.5.6](/updates/ksw/m700/witstek-t-m700_os_v156-ota) update, as they were built from the same source and at the same time.

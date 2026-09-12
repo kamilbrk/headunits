@@ -9,14 +9,14 @@ signatures:
   sha1: 721d4dd2ae556168fbb7dc79e2e40e176e30db08
   sha256: c1651e789ae3fcf24288c1504fc92c49b1a26a98406c358ea5ae9b10f62da2ad
 ---
-Summary:
+#### Summary
 - Zlink update 5.4.19 with "Recording mic file", "Noise reduction" and "Echo cancellation"
 - Version strings are now prefixed with `Witstek `
 - Further work on Ksw 360 Camera app
 - Fix for signal status icon
 - Partial fix for USB permission issues
 
-Changes since `Ksw-T-M600_OS_v1.2.0-ota`:
+#### Changes
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.3.49` to `5.4.19`
     - Internal checks to see if it's running on Android 13 (SDK 33) and mark some internal class files as read-only.
     - Updated Tencent Legu packer from `4.5.0.4` to `4.5.2.5`

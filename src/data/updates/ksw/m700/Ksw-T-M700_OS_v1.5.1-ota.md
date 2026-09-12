@@ -9,10 +9,10 @@ signatures:
   sha1: 1af9958fc47b8b580abbd224baaace4ec3b9bc25
   sha256: 1c9faccad7b7a3102c43fd76a5e8395f273a669323d6cfd3bfd44ba8cebc40af
 ---
-Summary:
+#### Summary
 - Zlink updated to 5.4.75
 
-Changes since `Ksw-T-M700_OS_v1.5.0-ota` built 12 days earlier:
+#### Changes
 - Zlink app updated from `5.4.63` to `5.4.75`, potential updates to wireless mirroring for Android and iOS phones, using mobile phone's Wi-Fi hotspot
 - Minor updates to [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme including new graphics, ability to show car speed in mph (in addition to existing kph) and support for more apps like Music, Video and Equalizer
 - More Ukrainian translations
