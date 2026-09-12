@@ -9,8 +9,8 @@ signatures:
   sha1: 5d9b0f4c1b83cb1614fc04332159876b6a7ec4a3
   sha256: d64f1c78638e03c148a461817a20d67b9995d1ec613f10cd1cf2ff1bd832346a
 ---
-Summary:
+#### Summary
 - Nothing, really.
 
-Changes since `Ksw-T-M600_OS_v1.5.9-ota` built 18 days earlier:
+#### Changes
 - Further changes to support [`UI_NTG6_FY_V3`](/themes/ksw/ui_ntg6_fy_v3) Benz theme partially introduced in 1.5.9

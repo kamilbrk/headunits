@@ -9,10 +9,10 @@ signatures:
   sha1: 903f8fb9f36b7e395ac29f209d4b6fc5f91f7a44
   sha256: 9587e94fd5b9c1254c84bff42aeef5b3bee90013c1c0e9209f0acee5f96cdd4d
 ---
-Summary:
+#### Summary
 - Zlink app updated `5.4.63`
 
-Changes since `Ksw-T-M700_OS_v1.4.4-ota` built 7 days earlier:
+#### Changes
 - Zlink app updated from `5.4.58` to `5.4.63`
 - Minor updates to various themes, mostly [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme
 

@@ -14,6 +14,7 @@ import {
   getUpdateVersion,
   getVendorSlug
 } from '../../shared/utilities';
+import Baseline from './_baseline.component.astro';
 import FileSignatures from './_file-signatures.component.astro';
 
 export async function getStaticPaths() {
@@ -83,6 +84,8 @@ const jsonLd = {
       {getAndroidVersion(entry)} for {vendor.data.name} devices running on {platform.data.name}{' '}
       platform, built on <strong><DateTime date={entry.data.date} /></strong>.
     </p>
+
+    <Baseline entry={entry} previous={previous} />
 
     {
       entry.body ? (

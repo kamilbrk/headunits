@@ -9,10 +9,10 @@ signatures:
   sha1: d2eb7f509ea49ce67583372c430ceacde8a972e7
   sha256: a3a123aeeebb349d467cd2ac70a5b391060ec0025dd4babbedf6b31247b20aa5
 ---
-Summary:
+#### Summary
 - Zlink updated to `5.4.58` with split screen (?)
 
-Changes since `Ksw-T-M700_OS_v1.4.0-ota` built 6 days earlier:
+#### Changes
 - Zlink updated from `5.4.54` to `5.4.58`, potentially supporting split screen since all activities are now marked as resizable
 - OTA updates with Android 13 can now be also prefixed with `Witstek-T-` in addition to existing `Ksw-T-`, for example `Witstek-T-M785_OS_v1.4.2-ota.zip`
 - Added a scrollbar to the apps view on [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme

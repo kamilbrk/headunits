@@ -5,7 +5,7 @@ platform: m501
 android: 10
 date: 2023-03-02T05:01:46Z
 ---
-Changes since `Ksw-Q-Userdebug_OS_v3.9.6-ota`:
+#### Changes
 - KswPLauncher (`com.wits.ksw`) app updated from `1.20_221216` to `1.20_230301_3`
     - Added [UI_GS_ID8](/themes/ksw/ui_gs_id8) theme with efficient (blue), sport (red) and default (yellow) skins
     - Added weather functionality to Audi theme

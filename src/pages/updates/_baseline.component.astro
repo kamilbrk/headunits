@@ -1,0 +1,53 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { getEntry } from 'astro:content';
+
+import DelimitedLinks from '../../shared/delimited-links.component.astro';
+import { getUpdateReferences } from '../../shared/utilities';
+
+interface Props {
+  entry: CollectionEntry<'updates'>;
+  /**
+  The previous entry on the same platform, used when no override is set.
+  */
+  previous: CollectionEntry<'updates'> | undefined;
+}
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const HANDWRITTEN_BASELINE = /^Changes since `/m;
+
+const { entry, previous } = Astro.props;
+
+// One entry compares against two baselines in prose and cannot be reduced to
+// a single generated sentence, so it keeps its hand-written lines.
+const handwritten = HANDWRITTEN_BASELINE.test(entry.body ?? '');
+
+const overrides = entry.data.comparedTo;
+const baselineIds = handwritten ? [] : (overrides ?? (previous ? [previous.id] : []));
+const baselines = await getUpdateReferences(baselineIds);
+
+const dates = await Promise.all(
+  baselineIds.map(async (id) => {
+    const baseline = await getEntry('updates', id);
+    return baseline?.data.date;
+  })
+);
+const oldest = dates.filter((date) => date !== undefined).map((date) => +date);
+const days =
+  oldest.length > 0 ? Math.round((+entry.data.date - Math.min(...oldest)) / MS_PER_DAY) : undefined;
+---
+
+{
+  baselines.length > 0 && (
+    <p>
+      Changes since <DelimitedLinks items={baselines} />
+      {days !== undefined && days > 0 && (
+        <>
+          , built {days} {days === 1 ? 'day' : 'days'} earlier
+        </>
+      )}
+      .
+    </p>
+  )
+}

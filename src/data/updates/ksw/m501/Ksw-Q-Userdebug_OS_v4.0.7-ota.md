@@ -5,7 +5,7 @@ platform: m501
 android: 10
 date: 2023-03-23T07:34:25Z
 ---
-Changes since `Ksw-Q-Userdebug_OS_v4.0.4-ota`
+#### Changes
 - KugouAuto (`com.kugou.android.auto`) app updated from `1.1.7` to `3.5.4`
 - KswPLauncher (`com.wits.ksw`) app updated from `1.20_230301_3` to `1.20_230323`
 - KswPMedia (`com.wits.ksw.media`) app updated from `1.2_230228` to `1.2_230323`
