@@ -9,10 +9,10 @@ signatures:
   sha1: 5435ab0ba8b990b8860e56d8d392fb6f96b816e0
   sha256: e5b3cecc9eb5fcfa99c3314ea7f053895896dc27760eba853aa8e14615572286
 ---
-Summary:
+#### Summary
 - Minor fixes for ID8 theme
 
-Changes since `Ksw-T-M700_OS_v1.4.2-ota` built 7 days earlier:
+#### Changes
 - Minor fixes for ID8 theme
 - WitsScreencast app learned new tricks, has a new "USB Display" launcher icon and ability to flash firmware upgrades. Some internal packages were renamed from `com.ms.ms2160` to `com.ms.msdisplay` and its display name changed from `MS9120` to `MS`. There are new labels suggesting switching between low and high quality, screen resolution, etc.
 

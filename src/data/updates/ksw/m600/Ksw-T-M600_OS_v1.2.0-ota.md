@@ -9,7 +9,7 @@ signatures:
   sha1: de060a92cc2d55e701042dcb64ea8491db68b7fd
   sha256: a5c47c6bd7a2fbfed52ceeced01e687131f6ccff285afb43cd2997ce99a8c432
 ---
-Changes since `Ksw-T-M600_OS_v1.1.9-ota`:
+#### Changes
 - Ksw360Camera (`com.ivicar.avm`) app updated to `1.0.1_231010_1`
     - New code to set `vendor.wits.360camera.power.open` setting
     - Disabled camera auto recording by default

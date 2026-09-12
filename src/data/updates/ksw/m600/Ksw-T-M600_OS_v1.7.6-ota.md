@@ -9,9 +9,9 @@ signatures:
   sha1: d38127f3dc55696fa46da78a7f2693244a84e89f
   sha256: b146d0a3f47f10790cb84dbda19851db04170678544745a325599633eea6f743
 ---
-Summary:
+#### Summary
 - Zlink updated to 5.4.76
 - [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme is now feature complete
 
-Changes since `Ksw-T-M600_OS_v1.7.4-ota` built 36 days earlier:
+#### Changes
 - See both [M700 1.5.1](/updates/ksw/m700/ksw-t-m700_os_v151-ota) and [M700 1.5.5](/updates/ksw/m700/ksw-t-m700_os_v155-ota) updates, as they were built from the same source and at the same time.

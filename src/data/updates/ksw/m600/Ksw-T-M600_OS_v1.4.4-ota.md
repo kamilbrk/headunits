@@ -8,11 +8,13 @@ signatures:
   md5: d9b20236d8753463e9a7ab6608163a59
   sha1: 8d7fa62686de537a2f528d2708ce49260b1066f5
   sha256: 4b78ccf89d847513343c445faf9213ee251849f3c17aba0650737ee1b3b64dd9
+comparedTo:
+  - ksw/m600/ksw-t-m600_os_v140-ota
 ---
-Summary:
+#### Summary
 - Minor performance updates in main launcher
 
-Changes since `Ksw-T-M600_OS_v1.4.0-ota` built 20 days earlier:
+#### Changes
 - Ksw360Camera (`com.ivicam.avm`) app updated from `1.0.1_231207` to `1.0.1_231227`
   - Changes to splash activity
   - Support for 1280x720 screen resolution

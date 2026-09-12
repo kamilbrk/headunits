@@ -9,11 +9,11 @@ signatures:
   sha1: 84be79669dd890c61e64ef5401b15b4d3187fa4a
   sha256: a65dddc361de19eae1dbe91a3ade81b47c06aeddf583ac250ca38de3f8b82db7
 ---
-Summary:
+#### Summary
 - Looks like Android 10 updates for M501/SD625 are recently showing up more often and are kept in line with latest Android 13 images for M600/SD662 and M700/SD680
 - Launcher and Zlink are updated to latest versions
 
-Changes since `Ksw-Q-Userdebug_OS_v4.2.0-ota`:
+#### Changes
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.4.2` to `5.4.25`
     - Same updates as in M600 A13 1.4.0
     - Added Huawei HiCar graphics and even more HiCar labels than A13 version

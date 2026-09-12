@@ -9,10 +9,10 @@ signatures:
   sha1: 537f88c1e7d990d594936aa902362848cf60beb5
   sha256: 0bfbb7ef8ab0c2e1d10c104846b2ee76b0cbde3961bf95256e82befa5d54d857
 ---
-Summary:
+#### Summary
 - Potentially fixed USB permissions
 
-Changes since `Ksw-T-M600_OS_v1.3.8-ota` built 6 days earlier:
+#### Changes
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.4.23` to `5.4.26`
 - Ksw360Camera (`com.ivicar.avm`) app updated from `1.0.1_231129` to `1.0.1_231207`
   - Reading MCU data to find out system mode and camera status

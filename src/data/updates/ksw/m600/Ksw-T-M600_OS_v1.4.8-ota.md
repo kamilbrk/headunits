@@ -9,10 +9,10 @@ signatures:
   sha1: f4eb5a28e95b45fc879039e54ed0675d7eccd84b
   sha256: 0d50d3a286402fc07bf620f4966ea024cc6991b8749aed988f200fa63b7c1220
 ---
-Summary:
+#### Summary
 - Potential support for Snapdragon 460 chip on M600 platform
 
-Changes since `Ksw-T-M600_OS_v1.4.4-ota`:
+#### Changes
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.4.26` to `5.4.29`
   - New labels for user license activation
   - Further changes for Huawei HiCar support
