@@ -1,0 +1,54 @@
+---
+import { REPOSITORY, URL_PREFIX } from '../shared/config';
+import Layout from '../shared/layout/base-layout.astro';
+import { getThemesWithoutImages } from '../shared/utilities';
+
+const missing = await getThemesWithoutImages();
+const issueUrl = `${REPOSITORY}/issues/new/choose`;
+---
+
+<Layout
+  title="Contribute"
+  description="How to add a firmware changelog, a theme screenshot or a correction to this site."
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    <p class="text-lg leading-8">
+      Everything here came from owners reading firmware images and comparing them. None of it is
+      official, and all of it has gaps. You do not need to know git to help.
+    </p>
+
+    <h3>The easiest thing that helps</h3>
+    <p>
+      <strong>{missing.length} themes have no screenshot.</strong> Activating one and taking a picture
+      of the home and settings screens is the single most useful contribution, because it is the one thing
+      that cannot be worked out by reading a firmware image.{' '}
+      <a href={`${URL_PREFIX}themes/help-wanted`}>See which ones are missing</a>.
+    </p>
+
+    <h3>If you have a firmware update we don't</h3>
+    <p>
+      Post it in <a href="https://discord.gg/Ex8e6qE2eR">Discord</a> or{' '}
+      <a href={issueUrl}>open an issue</a>. Useful even without a changelog: the version string, the
+      build date from Settings, your platform, and the md5 or sha256 of the file. Checksums matter
+      more than they look &mdash; they are the only link between a file circulating on Discord and
+      the file described here.
+    </p>
+
+    <h3>If something here is wrong</h3>
+    <p>
+      Every content page has an <em>Edit it on GitHub</em> link at the bottom that opens the source file
+      in the browser editor. GitHub creates the branch and the pull request for you. Corrections are as
+      welcome as additions &mdash; a setting described wrongly is worse than a setting not described at
+      all.
+    </p>
+
+    <h3>If you would rather use git</h3>
+    <p>
+      Content lives in <code>src/data/</code> as markdown with a small amount of frontmatter, one folder
+      per vendor. The <a href={REPOSITORY}>repository README</a> documents the shape of each collection.
+      Theme screenshots go next to the theme's <code>index.md</code> as{' '}
+      <code>home.png</code> and <code>settings.png</code>, which is the layout every documented
+      theme already uses.
+    </p>
+  </div>
+</Layout>
