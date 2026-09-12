@@ -109,6 +109,14 @@ export async function getCollectionGroupedByCollection<
   return filterFn ? grouped.filter((entry) => filterFn(entry)) : grouped;
 }
 
+/**
+The newest firmware updates across every vendor and platform.
+*/
+export async function getLatestUpdates(limit: number) {
+  const entries = await getCollection('updates');
+  return entries.toSorted(sortEntriesByDate).slice(0, limit);
+}
+
 export function sortEntriesByDate(
   entryA: CollectionEntry<'updates'>,
   entryB: CollectionEntry<'updates'>
