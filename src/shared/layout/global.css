@@ -52,3 +52,22 @@ html.dark .callout {
 html.dark .callout__label {
   color: #fbbf24;
 }
+
+/* Auto-generated glossary links from src/shared/autolink.plugin.ts. Quieter
+   than an authored prose link on purpose: the plugin adds a lot of them and
+   they should not read as editorial decisions. Plain CSS for the same reason
+   as the callouts above — Tailwind does not scan markup made in a plugin. */
+.glossary-link {
+  color: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+}
+
+.glossary-link:hover {
+  color: #4f46e5;
+  text-decoration: underline;
+}
+
+html.dark .glossary-link:hover {
+  color: #818cf8;
+}

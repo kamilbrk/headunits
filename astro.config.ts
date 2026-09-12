@@ -5,6 +5,7 @@ import { defineConfig } from 'astro/config';
 import pagefind from 'astro-pagefind';
 import tailwindcss from '@tailwindcss/vite';
 import { BASE, DOMAIN, SHIKI_THEMES, URL_PREFIX } from './src/shared/config';
+import autoLinkPlugin from './src/shared/autolink.plugin';
 import basePathPlugin from './src/shared/base-path.plugin';
 import calloutPlugin from './src/shared/callout.plugin';
 import { getUpdateLastmods } from './src/shared/sitemap-lastmod';
@@ -43,7 +44,7 @@ export default defineConfig({
   markdown: {
     processor: satteri({
       features: { directive: true },
-      mdastPlugins: [calloutPlugin],
+      mdastPlugins: [calloutPlugin, autoLinkPlugin],
       hastPlugins: [basePathPlugin]
     }),
     shikiConfig: {
