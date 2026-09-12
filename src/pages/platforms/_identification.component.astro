@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { Code } from 'astro:components';
+
+import { SHIKI_THEMES } from '../../shared/config';
+import SocIds from './_soc-ids.component.astro';
+
+interface Props {
+  platform: CollectionEntry<'platforms'>;
+  /**
+  Other platforms reporting the same `ro.board.platform` value.
+  */
+  sharedBoardWith: string[];
+}
+
+const { platform, sharedBoardWith } = Astro.props;
+
+const boards = platform.data.boards ?? [];
+const partNumbers = platform.data.models?.map((model) => model.socModel) ?? [];
+---
+
+<h3>Is this my unit?</h3>
+
+<p>Three ways to check, in increasing order of effort.</p>
+
+<h4>From Android settings</h4>
+<p>
+  Settings &rarr; About shows the build number, which starts with the platform name. On this
+  platform it looks like <code>{platform.data.models?.[0]?.model ?? platform.data.name}</code>. This
+  is the only check that separates platforms sharing a chipset.
+</p>
+
+<h4>From <code>build.prop</code></h4>
+{
+  boards.length > 0 && (
+    <p>
+      <code>ro.board.platform</code> on this platform reads{' '}
+      {boards.map((board, index) => (
+        <>
+          {index > 0 && ', '}
+          <code>{board}</code>
+        </>
+      ))}
+      .{' '}
+      {sharedBoardWith.length > 0 ? (
+        <>
+          That value alone does <strong>not</strong> identify your unit &mdash; it is shared with{' '}
+          {sharedBoardWith.join(' and ')}. Use the build number above to tell them apart.
+        </>
+      ) : (
+        <>On this vendor's range that value is unique to this platform.</>
+      )}
+    </p>
+  )
+}
+<p>
+  Ignore <code>ro.product.system.*</code>. It reads <code>qssi</code> on every Android 11 and newer unit
+  and identifies nothing.
+</p>
+
+<h4>From the chipset id</h4>
+<p>Read the SoC id the kernel reports:</p>
+<Code lang="sh" code="cat /sys/devices/soc0/soc_id" themes={SHIKI_THEMES} />
+<p>Then look it up. Part numbers used by this platform are in bold.</p>
+<SocIds highlight={partNumbers} />

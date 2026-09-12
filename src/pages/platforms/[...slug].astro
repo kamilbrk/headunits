@@ -11,6 +11,7 @@ import {
   getVendorSlug,
   sortEntriesByDate
 } from '../../shared/utilities';
+import Identification from './_identification.component.astro';
 
 export async function getStaticPaths() {
   return await getEntryStaticPathsFromCollection('platforms');
@@ -25,6 +26,16 @@ if (!platform) throw new Error(`Missing platforms entry: ${slug}`);
 const { Content } = await render(platform);
 
 const RECENT_UPDATE_COUNT = 10;
+// Platforms elsewhere in the range reporting the same `ro.board.platform`.
+const allPlatforms = await getCollection('platforms');
+const sharedBoardWith = allPlatforms
+  .filter(
+    (other) =>
+      other.id !== platform.id &&
+      other.data.boards?.some((board) => platform.data.boards?.includes(board))
+  )
+  .map((other) => other.data.models?.map((model) => model.model).join('/') ?? other.data.name);
+
 const updates = await getCollection('updates', (entry) => entry.id.startsWith(platform.id));
 const newestFirst = updates.toSorted(sortEntriesByDate);
 const recent = newestFirst.slice(0, RECENT_UPDATE_COUNT);
@@ -46,6 +57,44 @@ const jsonLd = {
   filters={{ platform: platform.id.split('/', 2)[1] }}
 >
   <div class="prose dark:prose-invert max-w-none break-words">
+    {
+      platform.data.models && (
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Chipset</th>
+              <th>Part number</th>
+              <th>CPU</th>
+            </tr>
+          </thead>
+          <tbody>
+            {platform.data.models.map((model) => (
+              <tr>
+                <td>{model.model}</td>
+                <td>{model.soc}</td>
+                <td>
+                  <code>{model.socModel}</code>
+                </td>
+                <td>
+                  {[
+                    model.cores && `${model.cores}-core`,
+                    model.clockGhz && `${model.clockGhz}GHz`,
+                    model.cpu
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )
+    }
+
+    <Identification platform={platform} sharedBoardWith={sharedBoardWith} />
+
+    <h3>Build properties</h3>
     <Content />
 
     <h3>Firmware for this platform</h3>

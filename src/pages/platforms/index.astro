@@ -9,6 +9,7 @@ import {
   getVendorSlug,
   sortEntriesByDate
 } from '../../shared/utilities';
+import SocIds from './_soc-ids.component.astro';
 
 const vendors = await getCollection('vendors');
 const platforms = await getCollectionGroupedByCollection('updates', 'platforms');
@@ -58,5 +59,12 @@ const groups = vendors.map((vendor) => ({
         </>
       ))
     }
+
+    <h3>Chipset ids</h3>
+    <p>
+      If the build number is gone or unreadable, read the chipset id the kernel reports with
+      <code>cat /sys/devices/soc0/soc_id</code> and look it up here.
+    </p>
+    <SocIds />
   </div>
 </Layout>

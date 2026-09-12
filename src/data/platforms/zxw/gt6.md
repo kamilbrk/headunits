@@ -1,6 +1,15 @@
 ---
 id: "gt6"
 name: "GT6 (SD665/SM6125)"
+models:
+  - model: GT6
+    soc: Snapdragon 665
+    socModel: SM6125
+    cores: 8
+    clockGhz: 2
+    cpu: Cortex-A73
+boards:
+  - trinket
 ---
 Qualcomm Snapdragon 665 (SM6125), 8-core 2.0GHz, Cortex-A73
 

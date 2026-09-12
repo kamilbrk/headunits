@@ -1,0 +1,46 @@
+---
+interface Props {
+  /**
+  Part numbers to mark as belonging to the platform being viewed.
+  */
+  highlight?: string[];
+}
+
+const { highlight = [] } = Astro.props;
+
+// Lifted from the shell snippet in src/data/platforms/ksw/m700.md, which maps
+// the kernel's soc_id to a part number. The same table applies to every
+// Qualcomm unit, so it does not belong on one platform's page.
+const SOC_IDS: { id: string; model: string }[] = [
+  { id: '417', model: 'SM4250' },
+  { id: '441', model: 'SM4125' },
+  { id: '444', model: 'SM6115' },
+  { id: '469', model: 'QCM4290' },
+  { id: '470', model: 'QCS4290' },
+  { id: '473', model: 'QCM2290' },
+  { id: '474', model: 'QCS2290' },
+  { id: '497', model: 'QCM6490' },
+  { id: '498', model: 'QCS6490' },
+  { id: '518, 561', model: 'SM6225' },
+  { id: '585', model: 'SG4150P' }
+];
+---
+
+<table>
+  <thead>
+    <tr>
+      <th><code>soc_id</code></th>
+      <th>Part number</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      SOC_IDS.map(({ id, model }) => (
+        <tr>
+          <td>{id}</td>
+          <td>{highlight.includes(model) ? <strong>{model}</strong> : model}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
