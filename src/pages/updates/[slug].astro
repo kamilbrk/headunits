@@ -35,8 +35,8 @@ const platformsWithEntries = await getCollectionGroupedByCollection(
             {group.entries.length > 0 ? (
               group.entries.sort(sortEntriesByDate).map((entry) => (
                 <li>
-                  <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>
-                  <span>(A{getAndroidVersion(entry)})</span>
+                  <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>{' '}
+                  <span>(A{getAndroidVersion(entry)})</span>{' '}
                   <time datetime={entry.data.date.toISOString()}>
                     {entry.data.date.toISOString().slice(0, 10)}
                   </time>

@@ -75,10 +75,9 @@ const jsonLd = {
 
   <div class="prose dark:prose-invert break-words">
     <p>
-      Version <strong>{getUpdateVersion(entry)}</strong> based on Android {getAndroidVersion(entry)} for
-      {vendor.data.name} devices running on {platform.data.name} platform, built on <strong
-        ><DateTime date={entry.data.date} /></strong
-      >.
+      Version <strong>{getUpdateVersion(entry)}</strong> based on Android{' '}
+      {getAndroidVersion(entry)} for {vendor.data.name} devices running on {platform.data.name}{' '}
+      platform, built on <strong><DateTime date={entry.data.date} /></strong>.
     </p>
 
     {
