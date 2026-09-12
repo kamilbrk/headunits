@@ -1,0 +1,80 @@
+---
+import { URL_PREFIX } from '../shared/config';
+import Layout from '../shared/layout/base-layout.astro';
+---
+
+<Layout
+  title="Before you change anything"
+  description="What can go wrong when updating firmware or applying a factory config to a KSW or ZXW head unit, and what reduces the risk."
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    <p class="text-lg leading-8">
+      This site is written by owners of these units, from reading firmware images and comparing
+      them. It is not from KSW, ZXW, Witstek, or any car manufacturer, and nobody here can repair a
+      unit that stops working.
+    </p>
+
+    <h3>What actually goes wrong</h3>
+    <ul>
+      <li>
+        An OTA built for a different platform, or installed out of the documented upgrade path, can
+        leave the unit stuck before it finishes booting. There is no user-accessible recovery from
+        that state: the unit comes out of the dash and goes back to the seller, or to someone with
+        the hardware to reflash it. See the{' '}
+        <a href={`${URL_PREFIX}faq/ksw/upgrade-path`}>KSW upgrade path</a> for the sequences we know about,
+        and <a href={`${URL_PREFIX}platforms`}>platforms</a> to confirm which unit you have.
+      </li>
+      <li>
+        The factory config file persists through a factory reset. Applying one taken from a
+        different unit can change the screen resolution, the CAN protocol, and what the unit assumes
+        about the amplifier, the camera and the steering wheel buttons. A unit left with a blank or
+        wrongly sized screen still has to be given a correct config file over USB before it is
+        usable again.
+      </li>
+      <li>
+        Changing CAN protocol or vehicle settings will not damage the car, but it can quietly stop
+        steering-wheel buttons, parking sensors or the reversing camera from working, and the
+        connection between the setting and the symptom is not obvious weeks later.
+      </li>
+      <li>
+        An MCU update that is interrupted is harder to recover from than an interrupted OTA. Don't
+        start one with the ignition about to time out.
+      </li>
+    </ul>
+
+    <h3>What reduces the risk</h3>
+    <ul>
+      <li>
+        Pull your <code>factory_config.xml</code> and keep a copy before you change anything. Keep it
+        on a FAT32 USB stick in the car, not only on a laptop at home &mdash; see{' '}
+        <a href={`${URL_PREFIX}faq/ksw/pull-factory-config`}>how to pull it</a>.
+      </li>
+      <li>
+        Write down your current firmware version and MCU version, from Settings and System
+        information, before you update. You need both to work out which update is next and to
+        describe the problem if one appears.
+      </li>
+      <li>
+        Check the upgrade path for your platform. Several updates are only installable from a
+        specific earlier build.
+      </li>
+      <li>
+        Compare the md5 or sha256 of your download against the values on the update page. Where we
+        have them, they are the only link between a file circulating on Discord and the file we
+        looked at.
+      </li>
+      <li>
+        Update with the engine running or on a charger, and stay with the car. Most failed OTAs are
+        units that lost power mid-write.
+      </li>
+    </ul>
+
+    <h3>What this site does and does not have</h3>
+    <p>
+      We describe firmware; we do not host it. Downloads circulate on{' '}
+      <a href="https://discord.gg/Ex8e6qE2eR">Discord</a> and on forums, and we have no control over what
+      is in them. Where an update page shows no checksum, it means nobody has published one &mdash; not
+      that the file is known to be good.
+    </p>
+  </div>
+</Layout>
