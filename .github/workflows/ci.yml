@@ -40,6 +40,8 @@ jobs:
             dist/search/index.html \
             dist/themes/ksw/index.html \
             dist/themes/zxw/index.html \
+            dist/themes/bmw/index.html \
+            dist/themes/help-wanted/index.html \
             dist/updates/ksw/index.html \
             dist/updates/zxw/index.html \
             dist/platforms/index.html \
@@ -62,6 +64,8 @@ jobs:
         run: npm run check:html
       - name: Check internal links
         run: npm run check:links
+      - name: Check inline spacing
+        run: npm run check:spacing
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5

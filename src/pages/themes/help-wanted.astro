@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+
+import Layout from '../../shared/layout/base-layout.astro';
+import {
+  getThemesWithoutImages,
+  getVendorSlug,
+  sortEntriesByThemeNumber
+} from '../../shared/utilities';
+import ThemesListItem from './_list-item.component.astro';
+
+const vendors = await getCollection('vendors');
+const missing = await getThemesWithoutImages();
+
+const groups = vendors
+  .map((vendor) => ({
+    vendor,
+    entries: missing
+      .filter((theme) => getVendorSlug(theme.id) === vendor.id)
+      .sort(sortEntriesByThemeNumber)
+  }))
+  .filter((group) => group.entries.length > 0);
+---
+
+<Layout
+  title="Themes that need screenshots"
+  description="Themes documented on this site that nobody has posted a screenshot of yet."
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    <p>
+      {missing.length} themes are documented here with no picture of what they actually look like. Most
+      are the newest ZXW ones, which makes them the most interesting and the least documented.
+    </p>
+    <p>To fill one in:</p>
+    <ol>
+      <li>
+        Open the theme's page. It generates the exact <code>&lt;Item&gt;</code> line to add to your factory
+        config to make the theme selectable.
+      </li>
+      <li>
+        Activate it on your unit and take a screenshot of the home screen and the settings screen.
+      </li>
+      <li>
+        Send them on <a href="https://discord.gg/Ex8e6qE2eR">Discord</a>, or open a pull request
+        adding <code>home.png</code> and <code>settings.png</code> next to that theme's{' '}
+        <code>index.md</code>, which is the layout every other theme uses.
+      </li>
+    </ol>
+  </div>
+
+  {
+    groups.map(({ vendor, entries }) => (
+      <div class="mt-10">
+        <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+          {vendor.data.name} &mdash; {entries.length}
+        </h3>
+        <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3 xl:gap-x-8">
+          {entries.map((entry) => (
+            <ThemesListItem theme={entry} />
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</Layout>

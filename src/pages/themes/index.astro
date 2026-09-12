@@ -1,8 +1,77 @@
 ---
+import { getCollection } from 'astro:content';
+
+import { THEME_BRANDS } from '../../shared/brands';
+import { URL_PREFIX } from '../../shared/config';
 import Layout from '../../shared/layout/base-layout.astro';
-import VendorLinks from '../../shared/vendor-links.component.astro';
+import { getThemesByBrand, getThemesWithoutImages, getVendorSlug } from '../../shared/utilities';
+
+const themes = await getCollection('themes');
+const vendors = await getCollection('vendors');
+const missing = await getThemesWithoutImages();
+
+const brands = await Promise.all(
+  Object.entries(THEME_BRANDS).map(async ([tag, name]) => {
+    const entries = await getThemesByBrand(tag);
+    return { tag, name, count: entries.length };
+  })
+);
+
+const vendorCounts = vendors.map((vendor) => ({
+  vendor,
+  count: themes.filter((theme) => getVendorSlug(theme.id) === vendor.id).length
+}));
+
+const withScreenshots = themes.length - missing.length;
 ---
 
-<Layout title="Themes">
-  <VendorLinks name="themes" route="themes" />
+<Layout
+  title="Themes"
+  description="Home screen themes available on KSW and ZXW Android head units, by car brand and by vendor."
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    <p>
+      {themes.length} themes across{' '}
+      {
+        vendorCounts.map(({ vendor, count }, index) => (
+          <>
+            {index > 0 && ' and '}
+            {count} {vendor.data.name}
+          </>
+        ))
+      }. {withScreenshots} have screenshots.
+    </p>
+
+    <h3>By car brand</h3>
+    <ul>
+      {
+        brands.map(({ tag, name, count }) => (
+          <li>
+            <a href={`${URL_PREFIX}themes/${tag}`}>{name}</a> &mdash; {count} themes
+          </li>
+        ))
+      }
+    </ul>
+
+    <h3>By vendor</h3>
+    <ul>
+      {
+        vendorCounts.map(({ vendor, count }) => (
+          <li>
+            <a href={`${URL_PREFIX}themes/${vendor.id}`}>{vendor.data.name}</a> &mdash; {count}{' '}
+            themes
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      missing.length > 0 && (
+        <p>
+          <strong>{missing.length} themes have no screenshots yet.</strong> If you can activate one
+          and take a picture, <a href={`${URL_PREFIX}themes/help-wanted`}>see which ones</a>.
+        </p>
+      )
+    }
+  </div>
 </Layout>
