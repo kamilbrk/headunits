@@ -54,6 +54,9 @@ jobs:
             dist/factory-settings/zxw/index.html \
             dist/faq/ksw/index.html \
             dist/faq/zxw/index.html \
+            dist/upgrade-path/ksw/index.html \
+            dist/upgrade-path/zxw/index.html \
+            dist/faq/ksw/upgrade-path/index.html \
             dist/sitemap-index.xml \
             dist/rss.xml \
             dist/og-image.jpg \

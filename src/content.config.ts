@@ -3,6 +3,7 @@ import faq from './data/faq';
 import platforms from './data/platforms';
 import themes from './data/themes';
 import updates from './data/updates';
+import upgradePaths from './data/upgrade-paths';
 import vendors from './data/vendors';
 
 export const collections = {
@@ -11,5 +12,6 @@ export const collections = {
   platforms,
   themes,
   updates,
+  'upgrade-paths': upgradePaths,
   vendors
 };

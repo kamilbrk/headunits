@@ -1,6 +1,7 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 
+import { URL_PREFIX } from '../../shared/config';
 import Layout from '../../shared/layout/base-layout.astro';
 import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
 import FaqItem from './_item.component.astro';
@@ -17,6 +18,13 @@ const entries = await getCollection('faq', (entry) => entry.id.startsWith(slug))
 ---
 
 <Layout title=`Frequently Asked Questions for ${vendor.data.name}`>
+  <div class="prose dark:prose-invert mb-12 max-w-none">
+    <p>
+      Looking for which firmware to install before which? That moved to{' '}
+      <a href={`${URL_PREFIX}upgrade-path/${vendor.id}`}>upgrade paths</a>.
+    </p>
+  </div>
+
   <div class="space-y-16">
     {
       entries.length > 0 ? (
