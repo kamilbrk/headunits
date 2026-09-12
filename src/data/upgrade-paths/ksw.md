@@ -4,20 +4,20 @@ title: Upgrade path for KSW units
 Some updates require certain prior versions to ensure compatibility. If your unit is running a version older or in between any of these listed below, make sure that you follow the upgrade path to avoid issues.
 
 #### M700 (SD680/SM6225) and M785 (SD685/SM6225-AD)
-1. [Ksw-T-M700_OS_v1.4.2-ota](/updates/ksw/m700/ksw-t-m700_os_v142-ota) A13 - _required before [1.5.6](/updates/ksw/m700/witstek-t-m700_os_v156-ota)_
-2. [Witstek-T-M700_OS_v1.5.6-ota](/updates/ksw/m700/witstek-t-m700_os_v156-ota) or later Android 13
+1. Ksw-T-M700_OS_v1.4.2-ota A13 - _required before [1.5.6](/updates/ksw/m700/witstek-t-m700_os_v156-ota)_
+2. Witstek-T-M700_OS_v1.5.6-ota or later Android 13
 
 #### M600 (SD662/SM6115) and M606 (SD460/SM4250)
-1. [Ksw-R-M600_OS_v1.3.1-ota](/updates/ksw/m600/ksw-r-m600_os_v131-ota) A11 - _required before [1.3.5](/updates/ksw/m600/ksw-r-m600_os_v135-ota)_
-2. [Ksw-R-M600_OS_v1.3.5-ota](/updates/ksw/m600/ksw-r-m600_os_v135-ota) A11 - _required before [1.4.0](/updates/ksw/m600/ksw-r-m600_os_v140-ota)_
-3. [Ksw-R-M600_OS_v1.4.0-ota](/updates/ksw/m600/ksw-r-m600_os_v140-ota) A11 - _required before [1.4.3](/updates/ksw/m600/ksw-r-m600_os_v143-ota)_
-4. [Ksw-R-M600_OS_v1.4.3-ota](/updates/ksw/m600/ksw-r-m600_os_v143-ota) A11 - _required before [1.4.5](/updates/ksw/m600/ksw-r-m600_os_v145-ota)_
-5. [Ksw-R-M600_OS_v1.4.5-ota](/updates/ksw/m600/ksw-r-m600_os_v145-ota) A11 - _required before [2.2.3](/updates/ksw/m600/ksw-r-m600_os_v223-ota)_
-6. [Ksw-R-M600_OS_v2.2.3-ota](/updates/ksw/m600/ksw-r-m600_os_v223-ota) A11 - _required before [2.4.2](/updates/ksw/m600/ksw-r-m600_os_v242-ota)_
-7. [Ksw-R-M600_OS_v2.4.2-ota](/updates/ksw/m600/ksw-r-m600_os_v242-ota) or later A11 - _required before A12_
-8. [Ksw-S-M600_OS_v1.4.4NEXAI-ota](/updates/ksw/m600/ksw-s-m600_os_v144nexai-ota) or later A12 - _required before A13_
-9. [Ksw-T-M600_OS_v1.6.9-ota](/updates/ksw/m600/ksw-t-m600_os_v169-ota) A13 - _required before [1.7.8](/updates/ksw/m600/witstek-t-m600_os_v178-ota)_
-10. [Witstek-T-M600_OS_v1.7.8-ota](/updates/ksw/m600/witstek-t-m600_os_v178-ota) or later Android 13
+1. Ksw-R-M600_OS_v1.3.1-ota A11 - _required before [1.3.5](/updates/ksw/m600/ksw-r-m600_os_v135-ota)_
+2. Ksw-R-M600_OS_v1.3.5-ota A11 - _required before [1.4.0](/updates/ksw/m600/ksw-r-m600_os_v140-ota)_
+3. Ksw-R-M600_OS_v1.4.0-ota A11 - _required before [1.4.3](/updates/ksw/m600/ksw-r-m600_os_v143-ota)_
+4. Ksw-R-M600_OS_v1.4.3-ota A11 - _required before [1.4.5](/updates/ksw/m600/ksw-r-m600_os_v145-ota)_
+5. Ksw-R-M600_OS_v1.4.5-ota A11 - _required before [2.2.3](/updates/ksw/m600/ksw-r-m600_os_v223-ota)_
+6. Ksw-R-M600_OS_v2.2.3-ota A11 - _required before [2.4.2](/updates/ksw/m600/ksw-r-m600_os_v242-ota)_
+7. Ksw-R-M600_OS_v2.4.2-ota or later A11 - _required before A12_
+8. Ksw-S-M600_OS_v1.4.4NEXAI-ota or later A12 - _required before A13_
+9. Ksw-T-M600_OS_v1.6.9-ota A13 - _required before [1.7.8](/updates/ksw/m600/witstek-t-m600_os_v178-ota)_
+10. Witstek-T-M600_OS_v1.7.8-ota or later Android 13
 
 #### M501 (SD625/MSM8953) and M501A- (SD450/SDM450)
 
@@ -28,6 +28,6 @@ For units that [originally came with Android 9](https://f30.bimmerpost.com/forum
 
 For units that [originally came with Android 10](https://f30.bimmerpost.com/forums/showthread.php?p=25873709&postcount=4):
 
-1. [Ksw-Q-Userdebug_OS_v4.3.3-ota](/updates/ksw/m501/ksw-q-userdebug_os_v433-ota) or later Android 10
+1. Ksw-Q-Userdebug_OS_v4.3.3-ota or later Android 10
 
 Sources: [Kri (Bimmerpost)](https://f30.bimmerpost.com/forums/showthread.php?t=1832178), [RedErik (Bimmerpost)](https://f30.bimmerpost.com/forums/showpost.php?p=27674534&postcount=4), [bimmer5101 (Discord)](https://discord.com/channels/702437587679313920/702438814274158644/1190606092837867550)

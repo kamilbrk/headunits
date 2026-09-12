@@ -10,7 +10,7 @@ signatures:
   sha256: c276aa10144d32992d28dcc869433e17efb70f921c45a2bf9b8a31b30d3fb588
 ---
 #### Summary
-- Minor updates to the new [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme
+- Minor updates to the new `EVOID9_ALS` theme
 
 #### Changes
-- Further additions for [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme including "one-click access to original car interface" option, updated graphics, music observer/controls functionality, new "app" option, fixes for Bluetooth calling
+- Further additions for `EVOID9_ALS` theme including "one-click access to original car interface" option, updated graphics, music observer/controls functionality, new "app" option, fixes for Bluetooth calling

@@ -13,4 +13,4 @@ signatures:
 - Nothing, really.
 
 #### Changes
-- Further changes to support [`UI_NTG6_FY_V3`](/themes/ksw/ui_ntg6_fy_v3) Benz theme partially introduced in 1.5.9
+- Further changes to support `UI_NTG6_FY_V3` Benz theme partially introduced in 1.5.9

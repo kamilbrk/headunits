@@ -13,6 +13,6 @@ signatures:
 - Nothing interesting
 
 #### Changes
-- New graphics for Bluetooth contact refresh/search buttons on [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme
+- New graphics for Bluetooth contact refresh/search buttons on `EVOID9_ALS` theme
 - Further logic to detect and replace displayed Android version based on the `ksw_android11` setting
 - [Easter Eggs app](https://play.google.com/store/apps/details?id=com.dede.android_eggs) comes pre-installed and shows up in 3rd party launchers

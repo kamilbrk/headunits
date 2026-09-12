@@ -139,6 +139,19 @@ check. All must pass before deploy. Don't merge if any is red.
   frontmatter (`nexai`, `platform`, `gs` do today). `npm run check:autolinks`
   guards the output and carries an expected site-wide count — update
   `EXPECTED_TOTAL` in the script when content moves it on purpose.
+- **Firmware version ids and theme ids are linked automatically too.** Write
+  `` `Ksw-T-M600_OS_v1.4.8-ota` `` or `UI_GS_ID8` in prose and the plugin links
+  it; don't hand-write the link. Unlike glossary terms these link at *every*
+  mention, because each is an exact identifier. A page never links its own id,
+  and a name belonging to two entries (KSW and ZXW both have a `LEXUS_UI`) is
+  left unlinked rather than guessed at. Links whose visible text is *not* the
+  id — `[1.3.5](…)`, `[first GT7](…)` — stay hand-written; there is nothing to
+  regenerate them from.
+- **`scripts/link-snapshot.mjs` + `scripts/link-diff.mjs` answer "did any link
+  on the site change?"** Build, snapshot, make the change, build, snapshot,
+  diff. Snapshots go in the scratchpad, never in the repo. They are what proved
+  the 123 hand-written entity links could be deleted: 6753 links across 251
+  pages, byte-identical before and after.
 - **A plugin change alone may not show up in `dist/`.** Astro caches rendered
   Markdown in `node_modules/.astro/data-store.json`, keyed on the content
   files, so editing `callout.plugin.ts` or `autolink.plugin.ts` and rebuilding
