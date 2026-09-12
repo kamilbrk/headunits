@@ -4,7 +4,7 @@ import { getCollection, getEntry } from 'astro:content';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
   getFirstLevelStaticPathsFromCollection,
-  sortEntriesByDataId
+  sortEntriesByThemeNumber
 } from '../../shared/utilities';
 import ThemesListItem from './_list-item.component.astro';
 
@@ -24,7 +24,7 @@ const entries = await getCollection('themes', (entry) => entry.id.startsWith(slu
     entries.length > 0 ? (
       <div class="lg:col-span-3">
         <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3 xl:gap-x-8">
-          {entries.sort(sortEntriesByDataId).map((entry) => (
+          {entries.sort(sortEntriesByThemeNumber).map((entry) => (
             <ThemesListItem theme={entry} />
           ))}
         </div>
