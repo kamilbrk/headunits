@@ -348,3 +348,6 @@ src/data/updates/*/*/*.zip
 src/data/updates/*/*/*/**
 public/bin/*
 !public/bin/.gitkeep
+
+# Local planning documents — deliberately not tracked.
+docs/
