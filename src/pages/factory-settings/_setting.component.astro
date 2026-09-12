@@ -7,12 +7,18 @@ import { slug } from 'github-slugger';
 interface Props {
   section: string;
   setting: SettingItem;
-  parent?: string;
+  parentSetting?: SettingItem;
 }
 
-const { section, setting, parent } = Astro.props;
+const { section, setting, parentSetting } = Astro.props;
 
-const uniqueId = slug([section, parent, setting.name].filter(Boolean).join(' '));
+const uniqueId = slug([section, parentSetting?.name, setting.name].filter(Boolean).join(' '));
+
+// A radio belongs to its parent's key: the group names the element, each
+// child names one value of it.
+const configKey =
+  setting.configKey ?? (setting.control === 'radio' ? parentSetting?.configKey : undefined);
+const editable = setting.editable !== false && parentSetting?.editable !== false;
 
 let configXmlRef;
 
@@ -27,7 +33,16 @@ if (setting.configValue !== undefined) {
 }
 ---
 
-<div>
+<div
+  data-setting
+  data-config-key={configKey}
+  data-control={setting.control}
+  data-value-type={setting.valueType}
+  data-on-value={setting.onValue}
+  data-off-value={setting.offValue}
+  data-config-value={setting.configValue}
+  data-editable={editable && configKey ? undefined : 'false'}
+>
   <div class="flex items-center space-x-2">
     {
       setting.control === 'checkbox' && (
@@ -88,6 +103,12 @@ if (setting.configValue !== undefined) {
         </span>
       )
     }
+
+    <span
+      hidden
+      data-setting-note
+      class="text-xs text-gray-500 italic dark:text-gray-400"
+      class:list={{ 'ml-6': setting.control === 'checkbox' || setting.control === 'radio' }}></span>
   </div>
 
   {
@@ -102,8 +123,21 @@ if (setting.configValue !== undefined) {
   }
 
   {
+    setting.warning && (
+      <aside
+        class="callout callout--warning not-prose text-sm"
+        class:list={{ 'ml-6': setting.control === 'checkbox' || setting.control === 'radio' }}
+        role="note"
+      >
+        <p class="callout__label">Warning</p>
+        <p>{setting.warning}</p>
+      </aside>
+    )
+  }
+
+  {
     setting.children?.map((child) => (
-      <Astro.self section={section} setting={child} parent={setting.name} />
+      <Astro.self section={section} setting={child} parentSetting={setting} />
     ))
   }
 </div>
