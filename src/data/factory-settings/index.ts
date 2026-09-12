@@ -14,6 +14,18 @@ this there is no way to know whether to write `2` or `"BMW_EVO_ID7_V2"`.
 */
 const ValueTypeSchema = z.enum(['int', 'string']);
 
+/**
+Where a `select` gets its choices: a list section of the reader's own file,
+because a firmware carrying themes we have never seen still knows its own.
+`attribute` supplies the value written back; `labelAttribute` the visible text,
+or the element's own text when it is omitted.
+*/
+const OptionsFromSchema = z.object({
+  path: z.string(),
+  attribute: z.string(),
+  labelAttribute: z.string().optional()
+});
+
 // https://github.com/colinhacks/zod?tab=readme-ov-file#recursive-types
 const BaseSettingItemSchema = z.object({
   name: z.string(),
@@ -25,6 +37,7 @@ const BaseSettingItemSchema = z.object({
   valueType: ValueTypeSchema.optional(),
   min: z.number().optional(),
   max: z.number().optional(),
+  optionsFrom: OptionsFromSchema.optional(),
   /**
   What a ticked and an unticked box write. Never inferred: the vendor uses
   `0: allow  1: Prohibited` in places, and guessing would silently reverse what

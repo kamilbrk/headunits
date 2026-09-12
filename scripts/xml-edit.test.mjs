@@ -3,7 +3,11 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import { applyEdits, decodeText, encodeText } from '../src/shared/factory-config/xml-edit.ts';
-import { blankComments, findScalarElements } from '../src/shared/factory-config/xml-scan.ts';
+import {
+  blankComments,
+  findListItems,
+  findScalarElements
+} from '../src/shared/factory-config/xml-scan.ts';
 
 const FIXTURES = ['public/factory_config.xml', 'public/zxw_factory_config.xml'];
 
@@ -96,4 +100,52 @@ test('a CRLF file keeps its line endings', () => {
 test('a byte order mark is left in place', () => {
   const source = '﻿<a>1</a>';
   assert.equal(applyEdits(source, [{ key: 'a', value: '2' }]).result, '﻿<a>2</a>');
+});
+
+test('option lists resolve in both example files', () => {
+  const ksw = readFileSync('public/factory_config.xml', 'utf8');
+  const zxw = readFileSync('public/zxw_factory_config.xml', 'utf8');
+
+  assert.equal(findListItems(ksw, 'SupportUIList/Item').length, 47);
+  assert.equal(findListItems(zxw, 'SupportUIList/Item').length, 40);
+  assert.equal(findListItems(zxw, 'CarDisplayParam/model').length, 23);
+  assert.equal(findListItems(zxw, 'CANBusProtocol/Protocol').length, 9);
+});
+
+test('only the live list is read, not the commented-out ones', () => {
+  const zxw = readFileSync('public/zxw_factory_config.xml', 'utf8');
+  // Three <CarDisplayParam> blocks, two of them inside comments.
+  assert.equal(zxw.split('<CarDisplayParam>').length - 1, 3);
+  assert.equal(findListItems(zxw, 'CarDisplayParam/model')[0].text.includes('NBT_F30'), true);
+});
+
+test('every item carries the attribute its setting names', () => {
+  const ksw = readFileSync('public/factory_config.xml', 'utf8');
+  const items = findListItems(ksw, 'SupportUIList/Item');
+
+  assert.equal(
+    items.every((item) => item.attributes.name !== undefined),
+    true
+  );
+  assert.equal(items[0].attributes.display, 'Alfa Romeo');
+});
+
+test('attributes are read with or without padding around the equals sign', () => {
+  const source = '<L><i a="1" b = "2"   c   =   "3" /></L>';
+  assert.deepEqual(findListItems(source, 'L/i'), [
+    { attributes: { a: '1', b: '2', c: '3' }, text: '' }
+  ]);
+});
+
+test('an item with text keeps it, a self-closing one has none', () => {
+  const source = '<L><i id="1">label</i><i id="2" /></L>';
+  assert.deepEqual(findListItems(source, 'L/i'), [
+    { attributes: { id: '1' }, text: 'label' },
+    { attributes: { id: '2' }, text: '' }
+  ]);
+});
+
+test('an absent or ambiguous list resolves to nothing rather than a guess', () => {
+  assert.deepEqual(findListItems('<L><i id="1" /></L>', 'Missing/i'), []);
+  assert.deepEqual(findListItems('<L><i id="1" /></L><L><i id="2" /></L>', 'L/i'), []);
 });

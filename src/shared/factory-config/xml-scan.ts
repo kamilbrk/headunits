@@ -79,3 +79,71 @@ export function findScalarElements(source: string) {
 
   return elements;
 }
+
+export interface ListItem {
+  /**
+  Attributes of the item, however they were spaced in the source.
+  */
+  attributes: Record<string, string>;
+  /**
+  Text between the tags, empty for a self-closing item.
+  */
+  text: string;
+}
+
+// Scanned rather than matched: the vendor files write both `id="1"` and
+// `id = "1"`, and a pattern covering the padding needs two quantifiers side by
+// side, which is the shape `sonarjs/super-linear-regex` rejects.
+const parseAttributes = (source: string) => {
+  const attributes: Record<string, string> = {};
+  let cursor = 0;
+
+  while (cursor < source.length) {
+    const equals = source.indexOf('=', cursor);
+    if (equals === -1) break;
+
+    const open = source.indexOf('"', equals);
+    if (open === -1) break;
+
+    const close = source.indexOf('"', open + 1);
+    if (close === -1) break;
+
+    const name = source.slice(cursor, equals).trim();
+    if (name) attributes[name] = source.slice(open + 1, close);
+    cursor = close + 1;
+  }
+
+  return attributes;
+};
+
+/**
+Items of a list section, named as `Parent/Child` — `SupportUIList/Item`,
+`CarDisplayParam/model`, `CANBusProtocol/Protocol`.
+
+Returns nothing when the parent is absent, or when the file carries more than
+one of it outside a comment: which list was meant would be a guess. The ZXW
+example file has three `<CarDisplayParam>` blocks, two of them commented out,
+which is what makes the comment handling load-bearing here.
+*/
+export function findListItems(source: string, path: string): ListItem[] {
+  const [parent, child] = path.split('/', 2);
+  if (!parent || !child) return [];
+
+  const blanked = blankComments(source);
+  const blocks = blanked
+    .matchAll(new RegExp(String.raw`<${parent}\b[^>]*>([\s\S]*?)</${parent}>`, 'g'))
+    .toArray();
+  const only = blocks.length === 1 ? blocks[0] : undefined;
+  if (!only) return [];
+
+  const start = only.index + only[0].indexOf('>') + 1;
+  const body = source.slice(start, start + (only[1] ?? '').length);
+  const items = body
+    .matchAll(new RegExp(String.raw`<${child}\b([^>]*?)(?:/>|>([\s\S]*?)</${child}>)`, 'g'))
+    .toArray();
+
+  return items.map((item) => ({
+    attributes: parseAttributes(item[1] ?? ''),
+    text: (item[2] ?? '').trim()
+  }));
+}

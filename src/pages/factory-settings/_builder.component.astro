@@ -111,7 +111,7 @@ const { vendor, fileName } = Astro.props;
 
 <script>
   import { applyEdits } from '../../shared/factory-config/xml-edit';
-  import { findScalarElements } from '../../shared/factory-config/xml-scan';
+  import { findListItems, findScalarElements } from '../../shared/factory-config/xml-scan';
 
   interface Loaded {
     name: string;
@@ -133,7 +133,45 @@ const { vendor, fileName } = Astro.props;
   // The control for a row is a direct grandchild; a radio group's own children
   // render their inputs inside nested rows of their own.
   const controlOf = (row: HTMLElement) =>
-    row.querySelector<HTMLInputElement>(':scope > div > input');
+    row.querySelector<HTMLInputElement | HTMLSelectElement>(
+      ':scope > div > input, :scope > div > select'
+    );
+
+  const isInput = (control: HTMLInputElement | HTMLSelectElement): control is HTMLInputElement =>
+    control.tagName === 'INPUT';
+
+  /**
+  Fills a select from a list section of the reader's own file. A value the list
+  does not offer keeps an option of its own, so loading a file never silently
+  reads as a change the reader did not make — the shipped ZXW example has
+  exactly that, a canProtocolSelection of 0 that its live protocol list lacks.
+  */
+  const fillOptions = (select: HTMLSelectElement, xml: string, value: string) => {
+    const { optionsPath, optionsAttribute, optionsLabel } = select.dataset;
+    if (!optionsPath || !optionsAttribute) return;
+
+    const options = findListItems(xml, optionsPath)
+      .map((item) => ({
+        value: item.attributes[optionsAttribute],
+        label: optionsLabel ? item.attributes[optionsLabel] : item.text
+      }))
+      .filter((option) => option.value !== undefined);
+
+    if (!options.some((option) => option.value === value)) {
+      options.unshift({ value, label: `${value} — not in your file's list` });
+    }
+
+    select.replaceChildren(
+      ...options.map(({ value: optionValue, label }) => {
+        const option = document.createElement('option');
+        option.value = optionValue ?? '';
+        option.textContent = label || (optionValue ?? '');
+        return option;
+      })
+    );
+
+    select.value = value;
+  };
   const nameOf = (row: HTMLElement) =>
     row.querySelector<HTMLElement>(':scope > div > span[id]')?.textContent?.trim() ?? '';
 
@@ -145,11 +183,19 @@ const { vendor, fileName } = Astro.props;
     note.hidden = text === '';
   };
 
-  const setEnabled = (control: HTMLInputElement, enabled: boolean) => {
+  const setEnabled = (control: HTMLInputElement | HTMLSelectElement, enabled: boolean) => {
     control.disabled = !enabled;
     control.setAttribute('tabindex', enabled ? '0' : '-1');
     if (enabled) control.removeAttribute('aria-hidden');
     else control.setAttribute('aria-hidden', 'true');
+  };
+
+  /** The value a radio option stands for, when that option is the chosen one. */
+  const selectedRadioValue = (row: HTMLElement) => {
+    const control = controlOf(row);
+    if (!control || !isInput(control) || !control.checked) return undefined;
+
+    return row.dataset.configValue;
   };
 
   /** What the row's control currently says the element's value should be. */
@@ -158,6 +204,7 @@ const { vendor, fileName } = Astro.props;
     const { control: kind, onValue, offValue } = row.dataset;
     if (!control) return undefined;
 
+    if (!isInput(control)) return control.value;
     if (kind === 'checkbox') return control.checked ? onValue : offValue;
     if (control.type === 'range') return control.value;
 
@@ -167,6 +214,11 @@ const { vendor, fileName } = Astro.props;
   const showValue = (row: HTMLElement, value: string) => {
     const control = controlOf(row);
     const { control: kind, onValue, configValue } = row.dataset;
+
+    if (control && !isInput(control)) {
+      control.value = value;
+      return;
+    }
 
     if (control && kind === 'checkbox') {
       control.checked = value === onValue;
@@ -240,12 +292,7 @@ const { vendor, fileName } = Astro.props;
 
       for (const row of keyedRows()) {
         const key = row.dataset.configKey;
-        const value =
-          row.dataset.control === 'radio'
-            ? controlOf(row)?.checked
-              ? row.dataset.configValue
-              : undefined
-            : valueOf(row);
+        const value = row.dataset.control === 'radio' ? selectedRadioValue(row) : valueOf(row);
 
         // A key that did not resolve has no value in the file to differ from,
         // and its control was never enabled.
@@ -379,9 +426,11 @@ const { vendor, fileName } = Astro.props;
 
         original.set(key, only.value);
         setNote(row, '');
-        showValue(row, only.value);
 
         const control = controlOf(row);
+        if (control && !isInput(control)) fillOptions(control, xml, only.value);
+        else showValue(row, only.value);
+
         if (control && row.dataset.editable !== 'false') setEnabled(control, true);
       }
 
@@ -431,7 +480,8 @@ const { vendor, fileName } = Astro.props;
         const control = controlOf(row);
         if (control) {
           setEnabled(control, false);
-          control.checked = false;
+          if (isInput(control)) control.checked = false;
+          else control.replaceChildren();
         }
       }
 
