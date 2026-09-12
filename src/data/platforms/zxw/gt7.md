@@ -1,6 +1,21 @@
 ---
 id: "gt7"
 name: "GT7 (SD680/SM6225) and GT7PRO (SD685/SM6225-AD)"
+models:
+  - model: GT7
+    soc: Snapdragon 680
+    socModel: SM6225
+    cores: 8
+    clockGhz: 2.4
+    cpu: Cortex-A73
+  - model: GT7PRO
+    soc: Snapdragon 685
+    socModel: SM6225-AD
+    cores: 8
+    clockGhz: 2.8
+    cpu: Cortex-A73
+boards:
+  - bengal
 ---
 GT7: Qualcomm Snapdragon 680 (SM6225), 8-core 2.4GHz, Cortex-A73
 GT7PRO: Qualcomm Snapdragon 685 (SM6225-AD), 8-core 2.8GHz, Cortex-A73
