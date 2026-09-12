@@ -9,10 +9,10 @@ signatures:
   sha1: f4323584737c562566b387bb6b2a0509d653dd54
   sha256: 832371ccfc60adb4c7b5ef8d4abdc12749b1395a7524a22eb99aae16b0d6e84e
 ---
-Summary:
+#### Summary
 - Updated Zlink app 5.4.33 could be more robust between head unit restarts
 
-Changes since `Ksw-T-M600_OS_v1.5.0-ota` built one month earlier:
+#### Changes
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.4.29` to `5.4.33`
     - Updated the CarLife activity to have its own launcher icon instead of re-using icon for Android Auto
     - Removed `android.permission.GET_TASKS` permission that allowed Zlink to retrieve information about running apps - that permission was effectively deprecated since Android 5.0 Lollipop and only returned tasks from Zlink, perhaps to discover when Zlink was running or put into background

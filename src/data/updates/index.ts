@@ -17,6 +17,10 @@ export default defineCollection({
     date: z.date(),
     android: z.number().optional(),
     version: z.string().optional(),
-    signatures: signaturesSchema.optional()
+    signatures: signaturesSchema.optional(),
+    // Overrides the comparison baseline for the generated "Changes since"
+    // sentence, for the few builds whose real baseline is not the previous
+    // entry on the same platform. Values are collection ids.
+    comparedTo: z.array(z.string()).optional()
   })
 });

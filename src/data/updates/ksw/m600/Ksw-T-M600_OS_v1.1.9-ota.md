@@ -9,7 +9,7 @@ signatures:
   sha1: c0f8fb27c6f4b9e102e87cd6d26a22344d3edfad
   sha256: 9895a189c54b4f36918feb90ab5a1a8f6ec69ad5fd5a884a7e93bf2dbf40ad11
 ---
-Changes since `Ksw-T-M600_OS_v1.1.3-ota`:
+#### Changes
 - New app: Ksw360Camera (`com.ivicar.avm`) version `1.0.1_230925`
 - Lots of permissions with storage, camera, location and network access
 - Activities around video settings, calibration, shop and license screens, recording, perhaps picture-in-picture / floating image, some unknown integration with receiving broadcasted events from Zlink

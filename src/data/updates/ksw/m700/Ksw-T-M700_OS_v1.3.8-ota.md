@@ -9,11 +9,11 @@ signatures:
   sha1: 83811c122ab32da811f1b0fc9be660353a3acd04
   sha256: b94c62c70cbdcaceaba92951854d0a85ad7d3bb6c7d7763fc1c497fe544aa3c8
 ---
-Summary:
+#### Summary
 - Zlink updated to `5.4.54`
 - New [`EVOID9_ALS`](/themes/ksw/evoid9_als) and [`EVOID8_UG_2mode`](/themes/ksw/evoid8_ug_2mode) themes
 
-Changes since `Ksw-T-M700_OS_v1.3.5-ota` built 14 days earlier:
+#### Changes
 - Zlink updated from `5.4.53` to `5.4.54`
 - New [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme
     - It will have the following modes to switch between: Comfort, Elegant, Mystery, Noble, Passionate, Steady, Vitality

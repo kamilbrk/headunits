@@ -9,10 +9,10 @@ signatures:
   sha1: 13b2abd85bd5093c00427652c27d34d78fb41e52
   sha256: 6ddbc8b4e4119d7eda2b6ff98067660729787ee27f8c50f8829864b74197d340
 ---
-Summary:
+#### Summary
 - Nothing interesting
 
-Changes since `Witstek-T-M700_OS_v1.5.6-ota` built 21 days earlier:
+#### Changes
 - New graphics for Bluetooth contact refresh/search buttons on [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme
 - Further logic to detect and replace displayed Android version based on the `ksw_android11` setting
 - [Easter Eggs app](https://play.google.com/store/apps/details?id=com.dede.android_eggs) comes pre-installed and shows up in 3rd party launchers

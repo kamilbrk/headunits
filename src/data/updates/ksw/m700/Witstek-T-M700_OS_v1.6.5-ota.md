@@ -9,8 +9,8 @@ signatures:
   sha1: 48aa25415890fb5b07f602caa748e7ef157245d7
   sha256: 11530fdea101c74d709d2efaff0e1527ccc1be5e903816efa2bba26ecf2207f0
 ---
-Summary:
+#### Summary
 - Nothing interesting
 
-Changes since `Witstek-T-M700_OS_v1.6.4-ota` built 2 months earlier:
+#### Changes
 - Screen resolution is now shown in Android settings

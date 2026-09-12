@@ -9,7 +9,7 @@ signatures:
   sha1: 92ae0daab9d3720b72d5cea8af6134e9eb698a5a
   sha256: d886250718c45695d9981fcfc62abc1ead4a6fe9d3e8d728695c49ca6ae5ad0e
 ---
-Changes since `Ksw-S-M600_OS_v1.5.6NEXAI-ota`:
+#### Changes
 - KswPLauncher (`com.wits.ksw`)  app updated from `1.20_230810` to `1.20_230830`
     - Work in progress on new versions of existing themes (do not activate):
     - Benz_MBUX2021_KSW_Three

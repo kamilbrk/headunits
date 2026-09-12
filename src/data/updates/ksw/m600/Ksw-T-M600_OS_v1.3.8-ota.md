@@ -9,7 +9,7 @@ signatures:
   sha1: 999d60a715570c669b2cdc000ddb104b202589f0
   sha256: 22601268897cb91f9981ca8ceffec1e587e4dd396e17586969d9f7b294f09f83
 ---
-Summary:
+#### Summary
 - Zlink update 5.4.23 with Huawei HiCar graphics
 - Czech translations
 - New [`UI_MBUX_YO`](/themes/ksw/ui_mbux_yo) theme which seems to be a variation of [`Benz_MBUX_2021`](/themes/ksw/benz_mbux_2021)
@@ -17,7 +17,7 @@ Summary:
 - Some internal changes in KSW Bluetooth app around A2DP AVRCP profiles and resuming playback
 - Further work on Ksw 360 Camera app
 
-Changes since `Ksw-T-M600_OS_v1.2.9-ota`:
+#### Changes
 - CarplayZlink (`com.zjinnova.zlink`) app updated from `5.4.19` to `5.4.23`
   - Updated Tencent Legu packer from `4.5.2.5` to `4.5.3.9`
   - Removed code to check CPU architecture (x86/armeabi/armeabi-v7a)
