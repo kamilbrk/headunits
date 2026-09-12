@@ -12,7 +12,7 @@ const DIST = 'dist';
 // looks. Update both numbers when content changes move the count on purpose;
 // the point of the check is that a silent collapse to zero — the plugin
 // falling out of astro.config.ts — cannot pass unnoticed.
-const EXPECTED_TOTAL = 134;
+const EXPECTED_TOTAL = 139;
 const TOLERANCE = 0.2;
 
 // These two page templates render several Markdown documents onto one page, so
@@ -20,8 +20,13 @@ const TOLERANCE = 0.2;
 // occurrence. Every other page renders exactly one body.
 const AGGREGATE_PAGES = [/^faq\/[^/]+\/index\.html$/, /^factory-settings\/[^/]+\/index\.html$/];
 
+// Only glossary terms are linked once per document. Entity ids are linked at
+// every mention on purpose, so counting them here would fail on the pages that
+// name one build repeatedly.
+const ONCE_PER_DOCUMENT = 'glossary';
+
 const ANCHOR_BOUNDARY = /<a\b[^>]*>|<\/a>/g;
-const AUTOLINK_ANCHOR = /<a\b[^>]*\bdata-autolink="[^"]*"[^>]*>/g;
+const AUTOLINK_ANCHOR = /<a\b[^>]*\bdata-autolink="([^"]*)"[^>]*>/g;
 const HREF = /\bhref="([^"]*)"/;
 const HEADING = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/g;
 const PRE = /<pre\b[^>]*>([\s\S]*?)<\/pre>/g;
@@ -56,13 +61,13 @@ for (const file of htmlFiles) {
   }
 
   const byHref = new Map();
-  for (const [tag] of html.matchAll(AUTOLINK_ANCHOR)) {
+  for (const [tag, kind] of html.matchAll(AUTOLINK_ANCHOR)) {
     total += 1;
     const href = HREF.exec(tag)?.[1] ?? '';
 
     if (BASE && !href.startsWith(`${BASE}/`)) report(`auto-link misses the base path — "${href}"`);
 
-    byHref.set(href, (byHref.get(href) ?? 0) + 1);
+    if (kind === ONCE_PER_DOCUMENT) byHref.set(href, (byHref.get(href) ?? 0) + 1);
   }
 
   if (!AGGREGATE_PAGES.some((pattern) => pattern.test(where))) {

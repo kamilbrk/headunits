@@ -1,16 +1,24 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Parents, Text } from 'mdast';
+import type { InlineCode, Parents, PhrasingContent, Text } from 'mdast';
 import type { MdastContent, MdastVisitorContext, PluginFactoryContext } from 'satteri';
 import type { AutoLinkDictionary, AutoLinkKind, AutoLinkLabel } from './entity-dictionary';
 
 import { defineMdastPlugin } from 'satteri';
 
-import { buildDictionary, getGlossaryLabels, TOKEN_PATTERN } from './entity-dictionary';
+import {
+  buildDictionary,
+  getEntryHref,
+  getGlossaryLabels,
+  getUpdateLabels,
+  TOKEN_PATTERN
+} from './entity-dictionary';
 
 const GLOSSARY_SOURCE = `${path.sep}src${path.sep}data${path.sep}glossary${path.sep}`;
 
-const CLASS_NAMES: Record<AutoLinkKind, string[]> = {
+// Entity links stand where an authored link stood, so they keep normal link
+// styling and carry no class of their own.
+const CLASS_NAMES: Partial<Record<AutoLinkKind, string[]>> = {
   glossary: ['glossary-link']
 };
 
@@ -21,8 +29,12 @@ const CLASS_NAMES: Record<AutoLinkKind, string[]> = {
 // and `delete` can sit in between.
 const SKIP_INSIDE = new Set(['heading', 'link', 'linkReference']);
 
-// Built once when the Astro config loads, not per document.
-const glossaryDictionary = buildDictionary(getGlossaryLabels());
+// Both built once when the Astro config loads, not per document. Inline code
+// is matched against entity ids alone: a glossary term inside a code span is
+// part of a command or a filename, not prose.
+const entityLabels = getUpdateLabels();
+const proseDictionary = buildDictionary([...getGlossaryLabels(), ...entityLabels]);
+const inlineCodeDictionary = buildDictionary(entityLabels);
 
 interface Match {
   start: number;
@@ -30,7 +42,7 @@ interface Match {
   label: AutoLinkLabel;
 }
 
-const isInsideSkipped = (node: Readonly<Text>, ctx: MdastVisitorContext) => {
+const isInsideSkipped = (node: Readonly<Text | InlineCode>, ctx: MdastVisitorContext) => {
   let current: Readonly<Parents> | undefined = ctx.parent(node);
 
   while (current) {
@@ -89,14 +101,18 @@ const findMatches = (
   return matches;
 };
 
-const toLink = (text: string, label: AutoLinkLabel): MdastContent => ({
-  type: 'link',
-  url: label.href,
-  children: [{ type: 'text', value: text }],
-  data: {
-    hProperties: { className: CLASS_NAMES[label.kind], 'data-autolink': label.kind }
-  }
-});
+const toLink = (children: PhrasingContent[], label: AutoLinkLabel): MdastContent => {
+  const className = CLASS_NAMES[label.kind];
+
+  return {
+    type: 'link',
+    url: label.href,
+    children,
+    data: {
+      hProperties: { ...(className && { className }), 'data-autolink': label.kind }
+    }
+  };
+};
 
 const splitAroundMatches = (value: string, matches: readonly Match[]) => {
   const nodes: MdastContent[] = [];
@@ -104,7 +120,7 @@ const splitAroundMatches = (value: string, matches: readonly Match[]) => {
 
   for (const match of matches) {
     if (match.start > cursor) nodes.push({ type: 'text', value: value.slice(cursor, match.start) });
-    nodes.push(toLink(value.slice(match.start, match.end), match.label));
+    nodes.push(toLink([{ type: 'text', value: value.slice(match.start, match.end) }], match.label));
     cursor = match.end;
   }
 
@@ -114,9 +130,13 @@ const splitAroundMatches = (value: string, matches: readonly Match[]) => {
 };
 
 /**
- * Links the first mention of each glossary term in a document to its entry on
- * `/glossary`, so an author writing "the MCU" gets the definition linked
- * without writing the link.
+ * Links known names in Markdown prose without the author writing the link:
+ * the first mention of each glossary term, and every mention of a firmware
+ * version id.
+ *
+ * Glossary terms are linked once per document because a definition only needs
+ * reading once. Version ids are linked every time, because each one is an
+ * exact identifier the reader may want to follow from wherever they are.
  *
  * Emits root-relative hrefs; `base-path.plugin.ts` adds the base path in the
  * hast phase, which runs after every mdast plugin.
@@ -129,11 +149,16 @@ const autoLink = (ctx: PluginFactoryContext) => {
   // The glossary defines these terms; linking them to themselves is noise.
   if (fileURLToPath(ctx.fileURL).includes(GLOSSARY_SOURCE)) return false;
 
+  const selfHref = getEntryHref(fileURLToPath(ctx.fileURL));
   // Resolved once per compiled document, so this is per-document state.
   const linked = new Set<string>();
 
   const claim = (label: AutoLinkLabel) => {
+    // A firmware page linking its own id would point at the page you are on.
+    if (label.href === selfHref) return false;
+    if (label.kind !== 'glossary') return true;
     if (linked.has(label.href)) return false;
+
     linked.add(label.href);
     return true;
   };
@@ -143,10 +168,23 @@ const autoLink = (ctx: PluginFactoryContext) => {
     text(node, context) {
       if (isInsideSkipped(node, context)) return;
 
-      const matches = findMatches(node.value, glossaryDictionary, claim);
+      const matches = findMatches(node.value, proseDictionary, claim);
       if (matches.length === 0) return;
 
       context.replaceNode(node, splitAroundMatches(node.value, matches));
+    },
+    // An `inlineCode` node is a leaf and cannot be split, so it is linked only
+    // when the whole span is one id. That reproduces what a hand-written
+    // [`ID`](/updates/…) renders as, byte for byte.
+    inlineCode(node, context) {
+      if (isInsideSkipped(node, context)) return;
+
+      const label = inlineCodeDictionary
+        .get(node.value)
+        ?.find((candidate) => candidate.text === node.value && claim(candidate));
+      if (!label) return;
+
+      context.replaceNode(node, toLink([{ type: 'inlineCode', value: node.value }], label));
     }
   });
 };
