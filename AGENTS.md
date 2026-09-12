@@ -187,7 +187,11 @@ check. All must pass before deploy. Don't merge if any is red.
   not marked `editable: false`; enabling one swaps `disabled` /
   `tabindex="-1"` / `aria-hidden` for a real tab stop named by
   `aria-labelledby`. Radios carry a `name` so the group behaves as one — the
-  exception to the no-`id`/no-`name` rule below.
+  exception to the no-`id`/no-`name` rule below. There is no download: the
+  example listing at the foot of the page becomes the reader's own file with
+  their changes in it, reusing the Shiki `<pre>` so it keeps that block's
+  colours and padding and only loses the highlighting. The original markup is
+  stashed on load and put back by "Remove file".
 - **`npm test` runs `node --test` over `scripts/*.test.mjs`** — no test runner
   and no new dependency, since Node 24 strips the types. It exists for one
   guarantee: `applyEdits` only ever rewrites the bytes between `>` and

@@ -27,7 +27,8 @@ const { vendor, fileName } = Astro.props;
       upload it to. Even so, back up the original before you change anything on your unit —{' '}
       <a class="underline" href={`${URL_PREFIX}faq/${vendor}/pull-factory-config`}>
         how to pull your factory config
-      </a>. A wrong value here can leave a unit unable to reach its own factory settings.
+      </a>. A wrong value here can leave a unit unable to reach its own factory settings, and
+      nothing this page produces has been tried on real hardware.
     </p>
   </aside>
 
@@ -67,23 +68,11 @@ const { vendor, fileName } = Astro.props;
   </details>
 
   <div data-builder-loaded hidden class="mt-3 text-sm">
-    <label class="flex items-start gap-2">
-      <input data-builder-acknowledge type="checkbox" class="mt-1 h-4 w-4 rounded-sm" />
-      <span>
-        I have a backup of my original {fileName} and I understand this file has not been tested on a
-        head unit.
-      </span>
-    </label>
+    <p class="mb-3">
+      The listing at the foot of this page is now your file, with your changes in it.
+    </p>
 
-    <div class="mt-3 flex flex-wrap items-center gap-3">
-      <button
-        data-builder-download
-        type="button"
-        disabled
-        class="rounded-md bg-indigo-600 px-3 py-1.5 font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-400"
-      >
-        Download modified file
-      </button>
+    <div class="flex flex-wrap items-center gap-3">
       <button
         data-builder-reset
         type="button"
@@ -201,9 +190,14 @@ const { vendor, fileName } = Astro.props;
     const changes = root.querySelector<HTMLDetailsElement>('[data-builder-changes]');
     const changesSummary = root.querySelector<HTMLElement>('[data-builder-changes-summary]');
     const changesBody = root.querySelector<HTMLElement>('[data-builder-changes-body]');
-    const download = root.querySelector<HTMLButtonElement>('[data-builder-download]');
-    const acknowledge = root.querySelector<HTMLInputElement>('[data-builder-acknowledge]');
     const settings = root.parentElement;
+
+    // The listing lives outside the builder panel, at the foot of the page.
+    const listingHeading = document.querySelector<HTMLElement>('[data-listing-heading]');
+    const listingIntro = document.querySelector<HTMLElement>('[data-listing-intro]');
+    const listingYours = document.querySelector<HTMLElement>('[data-listing-yours]');
+    const copyButton = document.querySelector<HTMLButtonElement>('[data-listing-copy]');
+    const listingCode = document.querySelector<HTMLElement>('[data-listing-code] code');
 
     if (
       !status ||
@@ -212,15 +206,26 @@ const { vendor, fileName } = Astro.props;
       !paste ||
       !changes ||
       !changesSummary ||
-      !changesBody ||
-      !download ||
-      !acknowledge ||
-      !settings
+      !changesBody
+    ) {
+      return;
+    }
+
+    if (
+      !settings ||
+      !listingHeading ||
+      !listingIntro ||
+      !listingYours ||
+      !copyButton ||
+      !listingCode
     ) {
       return;
     }
 
     let loaded: Loaded | undefined;
+    // The highlighted example, captured before any of the reader's text can
+    // reach the element, so "Remove file" can put it back.
+    const exampleMarkup = listingCode.innerHTML;
 
     const say = (message: string) => {
       status.textContent = message;
@@ -252,6 +257,12 @@ const { vendor, fileName } = Astro.props;
 
       return edits;
     };
+
+    const changedEdits = () =>
+      changed()
+        .entries()
+        .map(([key, value]) => ({ key, value }))
+        .toArray();
 
     const render = () => {
       if (!loaded) return;
@@ -293,7 +304,52 @@ const { vendor, fileName } = Astro.props;
       changes.hidden = false;
       changesSummary.textContent =
         count === 0 ? 'No changes yet' : `${count} change${count === 1 ? '' : 's'} — show them`;
-      download.disabled = count === 0 || !acknowledge.checked;
+
+      showListing(count);
+    };
+
+    /** Replaces the example listing with the reader's file, edits included. */
+    const showListing = (count: number) => {
+      if (!loaded) return;
+
+      const { result, skipped } = applyEdits(loaded.xml, changedEdits());
+
+      if (skipped.length > 0) {
+        say(
+          `Cannot rewrite ${skipped.map((edit) => edit.key).join(', ')} — not found in your file.`
+        );
+        return;
+      }
+
+      const name = document.createElement('code');
+      name.textContent = root.dataset.fileName ?? '';
+      listingHeading.replaceChildren(
+        document.createTextNode('Your '),
+        name,
+        document.createTextNode(
+          count === 0 ? '' : `, with ${count} change${count === 1 ? '' : 's'}`
+        )
+      );
+
+      listingCode.textContent = result;
+      listingIntro.hidden = true;
+      listingYours.hidden = false;
+      copyButton.hidden = false;
+    };
+
+    const restoreListing = () => {
+      const name = document.createElement('code');
+      name.textContent = root.dataset.fileName ?? '';
+      listingHeading.replaceChildren(
+        document.createTextNode('An example '),
+        name,
+        document.createTextNode(' file')
+      );
+
+      listingCode.innerHTML = exampleMarkup;
+      listingIntro.hidden = false;
+      listingYours.hidden = true;
+      copyButton.hidden = true;
     };
 
     const apply = (xml: string) => {
@@ -383,12 +439,11 @@ const { vendor, fileName } = Astro.props;
       paste.hidden = false;
       loadedPanel.hidden = true;
       changes.hidden = true;
-      acknowledge.checked = false;
+      restoreListing();
       say('');
     };
 
     settings.addEventListener('change', render);
-    acknowledge.addEventListener('change', render);
 
     root
       .querySelector<HTMLInputElement>('[data-builder-file]')
@@ -431,28 +486,13 @@ const { vendor, fileName } = Astro.props;
     root.querySelector('[data-builder-reset]')?.addEventListener('click', reset);
     root.querySelector('[data-builder-remove]')?.addEventListener('click', remove);
 
-    download.addEventListener('click', () => {
-      if (!loaded) return;
-
-      const edits = changed()
-        .entries()
-        .map(([key, value]) => ({ key, value }))
-        .toArray();
-      const { result, skipped } = applyEdits(loaded.xml, edits);
-
-      if (skipped.length > 0) {
-        say(`Refusing to write: ${skipped.map((edit) => edit.key).join(', ')} moved in your file.`);
-        return;
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(listingCode.textContent ?? '');
+        say('Copied the whole file.');
+      } catch {
+        say('Could not reach the clipboard — select the listing and copy it by hand.');
       }
-
-      const url = URL.createObjectURL(new Blob([result], { type: 'application/xml' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = root.dataset.fileName ?? 'factory_config.xml';
-      link.click();
-      URL.revokeObjectURL(url);
-
-      say(`Saved ${link.download} with ${edits.length} change${edits.length === 1 ? '' : 's'}.`);
     });
 
     root.hidden = false;

@@ -57,10 +57,10 @@ if (xml) {
     xml && (
       <>
         <article class="prose dark:prose-invert">
-          <h3>
+          <h3 data-listing-heading>
             An example <code>{vendor.data.factoryConfigFileName}</code> file
           </h3>
-          <p>
+          <p data-listing-intro>
             Please{' '}
             <a href={`${URL_PREFIX}faq/${vendor.id}/pull-factory-config`}>
               make a backup for your original file
@@ -72,13 +72,35 @@ if (xml) {
             </a>
             .
           </p>
+          <p data-listing-yours hidden>
+            Your own file, with your changes. Copy it over your{' '}
+            <code>{vendor.data.factoryConfigFileName}</code>, keeping the backup you made, then
+            follow{' '}
+            <a href={`${URL_PREFIX}faq/${vendor.id}/apply-factory-config`}>
+              instructions to import it to your Head Unit
+            </a>
+            .
+          </p>
+          <button
+            data-listing-copy
+            type="button"
+            hidden
+            class="not-prose rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+          >
+            Copy the whole file
+          </button>
         </article>
-        <Code
-          class="-mx-4 mt-4 p-4 sm:-mx-6 sm:mt-6 sm:p-6 lg:-mx-8 lg:mt-8 lg:p-8"
-          lang="xml"
-          code={xml}
-          themes={SHIKI_THEMES}
-        />
+        {/* The builder swaps the text inside this block for the reader's own
+            file, so it keeps the Shiki block's colours, padding and scrolling
+            and only loses the highlighting. */}
+        <div data-listing-code>
+          <Code
+            class="-mx-4 mt-4 p-4 sm:-mx-6 sm:mt-6 sm:p-6 lg:-mx-8 lg:mt-8 lg:p-8"
+            lang="xml"
+            code={xml}
+            themes={SHIKI_THEMES}
+          />
+        </div>
       </>
     )
   }
