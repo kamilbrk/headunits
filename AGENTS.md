@@ -122,6 +122,13 @@ check. All must pass before deploy. Don't merge if any is red.
 - **Check the exit code of the `check:*` scripts, not their last line of
   output.** `npm run check:html | tail -1` prints a blank line on failure and
   discards the status, which is how a real `html-validate` failure reached CI.
+- **`:::warning` callouts** come from `src/shared/callout.plugin.ts`, a Sätteri
+  mdast plugin, with `features: { directive: true }` enabled in
+  `astro.config.ts`. That flag changes how `:::` parses in *every* content
+  file, so check `grep -rn ':::' src/data/` before changing it. Unknown
+  directive names are left untouched rather than swallowed. Styling is plain
+  CSS in `global.css`, not utility classes — Tailwind does not scan markup
+  generated inside a plugin.
 - **Use `astro/zod`, not `astro:schema`** — the latter is deprecated in
   Astro 7 and removed in Astro 8.
 - **Controls on the factory-settings pages are decorative.** They mirror

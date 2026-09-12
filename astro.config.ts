@@ -6,6 +6,7 @@ import pagefind from 'astro-pagefind';
 import tailwindcss from '@tailwindcss/vite';
 import { BASE, DOMAIN, SHIKI_THEMES, URL_PREFIX } from './src/shared/config';
 import basePathPlugin from './src/shared/base-path.plugin';
+import calloutPlugin from './src/shared/callout.plugin';
 import { getUpdateLastmods } from './src/shared/sitemap-lastmod';
 
 const updateLastmods = getUpdateLastmods();
@@ -40,7 +41,11 @@ export default defineConfig({
     layout: 'constrained'
   },
   markdown: {
-    processor: satteri({ hastPlugins: [basePathPlugin] }),
+    processor: satteri({
+      features: { directive: true },
+      mdastPlugins: [calloutPlugin],
+      hastPlugins: [basePathPlugin]
+    }),
     shikiConfig: {
       themes: SHIKI_THEMES
     }
