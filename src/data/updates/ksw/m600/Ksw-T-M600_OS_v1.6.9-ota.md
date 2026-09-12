@@ -13,5 +13,5 @@ Summary:
 - Zlink updated to `5.4.58` with split screen (?)
 
 Changes since `Ksw-T-M600_OS_v1.6.7-ota` built 6 days earlier:
-- For further changes, see [M700 1.4.2](/headunits/updates/ksw/m700/ksw-t-m700_os_v142-ota) update, as they were built from the same source and at the same time.
+- For further changes, see [M700 1.4.2](/updates/ksw/m700/ksw-t-m700_os_v142-ota) update, as they were built from the same source and at the same time.
 - Additionally, seems like Ant_Man_prevue.mp4 and GoodTime.flac were removed, rest in peace.

@@ -13,4 +13,4 @@ Summary:
 - Nothing interesting
 
 Changes since `Witstek-T-M600_OS_v1.7.8-ota` built 21 days earlier:
-- See [M700 1.5.9](/headunits/updates/ksw/m700/witstek-t-m700_os_v159-ota) update, as they were built from the same source and at the same time.
+- See [M700 1.5.9](/updates/ksw/m700/witstek-t-m700_os_v159-ota) update, as they were built from the same source and at the same time.

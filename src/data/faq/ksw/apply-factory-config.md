@@ -1,7 +1,7 @@
 ---
 question: 'How to apply factory_config.xml file?'
 ---
-Before making any changes, make sure you have a [backup of your original file](/headunits/faq/ksw/pull-factory-config). Once you apply a new file, it will persist even through a factory reset.
+Before making any changes, make sure you have a [backup of your original file](/faq/ksw/pull-factory-config). Once you apply a new file, it will persist even through a factory reset.
 
 1. Use a USB drive with FAT32 formatted partition.
 2. On the root of the USB drive, create a folder called `OEM`.
