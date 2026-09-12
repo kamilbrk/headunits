@@ -25,7 +25,7 @@ const { items } = Astro.props;
             <LinkOrTextComponent item={item} />
             {index < items.length - 2 && ', '}
           </>
-        ))}
+        ))}{' '}
         and <LinkOrTextComponent item={items.at(-1)!!} />
       </>
     )

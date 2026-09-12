@@ -1,4 +1,4 @@
-/** Domain setting for publishing */
+// Domain setting for publishing
 export const DOMAIN = 'https://kamilbrk.github.io';
 
 /**
@@ -8,10 +8,10 @@ export const DOMAIN = 'https://kamilbrk.github.io';
  */
 export const BASE = '/headunits';
 
-/** Root URL user for home page links */
+// Root URL user for home page links
 export const ROOT = BASE || '/';
 
-/** Use this for other links across the site */
+// Use this for other links across the site
 export const URL_PREFIX = BASE ? `${BASE}/` : '/';
 
 export const DEFAULT_PAGE_TITLE = 'Android Head Units';

@@ -5,7 +5,7 @@
     "url": "https://github.com/kamilbrk/headunits"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24.16.0"
   },
   "scripts": {
     "lint": "eslint src/",
@@ -17,36 +17,36 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "0.9.9",
-    "@astrojs/mdx": "6.0.3",
-    "@astrojs/sitemap": "3.7.3",
-    "@tailwindcss/vite": "4.3.1",
-    "astro": "6.4.8",
+    "@astrojs/check": "0.9.10",
+    "@astrojs/mdx": "8.0.1",
+    "@astrojs/sitemap": "3.7.4",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.3.2",
     "astro-heroicons": "2.1.5-1",
-    "astro-pagefind": "2.0.0",
+    "astro-pagefind": "2.0.1",
     "typescript": "6.0.3"
   },
   "overrides": {
     "yaml-language-server": {
       "yaml": "2.8.3"
     },
-    "vite": "^7",
+    "vite": "^8",
     "esbuild": "^0.28.1"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.7.1",
     "@tailwindcss/typography": "0.5.20",
-    "eslint": "10.5.0",
+    "eslint": "10.10.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-astro": "1.7.0",
+    "eslint-plugin-astro": "3.1.0",
     "eslint-plugin-prettier": "5.5.6",
-    "eslint-plugin-sonarjs": "4.1.0",
-    "eslint-plugin-unicorn": "68.0.0",
+    "eslint-plugin-sonarjs": "4.2.0",
+    "eslint-plugin-unicorn": "74.0.0",
     "github-slugger": "2.0.0",
-    "prettier": "3.8.4",
+    "prettier": "3.9.6",
     "prettier-plugin-astro": "0.14.1",
-    "prettier-plugin-tailwindcss": "0.8.0",
-    "tailwindcss": "4.3.1",
-    "typescript-eslint": "8.61.1"
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "tailwindcss": "4.3.3",
+    "typescript-eslint": "8.70.0"
   }
 }
