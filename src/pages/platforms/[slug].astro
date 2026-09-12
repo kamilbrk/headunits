@@ -1,0 +1,61 @@
+---
+import { getEntry } from 'astro:content';
+
+import { URL_PREFIX } from '../../shared/config';
+import DateTime from '../../shared/date-time.component.astro';
+import Layout from '../../shared/layout/base-layout.astro';
+import {
+  getCollectionGroupedByCollection,
+  getFirstLevelStaticPathsFromCollection,
+  sortEntriesByDate
+} from '../../shared/utilities';
+
+export async function getStaticPaths() {
+  // Derived from `platforms` rather than `vendors`: a new platform folder then
+  // produces its page without a second edit here.
+  return await getFirstLevelStaticPathsFromCollection('platforms');
+}
+
+const { slug } = Astro.params;
+if (!slug) throw new Error('Missing slug param');
+const vendor = await getEntry('vendors', slug);
+if (!vendor) throw new Error(`Missing vendor: ${slug}`);
+const platforms = await getCollectionGroupedByCollection('updates', 'platforms', (entry) =>
+  entry.id.startsWith(slug)
+);
+---
+
+<Layout
+  title=`Platforms for ${vendor.data.name}`
+  description={`Hardware platforms used by ${vendor.data.name} Android head units, and the firmware available for each.`}
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    {
+      platforms.length > 0 ? (
+        <ul>
+          {platforms.map((platform) => {
+            const newest = platform.entries.sort(sortEntriesByDate)[0];
+            return (
+              <li>
+                <a href={`${URL_PREFIX}${platform.collection}/${platform.id}`}>
+                  {platform.data.name}
+                </a>{' '}
+                &mdash; {platform.entries.length} firmware{' '}
+                {platform.entries.length === 1 ? 'update' : 'updates'}
+                {newest && (
+                  <>
+                    , newest <DateTime date={newest.data.date} />
+                  </>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p>We don't have information about platforms for this vendor yet.</p>
+      )
+    }
+
+    <a href={`${URL_PREFIX}updates/${vendor.id}`}>All {vendor.data.name} firmware updates</a>
+  </div>
+</Layout>

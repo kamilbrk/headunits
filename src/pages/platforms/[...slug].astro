@@ -1,0 +1,84 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+
+import { DOMAIN, URL_PREFIX } from '../../shared/config';
+import DateTime from '../../shared/date-time.component.astro';
+import Layout from '../../shared/layout/base-layout.astro';
+import {
+  getAndroidVersion,
+  getEntryStaticPathsFromCollection,
+  getUpdateVersion,
+  getVendorSlug,
+  sortEntriesByDate
+} from '../../shared/utilities';
+
+export async function getStaticPaths() {
+  return await getEntryStaticPathsFromCollection('platforms');
+}
+
+const { slug } = Astro.params;
+if (!slug) throw new Error('Missing slug param');
+const vendor = await getEntry('vendors', getVendorSlug(slug));
+if (!vendor) throw new Error(`Missing vendor for slug: ${slug}`);
+const platform = await getEntry('platforms', slug);
+if (!platform) throw new Error(`Missing platforms entry: ${slug}`);
+const { Content } = await render(platform);
+
+const RECENT_UPDATE_COUNT = 10;
+const updates = await getCollection('updates', (entry) => entry.id.startsWith(platform.id));
+const newestFirst = updates.toSorted(sortEntriesByDate);
+const recent = newestFirst.slice(0, RECENT_UPDATE_COUNT);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: platform.data.name,
+  inLanguage: 'en',
+  url: new URL(`${URL_PREFIX}${platform.collection}/${platform.id}`, DOMAIN).href,
+  about: `${vendor.data.name} head unit hardware platform`
+};
+---
+
+<Layout
+  title={platform.data.name}
+  description={`Hardware details and firmware for the ${platform.data.name} platform used by ${vendor.data.name} Android head units.`}
+  jsonLd={jsonLd}
+  filters={{ platform: platform.id.split('/', 2)[1] }}
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    <Content />
+
+    <h3>Firmware for this platform</h3>
+    {
+      recent.length > 0 ? (
+        <ul>
+          {recent.map((entry) => (
+            <li>
+              <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>{' '}
+              <span>(A{getAndroidVersion(entry)})</span> <DateTime date={entry.data.date} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>We don't have information about updates for this platform yet.</p>
+      )
+    }
+
+    {
+      newestFirst.length > recent.length && (
+        <p>
+          Showing the newest {recent.length} of {newestFirst.length}. The most recent is version{' '}
+          <strong>{getUpdateVersion(recent[0]!)}</strong>.
+        </p>
+      )
+    }
+
+    <p>
+      <a href={`${URL_PREFIX}updates/${vendor.id}`}>All {vendor.data.name} firmware updates</a>
+      {' · '}
+      <a href={`${URL_PREFIX}platforms/${vendor.id}`}>All {vendor.data.name} platforms</a>
+      {' · '}
+      <a href={`${URL_PREFIX}factory-settings/${vendor.id}`}>Factory settings</a>
+    </p>
+  </div>
+</Layout>
