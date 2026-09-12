@@ -13,6 +13,7 @@
     "check:html": "html-validate \"dist/**/*.html\"",
     "check:links": "node scripts/check-links.mjs",
     "check:spacing": "node scripts/check-spacing.mjs",
+    "check:autolinks": "node scripts/check-autolinks.mjs",
     "lint:fix": "eslint --fix src/",
     "prettier": "prettier --write **/*.{astro,css,js,ts}",
     "dev": "astro dev",

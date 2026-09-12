@@ -129,6 +129,22 @@ check. All must pass before deploy. Don't merge if any is red.
   directive names are left untouched rather than swallowed. Styling is plain
   CSS in `global.css`, not utility classes — Tailwind does not scan markup
   generated inside a plugin.
+- **Glossary terms are linked automatically.** `src/shared/autolink.plugin.ts`
+  links the first mention of each glossary term in a Markdown body to its
+  anchor on `/glossary`; the dictionary is read off disk by
+  `src/shared/entity-dictionary.ts`, since `getCollection` isn't available
+  while the Astro config resolves. Don't hand-write `[MCU](/glossary#mcu)` in
+  content. A term that only appears inside a larger identifier, or that
+  collides with an ordinary word, opts out with `autolink: false` in its
+  frontmatter (`nexai`, `platform`, `gs` do today). `npm run check:autolinks`
+  guards the output and carries an expected site-wide count — update
+  `EXPECTED_TOTAL` in the script when content moves it on purpose.
+- **A plugin change alone may not show up in `dist/`.** Astro caches rendered
+  Markdown in `node_modules/.astro/data-store.json`, keyed on the content
+  files, so editing `callout.plugin.ts` or `autolink.plugin.ts` and rebuilding
+  can silently reuse the old HTML. Editing `astro.config.ts` or the content
+  itself does invalidate it. Delete that file before trusting a local build of
+  a plugin change; CI starts from a clean checkout and is unaffected.
 - **Use `astro/zod`, not `astro:schema`** — the latter is deprecated in
   Astro 7 and removed in Astro 8.
 - **Controls on the factory-settings pages are decorative.** They mirror

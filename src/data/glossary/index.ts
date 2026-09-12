@@ -9,6 +9,11 @@ export default defineCollection({
     /**
     Other spellings that mean the same thing.
     */
-    aliases: z.array(z.string()).optional()
+    aliases: z.array(z.string()).optional(),
+    /**
+    Skip this term when auto-linking prose. For terms that only ever appear
+    inside a larger identifier, or that collide with an ordinary word.
+    */
+    autolink: z.boolean().default(true)
   })
 });
