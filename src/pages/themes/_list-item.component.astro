@@ -4,13 +4,19 @@ import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 
 import { URL_PREFIX } from '../../shared/config';
+import { getVendorSlug } from '../../shared/utilities';
 
 interface Props {
   theme: CollectionEntry<'themes'>;
+  /**
+  Label the card with its vendor, for grids that mix both.
+  */
+  showVendor?: boolean;
 }
-const { theme } = Astro.props;
+const { theme, showVendor = false } = Astro.props;
 const tagClassNames = theme.data.tags?.map((x) => `tag--${x}`).join(' ');
 const name = theme.data.display || theme.data.id;
+const vendor = showVendor ? getVendorSlug(theme.id).toUpperCase() : undefined;
 ---
 
 <div class={`group relative ${tagClassNames}`}>
@@ -40,6 +46,7 @@ const name = theme.data.display || theme.data.id;
     <h3 class="text-sm text-gray-700 dark:text-gray-300">
       <a href={`${URL_PREFIX}${theme.collection}/${theme.id}`}>
         <span aria-hidden="true" class="absolute inset-0"></span>
+        {vendor && <span>{vendor} </span>}
         {theme.data.number && <span>ID#{theme.data.number} - </span>}
         {theme.data.id}
       </a>
