@@ -5,6 +5,7 @@ import { getEntry, render } from 'astro:content';
 
 import { DOMAIN, SHIKI_THEMES, URL_PREFIX } from '../../shared/config';
 import DelimitedLinks from '../../shared/delimited-links.component.astro';
+import EditOnGitHub from '../../shared/edit-on-github.component.astro';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
   getEntryStaticPathsFromCollection,
@@ -128,4 +129,5 @@ const jsonLd = {
       >Back to all {vendor.data.name} themes</a
     >
   </div>
+  <EditOnGitHub filePath={entry.filePath} />
 </Layout>

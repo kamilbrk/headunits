@@ -3,6 +3,7 @@ import { getCollection, getEntry, render } from 'astro:content';
 
 import { DOMAIN, URL_PREFIX } from '../../shared/config';
 import DateTime from '../../shared/date-time.component.astro';
+import EditOnGitHub from '../../shared/edit-on-github.component.astro';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
   getAndroidVersion,
@@ -130,4 +131,5 @@ const jsonLd = {
       <a href={`${URL_PREFIX}factory-settings/${vendor.id}`}>Factory settings</a>
     </p>
   </div>
+  <EditOnGitHub filePath={platform.filePath} />
 </Layout>

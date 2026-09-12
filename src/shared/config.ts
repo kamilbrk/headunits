@@ -14,6 +14,9 @@ export const ROOT = BASE || '/';
 // Use this for other links across the site
 export const URL_PREFIX = BASE ? `${BASE}/` : '/';
 
+export const REPOSITORY = 'https://github.com/kamilbrk/headunits';
+export const REPOSITORY_BRANCH = 'main';
+
 export const DEFAULT_PAGE_TITLE = 'Android Head Units';
 export const DEFAULT_PAGE_DESCRIPTION =
   'Community-driven information about KSW and ZXW Android head units — firmware updates, themes, factory settings and more.';

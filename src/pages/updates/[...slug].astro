@@ -5,6 +5,7 @@ import { getEntry, render } from 'astro:content';
 
 import { DOMAIN, URL_PREFIX } from '../../shared/config';
 import DateTime from '../../shared/date-time.component.astro';
+import EditOnGitHub from '../../shared/edit-on-github.component.astro';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
   getAndroidVersion,
@@ -101,4 +102,5 @@ const jsonLd = {
       >Back to all {vendor.data.name} updates</a
     >
   </div>
+  <EditOnGitHub filePath={entry.filePath} />
 </Layout>
