@@ -1,14 +1,13 @@
 ---
 import { getEntry } from 'astro:content';
 
-import { URL_PREFIX } from '../../shared/config';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
-  getAndroidVersion,
   getCollectionGroupedByCollection,
   getFirstLevelStaticPathsFromCollection,
   sortEntriesByDate
 } from '../../shared/utilities';
+import UpdatesListItem from './_list-item.component.astro';
 
 export async function getStaticPaths() {
   return await getFirstLevelStaticPathsFromCollection('vendors');
@@ -33,15 +32,9 @@ const platformsWithEntries = await getCollectionGroupedByCollection(
           <h3>{group.data.name}</h3>
           <ul>
             {group.entries.length > 0 ? (
-              group.entries.sort(sortEntriesByDate).map((entry) => (
-                <li>
-                  <a href={`${URL_PREFIX}${entry.collection}/${entry.id}`}>{entry.data.id}</a>{' '}
-                  <span>(A{getAndroidVersion(entry)})</span>{' '}
-                  <time datetime={entry.data.date.toISOString()}>
-                    {entry.data.date.toISOString().slice(0, 10)}
-                  </time>
-                </li>
-              ))
+              group.entries
+                .sort(sortEntriesByDate)
+                .map((entry) => <UpdatesListItem entry={entry} />)
             ) : (
               <li>We don't have information about updates for this platform yet.</li>
             )}
