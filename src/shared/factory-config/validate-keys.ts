@@ -1,7 +1,7 @@
 import type { SettingItem } from '../../data/factory-settings';
-import type { ScalarElement } from './xml-scan';
+import type { ScalarElement } from './xml-scan.ts';
 
-import { findScalarElements } from './xml-scan';
+import { findScalarElements } from './xml-scan.ts';
 
 type Elements = ReadonlyMap<string, readonly ScalarElement[]>;
 

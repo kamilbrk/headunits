@@ -13,7 +13,7 @@ if (!entry) throw new Error(`Missing factory-settings entry: ${slug}`);
 const { Content } = await render(entry);
 ---
 
-<div class="mb-5">
+<div class="mb-5" data-section={entry.data.section}>
   <h3 class="relative flex items-center">
     {entry.data.section}
   </h3>
