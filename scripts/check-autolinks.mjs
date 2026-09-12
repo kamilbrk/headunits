@@ -12,7 +12,7 @@ const DIST = 'dist';
 // looks. Update both numbers when content changes move the count on purpose;
 // the point of the check is that a silent collapse to zero — the plugin
 // falling out of astro.config.ts — cannot pass unnoticed.
-const EXPECTED_TOTAL = 139;
+const EXPECTED_TOTAL = 141;
 const TOLERANCE = 0.2;
 
 // These two page templates render several Markdown documents onto one page, so

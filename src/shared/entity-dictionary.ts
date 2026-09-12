@@ -6,10 +6,11 @@ import { slug } from 'github-slugger';
 const DATA_DIRECTORY = 'src/data';
 const GLOSSARY_DIRECTORY = path.join(DATA_DIRECTORY, 'glossary');
 const UPDATES_DIRECTORY = path.join(DATA_DIRECTORY, 'updates');
+const THEMES_DIRECTORY = path.join(DATA_DIRECTORY, 'themes');
 
 // Collections whose entries are published one-per-page under a route named
 // after the collection, so a file path alone gives the href.
-const ROUTED_COLLECTIONS = new Set(['updates']);
+const ROUTED_COLLECTIONS = new Set(['updates', 'themes']);
 
 export type AutoLinkKind = 'glossary' | 'entity';
 
@@ -153,15 +154,10 @@ export function getEntryHref(file: string) {
   return `/${collection}/${entryId(path.join(DATA_DIRECTORY, collection), file)}`;
 }
 
-/**
-Firmware version ids from the `updates` collection, pointing at the page for
-that build. Unlike glossary terms these are exact identifiers, so every mention
-is linked, matching what the hand-written links did.
-*/
-export function getUpdateLabels(): AutoLinkLabel[] {
+const idLabels = (directory: string) => {
   const labels: AutoLinkLabel[] = [];
 
-  for (const file of markdownFiles(UPDATES_DIRECTORY)) {
+  for (const file of markdownFiles(directory)) {
     const id = readFrontmatter(readFileSync(file, 'utf8')).get('id')?.[0];
     if (!id) continue;
 
@@ -172,7 +168,21 @@ export function getUpdateLabels(): AutoLinkLabel[] {
   }
 
   return labels;
-}
+};
+
+/**
+Firmware version ids from the `updates` collection, pointing at the page for
+that build. Unlike glossary terms these are exact identifiers, so every mention
+is linked, matching what the hand-written links did.
+*/
+export const getUpdateLabels = () => idLabels(UPDATES_DIRECTORY);
+
+/**
+Theme ids from the `themes` collection. Short, numerous and sharing prefixes
+(`UI_MBUX_2021_KSW_1024` and `UI_MBUX_2021_KSW_1024_V2`), so this is where
+longest-label-first earns its keep.
+*/
+export const getThemeLabels = () => idLabels(THEMES_DIRECTORY);
 
 /**
 Buckets labels by their first token and sorts each bucket longest-first, so
@@ -181,7 +191,18 @@ Buckets labels by their first token and sorts each bucket longest-first, so
 export function buildDictionary(labels: readonly AutoLinkLabel[]): AutoLinkDictionary {
   const dictionary = new Map<string, AutoLinkLabel[]>();
 
+  // The same name can belong to two entries — KSW and ZXW both have a theme
+  // called LEXUS_UI. An unqualified mention says nothing about which is meant,
+  // so neither is linked.
+  const targets = new Map<string, Set<string>>();
   for (const label of labels) {
+    const seen = targets.get(label.text);
+    if (seen) seen.add(label.href);
+    else targets.set(label.text, new Set([label.href]));
+  }
+
+  for (const label of labels) {
+    if ((targets.get(label.text)?.size ?? 0) > 1) continue;
     const firstToken = label.text.match(TOKEN_PATTERN)?.[0];
     if (!firstToken) continue;
 
