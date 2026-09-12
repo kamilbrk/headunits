@@ -103,6 +103,38 @@ Links between pages are written **root-relative without the base path**
 (`/updates/ksw`, not `/headunits/updates/ksw`). `src/shared/base-path.plugin.ts`
 prefixes `BASE` at build time.
 
+A warning that belongs next to an instruction goes in a callout:
+
+```md
+:::warning
+Installing an OTA that was not built for your platform can leave the unit
+stuck at boot.
+:::
+```
+
+### Glossary — `src/data/glossary/<slug>.md`
+
+```yaml
+---
+term: MCU                # required, the term as displayed
+aliases: [microcontroller]  # optional, other spellings
+---
+```
+
+Body is the definition, in Markdown. Flat, not split by vendor.
+
+### Upgrade paths — `src/data/upgrade-paths/<vendor>.md`
+
+```yaml
+---
+title: Upgrade path for KSW units
+---
+```
+
+Which builds have to be installed before which. ZXW has none yet — its
+firmware is datestamped with no version chain, so it isn't clear a required
+order exists.
+
 ### Factory settings — `src/data/factory-settings/<vendor>/<slug>.md`
 
 ```yaml
@@ -132,16 +164,20 @@ same shape.
 
 ```
 .github/workflows/ci.yml       CI: verify (lint, check, build, smoke,
-                               html + link checks) → deploy
+                               html, link and spacing checks) → deploy
+.github/ISSUE_TEMPLATE/        Forms for contributors who don't use git
 .github/dependabot.yml         Monthly grouped dependency PRs
 public/                        Static assets served as-is (XML configs,
                                OG image, robots.txt, helper scripts)
-src/data/                      Content collections (themes, updates,
-                               faq, factory-settings, platforms, vendors)
+src/data/                      Content collections (themes, updates, faq,
+                               factory-settings, glossary, upgrade-paths,
+                               platforms, vendors)
 src/pages/                     Astro routes, including dynamic [slug]
 src/shared/                    Layout, components, helpers, site config
+src/shared/*.plugin.ts         Sätteri markdown plugins (base path, callouts)
 src/content.config.ts          Collection registration
 scripts/check-links.mjs        Internal link checker run in CI
+scripts/check-spacing.mjs      Catches words glued to inline elements
 astro.config.ts                Astro config (integrations, output, image)
 ```
 
