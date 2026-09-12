@@ -5,6 +5,7 @@
     "require-sri": "off",
     "long-title": "off",
     "svg-focusable": "off",
-    "no-redundant-role": "off"
+    "no-redundant-role": "off",
+    "doctype-style": "off"
   }
 }

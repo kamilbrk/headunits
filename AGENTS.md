@@ -115,6 +115,13 @@ check. All must pass before deploy. Don't merge if any is red.
   `satteri({ hastPlugins: [...] })` in `astro.config.ts`. Setting
   `markdown.rehypePlugins` fails the build unless `@astrojs/markdown-remark`
   is installed, which would switch the whole pipeline back to unified.
+- **`doctype-style` is off in `.htmlvalidate.json`.** Astro writes the doctype,
+  not us, and it emits `<!doctype html>` on generated redirect pages while
+  normalising authored pages to `<!DOCTYPE html>`. The casing has no effect on
+  HTML5 parsing, so the rule only produced a failure nobody could act on.
+- **Check the exit code of the `check:*` scripts, not their last line of
+  output.** `npm run check:html | tail -1` prints a blank line on failure and
+  discards the status, which is how a real `html-validate` failure reached CI.
 - **Use `astro/zod`, not `astro:schema`** — the latter is deprecated in
   Astro 7 and removed in Astro 8.
 - **Controls on the factory-settings pages are decorative.** They mirror
