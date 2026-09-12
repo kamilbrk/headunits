@@ -143,6 +143,20 @@ export function sortEntriesByDataId(
  * number, ascending. KSW themes carry no number and fall back to their id, so
  * their grid is unaffected.
  */
+/**
+Themes tagged with a car brand, across both vendors.
+*/
+export async function getThemesByBrand(brand: string) {
+  return await getCollection('themes', (entry) => entry.data.tags?.includes(brand) ?? false);
+}
+
+/**
+Themes that have no screenshots yet.
+*/
+export async function getThemesWithoutImages() {
+  return await getCollection('themes', (entry) => !entry.data.images?.length);
+}
+
 export function sortEntriesByThemeNumber(
   entryA: CollectionEntry<'themes'>,
   entryB: CollectionEntry<'themes'>
