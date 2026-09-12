@@ -29,6 +29,8 @@ jobs:
         run: npm run lint
       - name: Type check
         run: npx astro check
+      - name: Unit tests
+        run: npm test
       - name: Build
         run: npm run build
       - name: Smoke test built artifacts

@@ -182,13 +182,26 @@ check. All must pass before deploy. Don't merge if any is red.
   leaves the browser and there is no server to send it to — keep it that way.
   The panel is server-rendered `hidden` and unhidden by the script, so with
   JavaScript off the page is exactly what it was before. Like the other files
-  with an inline `<script>`, it is in the ESLint ignore list.
-- **Controls on the factory-settings pages are decorative.** They mirror
-  what the car screen looks like and serve no form purpose, so they carry
-  `disabled`, `tabindex="-1"` and `aria-hidden="true"` and deliberately have
-  no `id`, `name` or `<label>`. The only `id` in a settings row is on the
-  `<span>` holding the name, for anchor linking. Putting ids back on the
-  inputs produced 90 duplicate ids on a single page.
+  with an inline `<script>`, it is in the ESLint ignore list. A control becomes
+  live only for a key the reader's own file carries and that the markdown has
+  not marked `editable: false`; enabling one swaps `disabled` /
+  `tabindex="-1"` / `aria-hidden` for a real tab stop named by
+  `aria-labelledby`. Radios carry a `name` so the group behaves as one — the
+  exception to the no-`id`/no-`name` rule below.
+- **`npm test` runs `node --test` over `scripts/*.test.mjs`** — no test runner
+  and no new dependency, since Node 24 strips the types. It exists for one
+  guarantee: `applyEdits` only ever rewrites the bytes between `>` and
+  `</key>`, so a reader's comments, indentation and unknown elements come back
+  untouched. The tests read the real files in `public/`, so they track what
+  ships. `tsconfig` sets `allowImportingTsExtensions` so those modules can
+  import each other with an explicit `.ts`, which is what Node's own resolver
+  needs.
+- **Controls on the factory-settings pages start decorative.** They mirror
+  what the car screen looks like, so until a reader loads their own file they
+  carry `disabled`, `tabindex="-1"` and `aria-hidden="true"` and have no `id`
+  or `<label>`. The only `id` in a settings row is on the `<span>` holding the
+  name, for anchor linking. Putting ids back on the inputs produced 90
+  duplicate ids on a single page.
 
 ## Patterns for adding a new page
 

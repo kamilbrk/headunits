@@ -2,6 +2,10 @@
   "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
     "jsx": "preserve",
+    // Lets the factory-config modules import each other with an explicit `.ts`
+    // extension, which is what Node's own resolver needs to run
+    // `scripts/xml-edit.test.mjs` against the real sources.
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {

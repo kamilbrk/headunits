@@ -51,6 +51,7 @@ if (setting.configValue !== undefined) {
           disabled
           tabindex="-1"
           aria-hidden="true"
+          aria-labelledby={uniqueId}
           class="h-4 w-4 rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500"
         />
       )
@@ -63,6 +64,8 @@ if (setting.configValue !== undefined) {
           disabled
           tabindex="-1"
           aria-hidden="true"
+          aria-labelledby={uniqueId}
+          name={configKey}
           class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
         />
       )
@@ -103,6 +106,13 @@ if (setting.configValue !== undefined) {
         </span>
       )
     }
+
+    <span
+      hidden
+      data-setting-changed
+      class="rounded-sm bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-900 dark:text-amber-100"
+      >changed</span
+    >
 
     <span
       hidden

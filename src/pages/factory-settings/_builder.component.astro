@@ -66,100 +66,270 @@ const { vendor, fileName } = Astro.props;
     </button>
   </details>
 
-  <div data-builder-loaded hidden class="mt-3 flex flex-wrap items-center gap-3 text-sm">
-    <button
-      data-builder-remove
-      type="button"
-      class="rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
-    >
-      Remove file
-    </button>
+  <div data-builder-loaded hidden class="mt-3 text-sm">
+    <label class="flex items-start gap-2">
+      <input data-builder-acknowledge type="checkbox" class="mt-1 h-4 w-4 rounded-sm" />
+      <span>
+        I have a backup of my original {fileName} and I understand this file has not been tested on a
+        head unit.
+      </span>
+    </label>
+
+    <div class="mt-3 flex flex-wrap items-center gap-3">
+      <button
+        data-builder-download
+        type="button"
+        disabled
+        class="rounded-md bg-indigo-600 px-3 py-1.5 font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-gray-700 dark:disabled:text-gray-400"
+      >
+        Download modified file
+      </button>
+      <button
+        data-builder-reset
+        type="button"
+        class="rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+      >
+        Undo my changes
+      </button>
+      <button
+        data-builder-remove
+        type="button"
+        class="rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+      >
+        Remove file
+      </button>
+    </div>
+
+    <details data-builder-changes hidden class="mt-3">
+      <summary class="cursor-pointer" data-builder-changes-summary>No changes yet</summary>
+      <table class="mt-2 w-full text-left text-xs">
+        <thead>
+          <tr class="text-gray-500 dark:text-gray-400">
+            <th scope="col" class="pr-3 font-medium">Section</th>
+            <th scope="col" class="pr-3 font-medium">Setting</th>
+            <th scope="col" class="pr-3 font-medium">Key</th>
+            <th scope="col" class="pr-3 font-medium">From</th>
+            <th scope="col" class="font-medium">To</th>
+          </tr>
+        </thead>
+        <tbody data-builder-changes-body></tbody>
+      </table>
+    </details>
   </div>
 
   <p data-builder-status role="status" class="mt-3 text-sm text-gray-600 dark:text-gray-400"></p>
 </section>
 
 <script>
+  import { applyEdits } from '../../shared/factory-config/xml-edit';
   import { findScalarElements } from '../../shared/factory-config/xml-scan';
 
-  const NOT_IN_FILE = 'not in your file';
+  interface Loaded {
+    name: string;
+    xml: string;
+    /** The value each resolved key had in the file as it arrived. */
+    original: Map<string, string>;
+    /** A human label per key, taken from the row that owns it. */
+    label: Map<string, string>;
+    section: Map<string, string>;
+  }
+
+  const ROW = '[data-setting]';
+  const KEYED_ROW = '[data-setting][data-config-key]';
+
+  const noteOf = (row: HTMLElement) =>
+    row.querySelector<HTMLElement>(':scope > div > [data-setting-note]');
+  const badgeOf = (row: HTMLElement) =>
+    row.querySelector<HTMLElement>(':scope > div > [data-setting-changed]');
+  // The control for a row is a direct grandchild; a radio group's own children
+  // render their inputs inside nested rows of their own.
+  const controlOf = (row: HTMLElement) =>
+    row.querySelector<HTMLInputElement>(':scope > div > input');
+  const nameOf = (row: HTMLElement) =>
+    row.querySelector<HTMLElement>(':scope > div > span[id]')?.textContent?.trim() ?? '';
 
   const setNote = (row: HTMLElement, text: string) => {
-    const note = row.querySelector<HTMLElement>(':scope > div > [data-setting-note]');
+    const note = noteOf(row);
     if (!note) return;
 
     note.textContent = text;
     note.hidden = text === '';
   };
 
-  // The control for a row is a direct grandchild; a radio group's own children
-  // render their inputs inside nested rows of their own.
-  const controlOf = (row: HTMLElement) =>
-    row.querySelector<HTMLInputElement>(':scope > div > input');
+  const setEnabled = (control: HTMLInputElement, enabled: boolean) => {
+    control.disabled = !enabled;
+    control.setAttribute('tabindex', enabled ? '0' : '-1');
+    if (enabled) control.removeAttribute('aria-hidden');
+    else control.setAttribute('aria-hidden', 'true');
+  };
 
-  const show = (row: HTMLElement, value: string) => {
+  /** What the row's control currently says the element's value should be. */
+  const valueOf = (row: HTMLElement) => {
+    const control = controlOf(row);
+    const { control: kind, onValue, offValue } = row.dataset;
+    if (!control) return undefined;
+
+    if (kind === 'checkbox') return control.checked ? onValue : offValue;
+    if (control.type === 'range') return control.value;
+
+    return undefined;
+  };
+
+  const showValue = (row: HTMLElement, value: string) => {
     const control = controlOf(row);
     const { control: kind, onValue, configValue } = row.dataset;
 
     if (control && kind === 'checkbox') {
       control.checked = value === onValue;
-      setNote(row, '');
       return;
     }
 
     if (control && kind === 'radio') {
       control.checked = value === configValue;
-      setNote(row, '');
       return;
     }
 
-    if (control && control.type === 'range') {
-      control.value = value;
-    }
-
+    if (control && control.type === 'range') control.value = value;
     setNote(row, `currently ${value}`);
-  };
-
-  const apply = (root: HTMLElement, xml: string) => {
-    const elements = findScalarElements(xml);
-    const rows = root.querySelectorAll<HTMLElement>('[data-setting][data-config-key]');
-    const resolved = new Set<string>();
-    const missing = new Set<string>();
-
-    for (const row of rows) {
-      const key = row.dataset.configKey;
-      if (!key) continue;
-
-      const found = elements.get(key);
-
-      const only = found?.length === 1 ? found[0] : undefined;
-
-      if (only) {
-        resolved.add(key);
-        show(row, only.value);
-      } else {
-        missing.add(key);
-        setNote(row, found ? 'appears more than once in your file' : NOT_IN_FILE);
-      }
-    }
-
-    return { resolved: resolved.size, missing: missing.size };
-  };
-
-  const clear = (root: HTMLElement) => {
-    for (const row of root.querySelectorAll<HTMLElement>('[data-setting]')) setNote(row, '');
   };
 
   function setUp(root: HTMLElement) {
     const status = root.querySelector<HTMLElement>('[data-builder-status]');
     const empty = root.querySelector<HTMLElement>('[data-builder-empty]');
-    const loaded = root.querySelector<HTMLElement>('[data-builder-loaded]');
+    const loadedPanel = root.querySelector<HTMLElement>('[data-builder-loaded]');
     const paste = root.querySelector<HTMLElement>('[data-builder-paste]');
-    const settingsRoot = root.parentElement;
-    if (!status || !empty || !loaded || !paste || !settingsRoot) return;
+    const changes = root.querySelector<HTMLDetailsElement>('[data-builder-changes]');
+    const changesSummary = root.querySelector<HTMLElement>('[data-builder-changes-summary]');
+    const changesBody = root.querySelector<HTMLElement>('[data-builder-changes-body]');
+    const download = root.querySelector<HTMLButtonElement>('[data-builder-download]');
+    const acknowledge = root.querySelector<HTMLInputElement>('[data-builder-acknowledge]');
+    const settings = root.parentElement;
+
+    if (
+      !status ||
+      !empty ||
+      !loadedPanel ||
+      !paste ||
+      !changes ||
+      !changesSummary ||
+      !changesBody ||
+      !download ||
+      !acknowledge ||
+      !settings
+    ) {
+      return;
+    }
+
+    let loaded: Loaded | undefined;
 
     const say = (message: string) => {
       status.textContent = message;
+    };
+
+    const keyedRows = () => settings.querySelectorAll<HTMLElement>(KEYED_ROW);
+
+    /** Every key whose control no longer agrees with the file it came from. */
+    const changed = () => {
+      const edits = new Map<string, string>();
+      if (!loaded) return edits;
+
+      for (const row of keyedRows()) {
+        const key = row.dataset.configKey;
+        const value =
+          row.dataset.control === 'radio'
+            ? controlOf(row)?.checked
+              ? row.dataset.configValue
+              : undefined
+            : valueOf(row);
+
+        // A key that did not resolve has no value in the file to differ from,
+        // and its control was never enabled.
+        if (!key || value === undefined || !loaded.original.has(key)) continue;
+        if (loaded.original.get(key) === value) continue;
+
+        edits.set(key, value);
+      }
+
+      return edits;
+    };
+
+    const render = () => {
+      if (!loaded) return;
+
+      const edits = changed();
+
+      for (const row of keyedRows()) {
+        const key = row.dataset.configKey;
+        const badge = badgeOf(row);
+        // The group row carries the badge for a radio group; marking every
+        // option as changed would be noise.
+        const mark = Boolean(key) && edits.has(key ?? '') && row.dataset.control !== 'radio';
+        if (badge) badge.hidden = !mark;
+      }
+
+      changesBody.replaceChildren(
+        ...edits.entries().map(([key, value]) => {
+          const cells = [
+            loaded?.section.get(key) ?? '',
+            loaded?.label.get(key) ?? '',
+            key,
+            loaded?.original.get(key) ?? '',
+            value
+          ];
+          const tr = document.createElement('tr');
+          tr.append(
+            ...cells.map((text) => {
+              const td = document.createElement('td');
+              td.className = 'pr-3 align-top';
+              td.textContent = text;
+              return td;
+            })
+          );
+          return tr;
+        })
+      );
+
+      const count = edits.size;
+      changes.hidden = false;
+      changesSummary.textContent =
+        count === 0 ? 'No changes yet' : `${count} change${count === 1 ? '' : 's'} — show them`;
+      download.disabled = count === 0 || !acknowledge.checked;
+    };
+
+    const apply = (xml: string) => {
+      const elements = findScalarElements(xml);
+      const original = new Map<string, string>();
+      const label = new Map<string, string>();
+      const section = new Map<string, string>();
+      const missing = new Set<string>();
+
+      for (const row of keyedRows()) {
+        const key = row.dataset.configKey;
+        if (!key) continue;
+
+        const found = elements.get(key);
+        const only = found?.length === 1 ? found[0] : undefined;
+
+        if (row.dataset.control !== 'radio') {
+          label.set(key, nameOf(row));
+          section.set(key, row.closest<HTMLElement>('[data-section]')?.dataset.section ?? '');
+        }
+
+        if (!only) {
+          missing.add(key);
+          setNote(row, found ? 'appears more than once in your file' : 'not in your file');
+          continue;
+        }
+
+        original.set(key, only.value);
+        setNote(row, '');
+        showValue(row, only.value);
+
+        const control = controlOf(row);
+        if (control && row.dataset.editable !== 'false') setEnabled(control, true);
+      }
+
+      return { original, label, section, missing: missing.size };
     };
 
     const load = (name: string, xml: string) => {
@@ -168,23 +338,57 @@ const { vendor, fileName } = Astro.props;
         return;
       }
 
-      const { resolved, missing } = apply(settingsRoot, xml);
+      const { original, label, section, missing } = apply(xml);
+      loaded = { name, xml, original, label, section };
+
       empty.hidden = true;
       paste.hidden = true;
-      loaded.hidden = false;
+      loadedPanel.hidden = false;
       say(
-        `${name} · ${xml.split('\n').length} lines · ${resolved} settings found, ${missing} not in your file. ` +
-          'Controls stay read-only for now.'
+        `${name} · ${xml.split('\n').length} lines · ${original.size} settings found, ` +
+          `${missing} not in your file.`
       );
+      render();
+    };
+
+    const reset = () => {
+      if (!loaded) return;
+
+      for (const row of keyedRows()) {
+        const key = row.dataset.configKey;
+        const value = key ? loaded.original.get(key) : undefined;
+        if (value !== undefined) showValue(row, value);
+      }
+
+      render();
     };
 
     const remove = () => {
-      clear(settingsRoot);
+      loaded = undefined;
+
+      for (const row of settings.querySelectorAll<HTMLElement>(ROW)) {
+        setNote(row, '');
+
+        const badge = badgeOf(row);
+        if (badge) badge.hidden = true;
+
+        const control = controlOf(row);
+        if (control) {
+          setEnabled(control, false);
+          control.checked = false;
+        }
+      }
+
       empty.hidden = false;
       paste.hidden = false;
-      loaded.hidden = true;
+      loadedPanel.hidden = true;
+      changes.hidden = true;
+      acknowledge.checked = false;
       say('');
     };
+
+    settings.addEventListener('change', render);
+    acknowledge.addEventListener('change', render);
 
     root
       .querySelector<HTMLInputElement>('[data-builder-file]')
@@ -215,6 +419,7 @@ const { vendor, fileName } = Astro.props;
 
     root.querySelector('[data-builder-read]')?.addEventListener('click', () => {
       const text = root.querySelector<HTMLTextAreaElement>('[data-builder-text]')?.value ?? '';
+
       if (text.trim() === '') {
         say('Paste the contents of your file first.');
         return;
@@ -223,7 +428,32 @@ const { vendor, fileName } = Astro.props;
       load('Pasted file', text);
     });
 
+    root.querySelector('[data-builder-reset]')?.addEventListener('click', reset);
     root.querySelector('[data-builder-remove]')?.addEventListener('click', remove);
+
+    download.addEventListener('click', () => {
+      if (!loaded) return;
+
+      const edits = changed()
+        .entries()
+        .map(([key, value]) => ({ key, value }))
+        .toArray();
+      const { result, skipped } = applyEdits(loaded.xml, edits);
+
+      if (skipped.length > 0) {
+        say(`Refusing to write: ${skipped.map((edit) => edit.key).join(', ')} moved in your file.`);
+        return;
+      }
+
+      const url = URL.createObjectURL(new Blob([result], { type: 'application/xml' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = root.dataset.fileName ?? 'factory_config.xml';
+      link.click();
+      URL.revokeObjectURL(url);
+
+      say(`Saved ${link.download} with ${edits.length} change${edits.length === 1 ? '' : 's'}.`);
+    });
 
     root.hidden = false;
   }
