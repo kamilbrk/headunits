@@ -56,13 +56,6 @@ export default [
       'unicorn/consistent-boolean-name': 'off',
       'unicorn/prefer-type-literal-last': 'off',
       'unicorn/max-nested-calls': 'off',
-      // unicorn 73. Its autofix rewrites `/** one-liner */` without the
-      // leading ` * ` continuation, which doesn't match the multi-line
-      // JSDoc blocks alongside it in `src/shared/config.ts`.
-      'unicorn/single-line-block-comment-style': 'off',
-      // unicorn 70. A micro-optimisation that wants the cheaper operand
-      // first; both operands here are pure, so it only costs readability.
-      'unicorn/prefer-simple-condition-first': 'off',
       // `exactOptionalPropertyTypes` makes `?` + `| undefined` meaningful,
       // not redundant — required for zod `.optional()` output types.
       'sonarjs/no-redundant-optional': 'off',
