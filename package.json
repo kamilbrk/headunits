@@ -5,7 +5,7 @@
     "url": "https://github.com/kamilbrk/headunits"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24.16.0"
   },
   "scripts": {
     "lint": "eslint src/",
@@ -18,10 +18,10 @@
   },
   "dependencies": {
     "@astrojs/check": "0.9.10",
-    "@astrojs/mdx": "6.0.3",
+    "@astrojs/mdx": "8.0.1",
     "@astrojs/sitemap": "3.7.4",
     "@tailwindcss/vite": "4.3.3",
-    "astro": "6.4.8",
+    "astro": "7.3.2",
     "astro-heroicons": "2.1.5-1",
     "astro-pagefind": "2.0.1",
     "typescript": "6.0.3"
@@ -30,7 +30,7 @@
     "yaml-language-server": {
       "yaml": "2.8.3"
     },
-    "vite": "^7",
+    "vite": "^8",
     "esbuild": "^0.28.1"
   },
   "devDependencies": {
@@ -38,7 +38,7 @@
     "@tailwindcss/typography": "0.5.20",
     "eslint": "10.10.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-astro": "1.7.0",
+    "eslint-plugin-astro": "3.1.0",
     "eslint-plugin-prettier": "5.5.6",
     "eslint-plugin-sonarjs": "4.2.0",
     "eslint-plugin-unicorn": "68.0.0",
