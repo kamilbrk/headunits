@@ -68,11 +68,15 @@ const getAriaCurrent = (href: string) => {
 
 <div
   id="primary-nav"
-  class="fixed inset-0 z-10 hidden w-72 flex flex-col lg:inset-y-0 lg:flex lg:w-72"
+  class="fixed inset-0 z-10 flex hidden w-72 flex-col lg:inset-y-0 lg:flex lg:w-72"
 >
   <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-4 sm:px-6">
     <div class="flex h-14 shrink-0 items-center">
-      <button type="button" class="-m-2.5 mr-0.5 p-2.5 cursor-pointer text-gray-400 lg:hidden" data-sidebar-toggle>
+      <button
+        type="button"
+        class="-m-2.5 mr-0.5 cursor-pointer p-2.5 text-gray-400 lg:hidden"
+        data-sidebar-toggle
+      >
         <span class="sr-only">Close sidebar</span>
         <XMark class="h-6 w-6" />
       </button>
@@ -122,7 +126,11 @@ const getAriaCurrent = (href: string) => {
 <div
   class="sticky top-0 z-10 flex items-center gap-x-6 bg-gray-900 px-4 py-4 shadow-xs sm:px-6 lg:hidden lg:pl-72"
 >
-  <button type="button" class="-m-2.5 p-2.5 cursor-pointer text-gray-400 lg:hidden" data-sidebar-toggle>
+  <button
+    type="button"
+    class="-m-2.5 cursor-pointer p-2.5 text-gray-400 lg:hidden"
+    data-sidebar-toggle
+  >
     <span class="sr-only">Open sidebar</span>
     <Bars3 class="h-6 w-6" />
   </button>
