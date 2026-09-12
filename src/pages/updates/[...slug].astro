@@ -46,7 +46,11 @@ const jsonLd = {
 };
 ---
 
-<Layout title={pageTitle} jsonLd={jsonLd}>
+<Layout
+  title={pageTitle}
+  jsonLd={jsonLd}
+  filters={{ platform: entry.data.platform, android: getAndroidVersion(entry) }}
+>
   {
     (previous || next) && (
       <div class="mb-4 flex select-none max-sm:justify-between" data-pagefind-ignore>

@@ -8,7 +8,7 @@ import { getFirstLevelStaticPathsFromCollection, sortEntriesById } from '../../s
 import FactorySettingsSection from './_section.component.astro';
 
 export async function getStaticPaths() {
-  return await getFirstLevelStaticPathsFromCollection('updates');
+  return await getFirstLevelStaticPathsFromCollection('vendors');
 }
 
 const { slug } = Astro.params;

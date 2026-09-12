@@ -6,7 +6,7 @@ import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
 import FaqItem from './_item.component.astro';
 
 export async function getStaticPaths() {
-  return await getFirstLevelStaticPathsFromCollection('updates');
+  return await getFirstLevelStaticPathsFromCollection('vendors');
 }
 
 const { slug } = Astro.params;

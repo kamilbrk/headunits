@@ -1,0 +1,19 @@
+---
+// Applies the colour scheme before first paint. A deferred module script runs
+// after the page has already painted, flashing the wrong theme on every
+// navigation. Kept in sync with color-scheme.component.astro.
+---
+
+<script is:inline>
+  {
+    let stored;
+    try {
+      stored = localStorage.getItem('theme');
+    } catch {
+      // Storage can be unavailable (private windows, blocked site data).
+    }
+    const theme = stored || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.classList.add(theme);
+    document.documentElement.dataset.theme = theme;
+  }
+</script>
