@@ -10,6 +10,7 @@ import {
   buildDictionary,
   getEntryHref,
   getGlossaryLabels,
+  getThemeLabels,
   getUpdateLabels,
   TOKEN_PATTERN
 } from './entity-dictionary';
@@ -32,7 +33,7 @@ const SKIP_INSIDE = new Set(['heading', 'link', 'linkReference']);
 // Both built once when the Astro config loads, not per document. Inline code
 // is matched against entity ids alone: a glossary term inside a code span is
 // part of a command or a filename, not prose.
-const entityLabels = getUpdateLabels();
+const entityLabels = [...getUpdateLabels(), ...getThemeLabels()];
 const proseDictionary = buildDictionary([...getGlossaryLabels(), ...entityLabels]);
 const inlineCodeDictionary = buildDictionary(entityLabels);
 
