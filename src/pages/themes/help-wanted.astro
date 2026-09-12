@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 
+import { URL_PREFIX } from '../../shared/config';
 import Layout from '../../shared/layout/base-layout.astro';
 import {
   getThemesWithoutImages,
@@ -41,8 +42,12 @@ const groups = vendors
         Activate it on your unit and take a screenshot of the home screen and the settings screen.
       </li>
       <li>
-        Send them on <a href="https://discord.gg/Ex8e6qE2eR">Discord</a>, or open a pull request
-        adding <code>home.png</code> and <code>settings.png</code> next to that theme's{' '}
+        Send them on <a href="https://discord.gg/Ex8e6qE2eR">Discord</a>, open an issue from the{
+          ' '
+        }
+        <a href={`${URL_PREFIX}contribute`}>contribute page</a>, or open a pull request adding <code
+          >home.png</code
+        > and <code>settings.png</code> next to that theme's{' '}
         <code>index.md</code>, which is the layout every other theme uses.
       </li>
     </ol>

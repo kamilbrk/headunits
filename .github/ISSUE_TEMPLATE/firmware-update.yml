@@ -1,0 +1,40 @@
+name: Firmware update
+description: Report a firmware build that is missing from the site
+labels: [content, updates]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A version string and a build date are enough. A changelog is a bonus,
+        not a requirement.
+  - type: input
+    id: version
+    attributes:
+      label: Version string
+      description: Exactly as shown in Settings or on the file.
+      placeholder: Witstek-T-M600_OS_v1.8.6-ota
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: M501, M600, M606, M700, M785, GT6, GT7 or GT7PRO. Unsure? See the Platforms page.
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Build date
+      placeholder: 2025-04-11
+  - type: textarea
+    id: signatures
+    attributes:
+      label: Checksums
+      description: md5, sha1 or sha256 of the file. These are the only link between a file on Discord and what we describe here.
+      render: text
+  - type: textarea
+    id: changes
+    attributes:
+      label: What changed
+      description: Anything you noticed, however small.

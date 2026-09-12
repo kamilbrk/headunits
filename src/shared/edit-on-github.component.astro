@@ -1,0 +1,24 @@
+---
+import { REPOSITORY, REPOSITORY_BRANCH } from './config';
+
+interface Props {
+  /**
+  `entry.filePath` — absent only if the loader did not record one.
+  */
+  filePath: string | undefined;
+}
+
+const { filePath } = Astro.props;
+---
+
+{
+  filePath && (
+    <p class="not-prose mt-8 text-sm text-gray-500 dark:text-gray-400" data-pagefind-ignore>
+      Something wrong or missing on this page?{' '}
+      <a class="underline" href={`${REPOSITORY}/edit/${REPOSITORY_BRANCH}/${filePath}`}>
+        Edit it on GitHub
+      </a>
+      .
+    </p>
+  )
+}

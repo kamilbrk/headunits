@@ -1,0 +1,24 @@
+name: Correction
+description: Something on the site is wrong or out of date
+labels: [content]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Most pages have an "Edit it on GitHub" link at the bottom if you would
+        rather change it directly — GitHub makes the branch and pull request
+        for you. Use this form if you would rather not.
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The URL, or the page title.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+      description: And what it should say, if you know.
+    validations:
+      required: true
