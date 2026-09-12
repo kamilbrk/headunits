@@ -1,7 +1,9 @@
 ---
 question: 'How to apply zxw_factory_config.xml file?'
 ---
+:::warning
 A factory config survives a factory reset. If the file you apply is wrong for your unit, the only way back is applying your own backup the same way — so [pull your original file](/faq/zxw/pull-factory-config) first and keep it somewhere you can reach from the car. See [before you change anything](/safety).
+:::
 
 1. Use a USB drive with FAT32 formatted partition.
 2. On the root of the USB drive, create a folder called `OEM`.
