@@ -113,7 +113,10 @@ const jsonLdBlocks = [
   <body class="bg-white dark:bg-gray-900">
     <Navigation title={title} />
 
-    <main class="max-w-(--breakpoint-2xl) py-8 lg:pl-72" data-pagefind-body={indexed || undefined}>
+    <main
+      class="max-w-(--breakpoint-2xl) pt-8 pb-24 lg:pl-72"
+      data-pagefind-body={indexed || undefined}
+    >
       {
         /* One element per facet: Pagefind reads a single `key:value` per
            attribute and treats a comma-separated list as one literal value. */
