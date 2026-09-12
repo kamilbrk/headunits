@@ -4,12 +4,12 @@ import { defineHastPlugin } from 'satteri';
 
 import { BASE } from './config';
 
-const ATTRIBUTES_BY_TAG: Record<string, string> = {
-  a: 'href',
-  img: 'src',
-  source: 'src',
-  video: 'src',
-  audio: 'src'
+const ATTRIBUTES_BY_TAG: Record<string, string[]> = {
+  a: ['href'],
+  img: ['src', 'srcset'],
+  source: ['src', 'srcset'],
+  video: ['src', 'poster'],
+  audio: ['src']
 };
 
 const withBase = (value: string) => {
@@ -18,6 +18,17 @@ const withBase = (value: string) => {
   if (value === BASE || value.startsWith(`${BASE}/`)) return value;
   return `${BASE}${value}`;
 };
+
+// `srcset` is a comma-separated list of `url descriptor` pairs, so it cannot
+// be rewritten as a single URL.
+const withBaseSrcset = (value: string) =>
+  value
+    .split(',')
+    .map((candidate) => {
+      const [url, ...descriptors] = candidate.trim().split(/\s+/);
+      return url ? [withBase(url), ...descriptors].join(' ') : candidate.trim();
+    })
+    .join(', ');
 
 /**
  * Rewrites root-relative links in Markdown/MDX content so they respect the
@@ -32,13 +43,15 @@ export default defineHastPlugin({
     visit(node: Readonly<Element>, ctx) {
       if (!BASE) return;
 
-      const attribute = ATTRIBUTES_BY_TAG[node.tagName];
-      if (!attribute) return;
+      const attributes = ATTRIBUTES_BY_TAG[node.tagName] ?? [];
 
-      const value = node.properties[attribute];
-      if (typeof value !== 'string') return;
+      for (const attribute of attributes) {
+        const value = node.properties[attribute];
+        if (typeof value !== 'string') continue;
 
-      ctx.setProperty(node, attribute, withBase(value));
+        const rewritten = attribute === 'srcset' ? withBaseSrcset(value) : withBase(value);
+        if (rewritten !== value) ctx.setProperty(node, attribute, rewritten);
+      }
     }
   }
 });

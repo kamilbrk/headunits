@@ -45,7 +45,7 @@ export function getUpdateLastmods() {
     const entryId = path
       .relative(UPDATES_DIRECTORY, file)
       .replace(/\.mdx?$/, '')
-      .split('/')
+      .split(path.sep)
       .map((segment) => slug(segment))
       .join('/');
 
