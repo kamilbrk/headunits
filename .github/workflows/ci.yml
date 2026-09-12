@@ -64,6 +64,8 @@ jobs:
         run: npm run check:html
       - name: Check internal links
         run: npm run check:links
+      - name: Check inline spacing
+        run: npm run check:spacing
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v5
