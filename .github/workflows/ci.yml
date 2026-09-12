@@ -42,6 +42,10 @@ jobs:
             dist/themes/zxw/index.html \
             dist/updates/ksw/index.html \
             dist/updates/zxw/index.html \
+            dist/platforms/index.html \
+            dist/platforms/ksw/index.html \
+            dist/platforms/zxw/index.html \
+            dist/platforms/ksw/m600/index.html \
             dist/factory-settings/ksw/index.html \
             dist/factory-settings/zxw/index.html \
             dist/faq/ksw/index.html \
