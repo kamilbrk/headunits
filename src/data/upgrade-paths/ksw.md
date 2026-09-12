@@ -1,5 +1,5 @@
 ---
-question: Upgrade path for KSW units
+title: Upgrade path for KSW units
 ---
 Some updates require certain prior versions to ensure compatibility. If your unit is running a version older or in between any of these listed below, make sure that you follow the upgrade path to avoid issues.
 
