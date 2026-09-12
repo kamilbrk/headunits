@@ -4,6 +4,8 @@ settings:
   - name: "Car Without OEM Monitor"
     configKey: notHaveScreen
     control: checkbox
+    onValue: 1
+    offValue: 0
     description: "Selecting the \"CAR\" menu option will display a clock instead of OEM system. Choose this option on cars without OEM screen, e.g. old BMW X1."
   - name: "Knob Type"
     configKey: iDriverType

@@ -160,6 +160,21 @@ check. All must pass before deploy. Don't merge if any is red.
   a plugin change; CI starts from a clean checkout and is unaffected.
 - **Use `astro/zod`, not `astro:schema`** — the latter is deprecated in
   Astro 7 and removed in Astro 8.
+- **Factory-settings `configKey` values are checked at build time.**
+  `src/shared/factory-config/validate-keys.ts` runs from
+  `src/pages/factory-settings/[slug].astro` against the example XML in
+  `public/`, and throws on a key that file does not carry, a key claimed by two
+  settings, a checkbox with a key but no `onValue`/`offValue`, or a radio group
+  whose children have no `configValue`. A key we have documented but never seen
+  in a real file says so with `unverified: true`; a row that must never become
+  a live control says `editable: false` and usually carries a `warning`.
+  Checkbox on/off values are never inferred — the vendor writes
+  `0: allow  1: Prohibited` in places.
+- **Tailwind scans prose, not just markup** — TypeScript comments, Markdown
+  bodies, and files like this one. A doc comment that happens to contain a
+  utility's name adds that utility to the built CSS and changes its hash. It is
+  harmless, and it is the answer when the stylesheet moves and nobody touched a
+  class.
 - **Controls on the factory-settings pages are decorative.** They mirror
   what the car screen looks like and serve no form purpose, so they carry
   `disabled`, `tabindex="-1"` and `aria-hidden="true"` and deliberately have

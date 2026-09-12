@@ -3,6 +3,7 @@ import { Code } from 'astro:components';
 import { getCollection, getEntry } from 'astro:content';
 
 import { SHIKI_THEMES, URL_PREFIX } from '../../shared/config';
+import { validateConfigKeys } from '../../shared/factory-config/validate-keys';
 import Layout from '../../shared/layout/base-layout.astro';
 import { getFirstLevelStaticPathsFromCollection, sortEntriesById } from '../../shared/utilities';
 import FactorySettingsSection from './_section.component.astro';
@@ -23,6 +24,15 @@ const xmls = import.meta.glob<string>('/public/*.xml', {
   eager: true
 });
 const xml = xmls[`/public/${vendor.data.factoryConfigFileName}`];
+
+// Build-time gate: every documented key has to name something the real file
+// carries. Runs here because this is the one place the settings and the
+// example file already meet.
+if (xml) {
+  for (const entry of entries) {
+    validateConfigKeys(slug, entry.data.settings ?? [], xml);
+  }
+}
 ---
 
 <Layout title=`Factory settings for ${vendor.data.name}`>

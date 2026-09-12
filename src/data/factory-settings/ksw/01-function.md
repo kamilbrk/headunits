@@ -4,44 +4,74 @@ settings:
   - name: "USB HOST"
     configKey: USB_HOST
     control: checkbox
+    onValue: 1
+    offValue: 0
     description: "Allow USB devices to be available to Android system. Switch this off if you want to run fastboot or other related tools."
   - name: "Zlink"
     configKey: zlink_auto_start # See CenterService.BootReceiver. Also, when either `zlink_auto_start` or `hotspot_open` (undocumented) options are true, Settings.MyReceiver will run `start5GTether` to set Wi-FI AP config and start tethering.
     control: checkbox
+    onValue: 1
+    offValue: 0
     description: "When enabled, Zlink should automatically start on boot. Additionally, it will take over Wi-Fi to create and maintain its wireless hotspot, therefore you will not be able to use Wi-Fi for other purposes."
   - name: "HiCar"
     configKey: zlink_hicar # See CenterService.BootReceiver
     control: checkbox
+    onValue: 1
+    offValue: 0
     description: "When enabled, Zlink should automatically start on boot. It will also directly open the Huawei HiCar mode/screen in Zlink. Most likely dependant on the \"Zlink\" option above."
   - name: "Google Apps"
     configKey: GoogleAPP
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "AUX"
     configKey: AUX_Type
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "DTV"
     configKey: DTV_Type
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "F_CAM"
     configKey: Front_view_camera
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Txzing Assistant"
+    configKey: Support_TXZ
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "BT"
-    configKey: BT_Type
     control: checkbox
+    onValue: 1
+    offValue: 0
+    editable: false
+    description: "Which Bluetooth the unit uses is set by \"Bluetooth Selection\" below, which owns the `BT_Type` key. What this box does on its own is not known."
   - name: "Touch data continuously sent"
     configKey: touch_continuous_send
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Equaliser App"
     nameOld: "Equalizer APP"
+    configKey: EQ_app
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Global Weather App"
     configKey: globalweather_app
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "360APK"
     configKey: APK360
     control: checkbox
+    unverified: true
+    onValue: 1
+    offValue: 0
   - name: "Boot Mode Memory"
     nameOld: "Remember The Last Mode"
     configKey: Default_PowerBoot
@@ -152,7 +182,12 @@ settings:
   - name: "Disable Video In Motion"
     configKey: DoNotPlayVideosWhileDriving
     control: checkbox
+    onValue: 1
+    offValue: 0
   - name: "Front view mirror setting"
     configKey: forwardCamMirror
+    unverified: true
     control: checkbox
+    onValue: 1
+    offValue: 0
 ---
