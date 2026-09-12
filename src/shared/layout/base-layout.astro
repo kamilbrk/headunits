@@ -44,6 +44,11 @@ const pagefindFilters = Object.entries({ section, vendor, ...pageFilters }).filt
 );
 const ogImageUrl = new URL(`${URL_PREFIX}og-image.jpg`, DOMAIN).href;
 
+// The footer sends readers to the safety page; on the safety page itself that
+// would be a link to where they already are.
+const safetyPath = `${URL_PREFIX}safety`;
+const onSafetyPage = Astro.url.pathname.replace(/\/$/, '') === safetyPath;
+
 const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -147,8 +152,21 @@ const jsonLdBlocks = [
     >
       <p class="sm:px-6 lg:px-8">
         Community notes, not vendor documentation. Firmware and factory-config changes can leave a
-        head unit unusable &mdash;{' '}
-        <a class="underline" href={`${URL_PREFIX}safety`}>read this first</a>.
+        head unit unusable
+        {
+          onSafetyPage ? (
+            '.'
+          ) : (
+            <>
+              {' '}
+              &mdash;{' '}
+              <a class="underline" href={safetyPath}>
+                read this first
+              </a>
+              .
+            </>
+          )
+        }
       </p>
     </footer>
 
