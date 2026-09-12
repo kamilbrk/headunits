@@ -45,6 +45,10 @@ The two `check:*` scripts need a build first — they read `dist/`.
 
 ## Contributing content
 
+The site's own [Contribute page](https://kamilbrk.github.io/headunits/contribute) covers this
+for people who would rather not use git; every content page also has an "Edit it on GitHub"
+link at the bottom.
+
 All content lives under `src/data/<collection>/`. Each entry is a
 Markdown (or MDX, for updates) file with frontmatter that has to match
 the collection's zod schema in `src/data/<collection>/index.ts`.

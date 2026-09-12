@@ -1,0 +1,39 @@
+name: Theme screenshot
+description: Share a screenshot of a theme that has none yet
+labels: [content, themes]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks. Screenshots are the one thing that cannot be worked out by
+        reading a firmware image, so this is the most useful thing you can send.
+  - type: input
+    id: theme
+    attributes:
+      label: Theme
+      description: The theme name or ID as it appears on the site.
+      placeholder: KSW_BMW_ID9, or ID#56
+    validations:
+      required: true
+  - type: dropdown
+    id: vendor
+    attributes:
+      label: Vendor
+      options: [KSW, ZXW]
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: |
+        Drag the images into this box to attach them. The home screen and the
+        settings screen are the two the site shows; more are welcome.
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware version
+      description: From Settings, if you have it. Helps us record when the theme became available.
+      placeholder: Witstek-T-M600_OS_v1.8.6-ota
