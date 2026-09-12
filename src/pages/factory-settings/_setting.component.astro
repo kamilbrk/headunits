@@ -13,14 +13,13 @@ interface Props {
 const { section, setting, parent } = Astro.props;
 
 const uniqueId = slug([section, parent, setting.name].filter(Boolean).join(' '));
-const parentId = parent ? slug([section, parent].filter(Boolean).join(' ')) : undefined;
 
 let configXmlRef;
 
 if (setting.configValue !== undefined) {
   configXmlRef = `Value for the setting above in factory config file should be "${setting.configValue}"`;
 } else if (setting.configKey) {
-  configXmlRef = `This setting can be found and set in factory config file file with key "${setting.configKey}"`;
+  configXmlRef = `This setting can be found and set in factory config file with key "${setting.configKey}"`;
 
   if (setting.control === 'checkbox' && !setting.children) {
     configXmlRef += `\n\nAdditionally, the values will be most likely "0" or "1" to indicate disabled/enabled state.`;
@@ -34,9 +33,9 @@ if (setting.configValue !== undefined) {
       setting.control === 'checkbox' && (
         <input
           type="checkbox"
-          id={uniqueId}
-          name={uniqueId}
-          disabled="disabled"
+          disabled
+          tabindex="-1"
+          aria-hidden="true"
           class="h-4 w-4 rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500"
         />
       )
@@ -46,9 +45,9 @@ if (setting.configValue !== undefined) {
       setting.control === 'radio' && (
         <input
           type="radio"
-          id={uniqueId}
-          name={parentId}
-          disabled="disabled"
+          disabled
+          tabindex="-1"
+          aria-hidden="true"
           class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
         />
       )
@@ -63,11 +62,11 @@ if (setting.configValue !== undefined) {
         <>
           <input
             type="range"
-            id={uniqueId}
-            name={uniqueId}
             min={setting.min}
             max={setting.max}
-            disabled="disabled"
+            disabled
+            tabindex="-1"
+            aria-hidden="true"
             class="h-2 cursor-pointer appearance-none rounded-lg bg-gray-300 dark:bg-gray-700"
           />
           <span>

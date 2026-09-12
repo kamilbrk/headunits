@@ -17,6 +17,7 @@ export default [
       // eslint-plugin-prettier mis-parses inline <script> content and
       // reports a spurious "Unexpected token" error. `npm run prettier`
       // still formats these files via plain prettier-plugin-astro.
+      'src/shared/layout/color-scheme-bootstrap.component.astro',
       'src/shared/layout/color-scheme.component.astro',
       'src/shared/layout/navigation.component.astro',
       'src/pages/search.astro'

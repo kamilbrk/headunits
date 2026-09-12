@@ -8,8 +8,8 @@ import Sun from 'astro-heroicons/outline/Sun.astro';
   type="button"
   class="flex w-full cursor-pointer gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
 >
-  <Sun class="hidden h-6 w-6 shrink-0 dark:inline" aria-hidden="true" />
-  <Moon class="h-6 w-6 shrink-0 dark:hidden" aria-hidden="true" />
+  <Sun class="hidden h-6 w-6 shrink-0 dark:inline" />
+  <Moon class="h-6 w-6 shrink-0 dark:hidden" />
   <span
     >Switch to <span class="dark:hidden">dark</span><span class="hidden dark:inline">light</span> mode</span
   >
@@ -31,12 +31,19 @@ import Sun from 'astro-heroicons/outline/Sun.astro';
     document.documentElement.dataset.theme = value;
   };
 
-  const currentTheme = () => localStorage.getItem('theme') || systemTheme();
+  const storedTheme = () => {
+    try {
+      return localStorage.getItem('theme');
+    } catch {
+      // Storage can be unavailable (private windows, blocked site data).
+      return null;
+    }
+  };
 
-  applyTheme(currentTheme());
+  const currentTheme = () => storedTheme() || systemTheme();
 
   matcher.addEventListener('change', () => {
-    if (!localStorage.getItem('theme')) applyTheme(systemTheme());
+    if (!storedTheme()) applyTheme(systemTheme());
   });
 
   document.addEventListener('astro:after-swap', () => applyTheme(currentTheme()));
@@ -45,7 +52,11 @@ import Sun from 'astro-heroicons/outline/Sun.astro';
     if (!(event.target instanceof Element)) return;
     if (!event.target.closest('#color-scheme-switch')) return;
     const next = currentTheme() === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('theme', next);
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // Storage can be unavailable; the toggle still applies for this page view.
+    }
     applyTheme(next);
   });
 </script>
