@@ -3,9 +3,15 @@ import path from 'node:path';
 
 import { slug } from 'github-slugger';
 
-const GLOSSARY_DIRECTORY = 'src/data/glossary';
+const DATA_DIRECTORY = 'src/data';
+const GLOSSARY_DIRECTORY = path.join(DATA_DIRECTORY, 'glossary');
+const UPDATES_DIRECTORY = path.join(DATA_DIRECTORY, 'updates');
 
-export type AutoLinkKind = 'glossary';
+// Collections whose entries are published one-per-page under a route named
+// after the collection, so a file path alone gives the href.
+const ROUTED_COLLECTIONS = new Set(['updates']);
+
+export type AutoLinkKind = 'glossary' | 'entity';
 
 export interface AutoLinkLabel {
   /**
@@ -115,6 +121,54 @@ export function getGlossaryLabels(): AutoLinkLabel[] {
         tokenCount: countTokens(text)
       });
     }
+  }
+
+  return labels;
+}
+
+/**
+The collection id Astro's glob loader derives from a file path, which is also
+the route the entry is published at. Verified against `dist/`:
+`ksw/m600/Ksw-R-M600_OS_v1.3.1-ota.md` becomes `ksw/m600/ksw-r-m600_os_v131-ota`.
+*/
+const entryId = (directory: string, file: string) =>
+  path
+    .relative(directory, file)
+    .replace(/\.mdx?$/, '')
+    .replace(/[/\\]index$/, '')
+    .split(path.sep)
+    .map((segment) => slug(segment))
+    .join('/');
+
+/**
+Where a content file is published, or an empty string for a collection that
+isn't published one entry per page. Takes a path relative to the repository
+root or an absolute one.
+*/
+export function getEntryHref(file: string) {
+  const relative = path.relative(path.resolve(DATA_DIRECTORY), path.resolve(file));
+  const collection = relative.split(path.sep)[0];
+  if (!collection || !ROUTED_COLLECTIONS.has(collection)) return '';
+
+  return `/${collection}/${entryId(path.join(DATA_DIRECTORY, collection), file)}`;
+}
+
+/**
+Firmware version ids from the `updates` collection, pointing at the page for
+that build. Unlike glossary terms these are exact identifiers, so every mention
+is linked, matching what the hand-written links did.
+*/
+export function getUpdateLabels(): AutoLinkLabel[] {
+  const labels: AutoLinkLabel[] = [];
+
+  for (const file of markdownFiles(UPDATES_DIRECTORY)) {
+    const id = readFrontmatter(readFileSync(file, 'utf8')).get('id')?.[0];
+    if (!id) continue;
+
+    const href = getEntryHref(file);
+    if (!href) continue;
+
+    labels.push({ text: id, href, kind: 'entity', tokenCount: countTokens(id) });
   }
 
   return labels;
