@@ -130,6 +130,25 @@ export function sortEntriesByDataId(
   return entryA.data.id.localeCompare(entryB.data.id);
 }
 
+/**
+ * Orders themes the way a user's `<SupportUIList>` lists them: by ZXW theme
+ * number, ascending. KSW themes carry no number and fall back to their id, so
+ * their grid is unaffected.
+ */
+export function sortEntriesByThemeNumber(
+  entryA: CollectionEntry<'themes'>,
+  entryB: CollectionEntry<'themes'>
+) {
+  const numberA = entryA.data.number;
+  const numberB = entryB.data.number;
+
+  if (numberA !== undefined && numberB !== undefined) return numberA - numberB;
+  if (numberA !== undefined) return -1;
+  if (numberB !== undefined) return 1;
+
+  return sortEntriesByDataId(entryA, entryB);
+}
+
 const REGEX_KSW = /(?:Ksw|Witstek)-([A-Z])-\w+_v([\d.]+)-ota/;
 const REGEX_ZXW = /(\d{8})GT_KSW/;
 
