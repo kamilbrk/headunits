@@ -11,9 +11,10 @@ export async function GET(context: APIContext) {
   const items = await Promise.all(
     updates.sort(sortEntriesByDate).map(async (entry) => {
       const vendor = await getEntry('vendors', entry.data.vendor);
-      const platform = await getEntry('platforms', `${entry.data.vendor}/${entry.data.platform}`);
+      const platformId = `${entry.data.vendor}/${entry.data.platform}`;
+      const platform = await getEntry('platforms', platformId);
       if (!vendor) throw new Error(`Missing vendor: ${entry.data.vendor}`);
-      if (!platform) throw new Error(`Missing platform: ${entry.data.platform}`);
+      if (!platform) throw new Error(`Missing platform: ${platformId}`);
 
       return {
         title: `${vendor.data.name} ${platform.data.name} — ${entry.data.id}`,

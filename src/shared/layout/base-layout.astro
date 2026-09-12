@@ -16,13 +16,20 @@ export interface Props {
    * Extra Pagefind facets for this page, on top of the ones read from the URL.
    */
   filters?: Record<string, string | number | undefined>;
+  /**
+   * Whether this page belongs in the search index. The 404 and search pages
+   * have no content worth returning, and indexing them puts `404` and
+   * `search` into the section facet as selectable values.
+   */
+  indexed?: boolean;
 }
 
 const {
   title: pageTitle,
   description: pageDescription,
   jsonLd: pageJsonLd,
-  filters: pageFilters
+  filters: pageFilters,
+  indexed = true
 } = Astro.props;
 const title = pageTitle || DEFAULT_PAGE_TITLE;
 const description = pageDescription || DEFAULT_PAGE_DESCRIPTION;
@@ -106,13 +113,14 @@ const jsonLdBlocks = [
   <body class="bg-white dark:bg-gray-900">
     <Navigation title={title} />
 
-    <main class="max-w-(--breakpoint-2xl) py-8 lg:pl-72" data-pagefind-body>
+    <main class="max-w-(--breakpoint-2xl) py-8 lg:pl-72" data-pagefind-body={indexed || undefined}>
       {
         /* One element per facet: Pagefind reads a single `key:value` per
            attribute and treats a comma-separated list as one literal value. */
-        pagefindFilters.map(([key, value]) => (
-          <div hidden data-pagefind-filter={`${key}:${value}`} />
-        ))
+        indexed &&
+          pagefindFilters.map(([key, value]) => (
+            <div hidden data-pagefind-filter={`${key}:${value}`} />
+          ))
       }
       <div class="px-4 sm:px-6 lg:px-8">
         {

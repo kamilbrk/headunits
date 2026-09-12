@@ -94,8 +94,8 @@ export async function getCollectionGroupedByCollection<
   const children = await getCollection(childrenCollectionKey);
   const parents = await getCollection(parentsCollectionKey);
 
-  // Copied rather than mutated: entries from `getCollection` come out of a
-  // shared cache, so assigning onto them leaks into every other caller.
+  // Copied rather than mutated so the returned shape is built here rather than
+  // bolted onto entries the caller also holds a reference to.
   const grouped: CollectionEntryWithEntries<P, C>[] = parents.map((parent) => ({
     ...parent,
     entries: children.filter((entry) => entry.id.startsWith(parent.id))

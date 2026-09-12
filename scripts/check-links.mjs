@@ -2,7 +2,7 @@
 // that no development URLs leaked into content. Run against `dist/` after a
 // build. Nothing else in the pipeline catches either problem.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { dirname, join, posix, relative, resolve } from 'node:path';
+import path from 'node:path';
 
 import { BASE } from '../src/shared/config.ts';
 
@@ -13,30 +13,35 @@ const IGNORED_SCHEMES = ['mailto:', 'tel:', 'data:', 'javascript:'];
 
 const walk = (directory) =>
   readdirSync(directory).flatMap((name) => {
-    const path = join(directory, name);
-    return statSync(path).isDirectory() ? walk(path) : [path];
+    const entry = path.join(directory, name);
+    return statSync(entry).isDirectory() ? walk(entry) : [entry];
   });
 
-const exists = (path) => {
+const exists = (target) => {
   try {
-    return statSync(path).isFile();
+    return statSync(target).isFile();
   } catch {
     return false;
   }
 };
 
-const resolvesInDist = (urlPath) => {
-  const withoutBase = BASE && urlPath.startsWith(BASE) ? urlPath.slice(BASE.length) : urlPath;
-  const target = join(DIST, withoutBase);
-  return exists(target) || exists(join(target, 'index.html')) || exists(`${target}.html`);
+// A link may name the file itself, a directory served by its index.html, or an
+// extensionless route. All three resolve for root-relative and relative links
+// alike — checking only the first reports working links as dead.
+const resolvesTo = (distRelativePath) => {
+  const target = path.join(DIST, distRelativePath);
+  return exists(target) || exists(path.join(target, 'index.html')) || exists(`${target}.html`);
 };
+
+const resolvesInDist = (urlPath) =>
+  resolvesTo(BASE && urlPath.startsWith(BASE) ? urlPath.slice(BASE.length) : urlPath);
 
 const failures = [];
 const htmlFiles = walk(DIST).filter((file) => file.endsWith('.html'));
 
 for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
-  const where = relative(DIST, file);
+  const where = path.relative(DIST, file);
 
   for (const [, rawValue] of html.matchAll(ATTRIBUTE)) {
     const value = rawValue.trim();
@@ -50,20 +55,22 @@ for (const file of htmlFiles) {
 
     if (/^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith('//')) continue;
 
-    const [path] = value.split(/[?#]/);
-    if (!path) continue;
+    const [linkPath] = value.split(/[?#]/);
+    if (!linkPath) continue;
 
-    if (path.startsWith('/')) {
-      if (BASE && !path.startsWith(`${BASE}/`) && path !== BASE) {
+    if (linkPath.startsWith('/')) {
+      if (BASE && !linkPath.startsWith(`${BASE}/`) && linkPath !== BASE) {
         failures.push(`${where}: root-relative link misses the base path — "${value}"`);
         continue;
       }
-      if (!resolvesInDist(path)) failures.push(`${where}: dead link "${value}"`);
+      if (!resolvesInDist(linkPath)) failures.push(`${where}: dead link "${value}"`);
       continue;
     }
 
-    const absolute = posix.normalize(posix.join('/', relative(DIST, dirname(file)), path));
-    if (!exists(resolve(DIST, absolute.slice(1)))) {
+    const fromDist = path.normalize(path.join(path.relative(DIST, path.dirname(file)), linkPath));
+    if (fromDist.startsWith('..')) {
+      failures.push(`${where}: relative link escapes the site — "${value}"`);
+    } else if (!resolvesTo(fromDist)) {
       failures.push(`${where}: dead relative link "${value}"`);
     }
   }
