@@ -1,0 +1,59 @@
+---
+import { getEntry, render } from 'astro:content';
+
+import { URL_PREFIX } from '../../shared/config';
+import EditOnGitHub from '../../shared/edit-on-github.component.astro';
+import Layout from '../../shared/layout/base-layout.astro';
+import { getFirstLevelStaticPathsFromCollection } from '../../shared/utilities';
+
+export async function getStaticPaths() {
+  return await getFirstLevelStaticPathsFromCollection('vendors');
+}
+
+const { slug } = Astro.params;
+if (!slug) throw new Error('Missing slug param');
+const vendor = await getEntry('vendors', slug);
+if (!vendor) throw new Error(`Missing vendor: ${slug}`);
+
+const entry = await getEntry('upgrade-paths', slug);
+const rendered = entry ? await render(entry) : undefined;
+const Content = rendered?.Content;
+---
+
+<Layout
+  title={entry?.data.title ?? `Upgrade path for ${vendor.data.name} units`}
+  description={`Which firmware builds have to be installed before which, on ${vendor.data.name} Android head units.`}
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    {
+      Content ? (
+        <Content />
+      ) : (
+        <>
+          <p>
+            We don't have a documented upgrade path for {vendor.data.name} units yet.
+            {vendor.id === 'zxw' && (
+              <>
+                {' '}
+                ZXW builds are named by date rather than by version, so it isn't yet clear whether a
+                required install order exists at all.
+              </>
+            )}
+          </p>
+          <p>
+            If you know of builds that have to be installed in a particular order, please{' '}
+            <a href={`${URL_PREFIX}contribute`}>tell us</a>.
+          </p>
+        </>
+      )
+    }
+
+    <p>
+      <a href={`${URL_PREFIX}updates/${vendor.id}`}>All {vendor.data.name} firmware updates</a>
+      {' · '}
+      <a href={`${URL_PREFIX}safety`}>Before you change anything</a>
+    </p>
+
+    <EditOnGitHub filePath={entry?.filePath} />
+  </div>
+</Layout>
