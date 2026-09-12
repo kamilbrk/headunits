@@ -15,6 +15,11 @@ interface Props {
 }
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const DAYS_PER_MONTH = 30.44;
+// Below this, an exact day count is the more useful number — 99 of the 112
+// intervals in the collection are shorter than it. Above it, "about 5 months"
+// reads better than "150 days", and the exact dates are on the page anyway.
+const APPROXIMATE_ABOVE_DAYS = 60;
 const HANDWRITTEN_BASELINE = /^Changes since `/m;
 
 const { entry, previous } = Astro.props;
@@ -36,18 +41,20 @@ const dates = await Promise.all(
 const oldest = dates.filter((date) => date !== undefined).map((date) => +date);
 const days =
   oldest.length > 0 ? Math.round((+entry.data.date - Math.min(...oldest)) / MS_PER_DAY) : undefined;
+
+const describeInterval = (value: number) => {
+  if (value < APPROXIMATE_ABOVE_DAYS) return `${value} ${value === 1 ? 'day' : 'days'}`;
+  return `about ${Math.round(value / DAYS_PER_MONTH)} months`;
+};
+
+const interval = days !== undefined && days > 0 ? describeInterval(days) : undefined;
 ---
 
 {
   baselines.length > 0 && (
     <p>
       Changes since <DelimitedLinks items={baselines} />
-      {days !== undefined && days > 0 && (
-        <>
-          , built {days} {days === 1 ? 'day' : 'days'} earlier
-        </>
-      )}
-      .
+      {interval && <>, built {interval} earlier</>}.
     </p>
   )
 }
