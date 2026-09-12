@@ -25,6 +25,12 @@ export default defineConfig({
     pagefind()
   ],
   output: 'static',
+  redirects: {
+    // The upgrade path used to live in the FAQ; inbound Discord and forum
+    // links still point there.
+    // The target is not base-prefixed by Astro, unlike the source key.
+    '/faq/ksw/upgrade-path': `${URL_PREFIX}upgrade-path/ksw`
+  },
   site: DOMAIN,
   base: BASE,
   prefetch: {
