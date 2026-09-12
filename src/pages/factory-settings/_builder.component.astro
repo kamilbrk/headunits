@@ -1,0 +1,234 @@
+---
+import { URL_PREFIX } from '../../shared/config';
+
+interface Props {
+  vendor: string;
+  fileName: string;
+}
+
+const { vendor, fileName } = Astro.props;
+---
+
+<section
+  hidden
+  data-builder
+  data-vendor={vendor}
+  data-file-name={fileName}
+  data-example-url={`${URL_PREFIX}${fileName}`}
+  class="not-prose mb-8 rounded-md border border-gray-200 p-4 dark:border-gray-700"
+  aria-labelledby="builder-heading"
+>
+  <h3 id="builder-heading" class="mt-0 mb-2 text-base font-semibold">Read your own file</h3>
+
+  <aside class="callout callout--warning" role="note">
+    <p class="callout__label">Warning</p>
+    <p>
+      Your file stays in this browser. It is never uploaded anywhere, and this page has no server to
+      upload it to. Even so, back up the original before you change anything on your unit —{' '}
+      <a class="underline" href={`${URL_PREFIX}faq/${vendor}/pull-factory-config`}>
+        how to pull your factory config
+      </a>. A wrong value here can leave a unit unable to reach its own factory settings.
+    </p>
+  </aside>
+
+  <div data-builder-empty class="mt-3 flex flex-wrap items-center gap-3 text-sm">
+    <label
+      class="cursor-pointer rounded-md bg-indigo-600 px-3 py-1.5 font-medium text-white hover:bg-indigo-500"
+    >
+      Choose your {fileName}
+      <input data-builder-file type="file" accept=".xml,text/xml,application/xml" class="sr-only" />
+    </label>
+
+    <button
+      data-builder-example
+      type="button"
+      class="rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+    >
+      Try the example file
+    </button>
+  </div>
+
+  <details data-builder-paste class="mt-3 text-sm">
+    <summary class="cursor-pointer">Or paste the file contents</summary>
+    <textarea
+      data-builder-text
+      rows="6"
+      spellcheck="false"
+      aria-label={`Contents of ${fileName}`}
+      class="mt-2 w-full rounded-md border border-gray-300 p-2 font-mono text-xs dark:border-gray-600 dark:bg-gray-900"
+    ></textarea>
+    <button
+      data-builder-read
+      type="button"
+      class="mt-2 rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+    >
+      Read pasted file
+    </button>
+  </details>
+
+  <div data-builder-loaded hidden class="mt-3 flex flex-wrap items-center gap-3 text-sm">
+    <button
+      data-builder-remove
+      type="button"
+      class="rounded-md border border-gray-300 px-3 py-1.5 font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+    >
+      Remove file
+    </button>
+  </div>
+
+  <p data-builder-status role="status" class="mt-3 text-sm text-gray-600 dark:text-gray-400"></p>
+</section>
+
+<script>
+  import { findScalarElements } from '../../shared/factory-config/xml-scan';
+
+  const NOT_IN_FILE = 'not in your file';
+
+  const setNote = (row: HTMLElement, text: string) => {
+    const note = row.querySelector<HTMLElement>(':scope > div > [data-setting-note]');
+    if (!note) return;
+
+    note.textContent = text;
+    note.hidden = text === '';
+  };
+
+  // The control for a row is a direct grandchild; a radio group's own children
+  // render their inputs inside nested rows of their own.
+  const controlOf = (row: HTMLElement) =>
+    row.querySelector<HTMLInputElement>(':scope > div > input');
+
+  const show = (row: HTMLElement, value: string) => {
+    const control = controlOf(row);
+    const { control: kind, onValue, configValue } = row.dataset;
+
+    if (control && kind === 'checkbox') {
+      control.checked = value === onValue;
+      setNote(row, '');
+      return;
+    }
+
+    if (control && kind === 'radio') {
+      control.checked = value === configValue;
+      setNote(row, '');
+      return;
+    }
+
+    if (control && control.type === 'range') {
+      control.value = value;
+    }
+
+    setNote(row, `currently ${value}`);
+  };
+
+  const apply = (root: HTMLElement, xml: string) => {
+    const elements = findScalarElements(xml);
+    const rows = root.querySelectorAll<HTMLElement>('[data-setting][data-config-key]');
+    const resolved = new Set<string>();
+    const missing = new Set<string>();
+
+    for (const row of rows) {
+      const key = row.dataset.configKey;
+      if (!key) continue;
+
+      const found = elements.get(key);
+
+      const only = found?.length === 1 ? found[0] : undefined;
+
+      if (only) {
+        resolved.add(key);
+        show(row, only.value);
+      } else {
+        missing.add(key);
+        setNote(row, found ? 'appears more than once in your file' : NOT_IN_FILE);
+      }
+    }
+
+    return { resolved: resolved.size, missing: missing.size };
+  };
+
+  const clear = (root: HTMLElement) => {
+    for (const row of root.querySelectorAll<HTMLElement>('[data-setting]')) setNote(row, '');
+  };
+
+  function setUp(root: HTMLElement) {
+    const status = root.querySelector<HTMLElement>('[data-builder-status]');
+    const empty = root.querySelector<HTMLElement>('[data-builder-empty]');
+    const loaded = root.querySelector<HTMLElement>('[data-builder-loaded]');
+    const paste = root.querySelector<HTMLElement>('[data-builder-paste]');
+    const settingsRoot = root.parentElement;
+    if (!status || !empty || !loaded || !paste || !settingsRoot) return;
+
+    const say = (message: string) => {
+      status.textContent = message;
+    };
+
+    const load = (name: string, xml: string) => {
+      if (!xml.includes('<ConfigInfo')) {
+        say(`${name} does not look like a factory config file — no <ConfigInfo> in it.`);
+        return;
+      }
+
+      const { resolved, missing } = apply(settingsRoot, xml);
+      empty.hidden = true;
+      paste.hidden = true;
+      loaded.hidden = false;
+      say(
+        `${name} · ${xml.split('\n').length} lines · ${resolved} settings found, ${missing} not in your file. ` +
+          'Controls stay read-only for now.'
+      );
+    };
+
+    const remove = () => {
+      clear(settingsRoot);
+      empty.hidden = false;
+      paste.hidden = false;
+      loaded.hidden = true;
+      say('');
+    };
+
+    root
+      .querySelector<HTMLInputElement>('[data-builder-file]')
+      ?.addEventListener('change', async (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        try {
+          load(file.name, await file.text());
+        } catch {
+          say(`Could not read ${file.name}.`);
+        }
+      });
+
+    root.querySelector('[data-builder-example]')?.addEventListener('click', async () => {
+      const url = root.dataset.exampleUrl;
+      if (!url) return;
+
+      say('Loading the example file…');
+
+      try {
+        const response = await fetch(url);
+        load(`${root.dataset.fileName} (example)`, await response.text());
+      } catch {
+        say('Could not load the example file.');
+      }
+    });
+
+    root.querySelector('[data-builder-read]')?.addEventListener('click', () => {
+      const text = root.querySelector<HTMLTextAreaElement>('[data-builder-text]')?.value ?? '';
+      if (text.trim() === '') {
+        say('Paste the contents of your file first.');
+        return;
+      }
+
+      load('Pasted file', text);
+    });
+
+    root.querySelector('[data-builder-remove]')?.addEventListener('click', remove);
+
+    root.hidden = false;
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    for (const root of document.querySelectorAll<HTMLElement>('[data-builder]')) setUp(root);
+  });
+</script>
