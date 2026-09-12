@@ -38,6 +38,7 @@ jobs:
             dist/index.html \
             dist/404.html \
             dist/search/index.html \
+            dist/safety/index.html \
             dist/themes/ksw/index.html \
             dist/themes/zxw/index.html \
             dist/themes/bmw/index.html \
