@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+
+import { URL_PREFIX } from '../../shared/config';
+import DateTime from '../../shared/date-time.component.astro';
+import Layout from '../../shared/layout/base-layout.astro';
+import {
+  getCollectionGroupedByCollection,
+  getVendorSlug,
+  sortEntriesByDate
+} from '../../shared/utilities';
+
+const vendors = await getCollection('vendors');
+const platforms = await getCollectionGroupedByCollection('updates', 'platforms');
+
+const groups = vendors.map((vendor) => ({
+  vendor,
+  platforms: platforms
+    .filter((platform) => getVendorSlug(platform.id) === vendor.id)
+    .map((platform) => ({
+      platform,
+      count: platform.entries.length,
+      newest: platform.entries.sort(sortEntriesByDate)[0]
+    }))
+}));
+---
+
+<Layout
+  title="Platforms"
+  description="Hardware platforms behind KSW and ZXW Android head units — Qualcomm Snapdragon models, board names and the firmware available for each."
+>
+  <div class="prose dark:prose-invert max-w-none break-words">
+    <p>
+      Every head unit is built on one of a handful of Qualcomm platforms. Which one you have decides
+      which firmware you can install. If you don't know yours yet, the build number in Android
+      settings starts with the platform name.
+    </p>
+
+    {
+      groups.map(({ vendor, platforms: vendorPlatforms }) => (
+        <>
+          <h3>{vendor.data.name}</h3>
+          <ul>
+            {vendorPlatforms.map(({ platform, count, newest }) => (
+              <li>
+                <a href={`${URL_PREFIX}${platform.collection}/${platform.id}`}>
+                  {platform.data.name}
+                </a>{' '}
+                &mdash; {count} firmware {count === 1 ? 'update' : 'updates'}
+                {newest && (
+                  <>
+                    , newest <DateTime date={newest.data.date} />
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      ))
+    }
+  </div>
+</Layout>
