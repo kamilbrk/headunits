@@ -14,7 +14,7 @@ Summary:
 
 Changes since `Ksw-T-M700_OS_v1.4.4-ota` built 7 days earlier:
 - Zlink app updated from `5.4.58` to `5.4.63`
-- Minor updates to various themes, mostly [`EVOID9_ALS`](/headunits/themes/ksw/evoid9_als) theme
+- Minor updates to various themes, mostly [`EVOID9_ALS`](/themes/ksw/evoid9_als) theme
 
 Changes provided by Witstek:
 - Final version of ID9 (for now)

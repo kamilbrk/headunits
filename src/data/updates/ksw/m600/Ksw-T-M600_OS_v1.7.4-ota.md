@@ -15,4 +15,4 @@ Summary:
 - Added Ukrainian translations
 
 Changes since `Ksw-T-M600_OS_v1.7.1-ota` built 35 days earlier:
-- See both [M700 1.4.5](/headunits/updates/ksw/m700/ksw-t-m700_os_v145-ota) and [M700 1.5.0](/headunits/updates/ksw/m700/ksw-t-m700_os_v150-ota) updates, as they were built from the same source and at the same time.
+- See both [M700 1.4.5](/updates/ksw/m700/ksw-t-m700_os_v145-ota) and [M700 1.5.0](/updates/ksw/m700/ksw-t-m700_os_v150-ota) updates, as they were built from the same source and at the same time.

@@ -13,4 +13,4 @@ Summary:
 - Minor fixes for ID8 theme
 
 Changes since `Ksw-T-M600_OS_v1.6.9-ota` built 7 days earlier:
-- For further changes, see [M700 1.4.4](/headunits/updates/ksw/m700/ksw-t-m700_os_v144-ota) update, as they were built from the same source and at the same time.
+- For further changes, see [M700 1.4.4](/updates/ksw/m700/ksw-t-m700_os_v144-ota) update, as they were built from the same source and at the same time.
