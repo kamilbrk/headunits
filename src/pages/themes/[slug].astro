@@ -1,36 +1,49 @@
 ---
 import { getCollection, getEntry } from 'astro:content';
 
+import { THEME_BRANDS } from '../../shared/brands';
 import Layout from '../../shared/layout/base-layout.astro';
-import {
-  getFirstLevelStaticPathsFromCollection,
-  sortEntriesByThemeNumber
-} from '../../shared/utilities';
+import { getThemesByBrand, sortEntriesByThemeNumber } from '../../shared/utilities';
 import ThemesListItem from './_list-item.component.astro';
 
 export async function getStaticPaths() {
-  return await getFirstLevelStaticPathsFromCollection('vendors');
+  const vendors = await getCollection('vendors');
+
+  return [
+    ...vendors.map((vendor) => ({ params: { slug: vendor.id }, props: { brand: undefined } })),
+    ...Object.keys(THEME_BRANDS).map((brand) => ({ params: { slug: brand }, props: { brand } }))
+  ];
 }
 
 const { slug } = Astro.params;
 if (!slug) throw new Error('Missing slug param');
-const vendor = await getEntry('vendors', slug);
-if (!vendor) throw new Error(`Missing vendor: ${slug}`);
-const entries = await getCollection('themes', (entry) => entry.id.startsWith(slug));
+const { brand } = Astro.props;
+
+const vendor = brand ? undefined : await getEntry('vendors', slug);
+if (!brand && !vendor) throw new Error(`Missing vendor: ${slug}`);
+
+const entries = brand
+  ? await getThemesByBrand(brand)
+  : await getCollection('themes', (entry) => entry.id.startsWith(slug));
+
+const title = brand ? `${THEME_BRANDS[brand]} themes` : `Themes for ${vendor?.data.name}`;
+const description = brand
+  ? `${THEME_BRANDS[brand]} themes available on KSW and ZXW Android head units.`
+  : `Themes available on ${vendor?.data.name} Android head units.`;
 ---
 
-<Layout title=`Themes for ${vendor.data.name}`>
+<Layout title={title} description={description}>
   {
     entries.length > 0 ? (
       <div class="lg:col-span-3">
         <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3 xl:gap-x-8">
           {entries.sort(sortEntriesByThemeNumber).map((entry) => (
-            <ThemesListItem theme={entry} />
+            <ThemesListItem theme={entry} showVendor={Boolean(brand)} />
           ))}
         </div>
       </div>
     ) : (
-      <p>We don't have any themes for this {vendor.data.name} vendor yet.</p>
+      <p>We don't have any themes here yet.</p>
     )
   }
 </Layout>
