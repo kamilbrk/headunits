@@ -5,6 +5,6 @@ display: BMW ID8 PEMP
 tags:
   - bmw
   - bmw-id8
-  - bmw-pemp
+  - pemp
 client: ALS_6208
 ---

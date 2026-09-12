@@ -4,6 +4,7 @@ id: KSW_COMMON_ID7
 display: Common ID7
 tags:
   - common
+  - bmw
   - bmw-id7
 since:
   - zxw/gt6/20240613gt_ksw
