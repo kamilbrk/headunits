@@ -82,6 +82,63 @@ jobs:
         with:
           path: ./dist
 
+  # A separate job: a flaky browser test should not hold up the deploy, which
+  # `verify` alone gates.
+  e2e:
+    runs-on: ubuntu-latest
+    # The browsers and their system dependencies are already in this image, so
+    # there is no `playwright install` step. Keep the tag in step with the
+    # `@playwright/test` version in package.json: a mismatch means the package
+    # looks for a browser build the image does not carry.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --user 1001 --ipc=host
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      # The image's Node is outside our control and moves with the tag, so a
+      # drift below the repo's floor is caught here rather than as a confusing
+      # failure further down.
+      - name: Check the image's Node against the repo floor
+        run: |
+          node --version
+          node -e "
+            const [major, minor] = process.versions.node.split('.').map(Number);
+            if (major < 24 || (major === 24 && minor < 16)) {
+              console.error('Node ' + process.versions.node + ' is below the >=24.16.0 floor in package.json');
+              process.exit(1);
+            }"
+      - name: Cache npm downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+      - name: Install dependencies
+        run: npm ci
+      # Dependabot bumps the package but not the image tag above, and the
+      # mismatch would otherwise surface as a missing browser build.
+      - name: Check the image tag matches @playwright/test
+        run: |
+          node -e "
+            const wanted = require('./package.json').devDependencies['@playwright/test'];
+            const image = 'mcr.microsoft.com/playwright:v1.63.0-noble';
+            if (!image.includes('v' + wanted + '-')) {
+              console.error('Image ' + image + ' does not match @playwright/test ' + wanted);
+              process.exit(1);
+            }"
+      - name: Build
+        run: npm run build
+      - name: End-to-end tests
+        run: npm run test:e2e
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
   deploy:
     needs: verify
     if: github.event_name != 'pull_request'
