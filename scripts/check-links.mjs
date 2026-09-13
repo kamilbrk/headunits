@@ -8,6 +8,10 @@ import { BASE } from '../src/shared/config.ts';
 
 const DIST = 'dist';
 const ATTRIBUTE = /(?:href|src)="([^"]*)"/g;
+// Breadcrumb trails carry URLs inside a <script> tag, where the attribute
+// sweep below cannot see them, and a breadcrumb pointing at a 404 is worse
+// than no breadcrumb.
+const JSON_LD = /<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/g;
 const DEV_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0'];
 const IGNORED_SCHEMES = ['mailto:', 'tel:', 'data:', 'javascript:'];
 
@@ -36,12 +40,37 @@ const resolvesTo = (distRelativePath) => {
 const resolvesInDist = (urlPath) =>
   resolvesTo(BASE && urlPath.startsWith(BASE) ? urlPath.slice(BASE.length) : urlPath);
 
+const breadcrumbUrls = (html) => {
+  const urls = [];
+
+  for (const [, block] of html.matchAll(JSON_LD)) {
+    let parsed;
+    try {
+      parsed = JSON.parse(block);
+    } catch {
+      continue;
+    }
+
+    if (parsed?.['@type'] !== 'BreadcrumbList') continue;
+    for (const entry of parsed.itemListElement ?? []) {
+      if (typeof entry?.item === 'string') urls.push(entry.item);
+    }
+  }
+
+  return urls;
+};
+
 const failures = [];
 const htmlFiles = walk(DIST).filter((file) => file.endsWith('.html'));
 
 for (const file of htmlFiles) {
   const html = readFileSync(file, 'utf8');
   const where = path.relative(DIST, file);
+
+  for (const url of breadcrumbUrls(html)) {
+    const { pathname } = new URL(url);
+    if (!resolvesInDist(pathname)) failures.push(`${where}: breadcrumb points at "${url}"`);
+  }
 
   for (const [, rawValue] of html.matchAll(ATTRIBUTE)) {
     const value = rawValue.trim();

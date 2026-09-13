@@ -4,6 +4,7 @@ import './global.css';
 
 import { ClientRouter } from 'astro:transitions';
 
+import { getBreadcrumbJsonLd } from '../breadcrumbs';
 import { DEFAULT_PAGE_DESCRIPTION, DEFAULT_PAGE_TITLE, DOMAIN, URL_PREFIX } from '../config';
 import ColorSchemeBootstrap from './color-scheme-bootstrap.component.astro';
 import Navigation from './navigation.component.astro';
@@ -56,8 +57,12 @@ const websiteJsonLd = {
   url: new URL(URL_PREFIX, DOMAIN).href,
   description: DEFAULT_PAGE_DESCRIPTION
 };
+// Pages kept out of the index have nothing to place in a trail.
+const breadcrumbJsonLd = indexed ? await getBreadcrumbJsonLd(Astro.url.pathname, title) : undefined;
+
 const jsonLdBlocks = [
   websiteJsonLd,
+  ...(breadcrumbJsonLd ? [breadcrumbJsonLd] : []),
   ...(Array.isArray(pageJsonLd) ? pageJsonLd : pageJsonLd ? [pageJsonLd] : [])
 ];
 ---
