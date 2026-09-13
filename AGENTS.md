@@ -158,6 +158,22 @@ check. All must pass before deploy. Don't merge if any is red.
   can silently reuse the old HTML. Editing `astro.config.ts` or the content
   itself does invalidate it. Delete that file before trusting a local build of
   a plugin change; CI starts from a clean checkout and is unaffected.
+- **Two upgrades are held back on purpose. Don't re-propose them.**
+  - `prettier-plugin-astro` stays on 0.14.x. 1.0.0 silently disables
+    `prettier-plugin-tailwindcss` class sorting
+    ([withastro/prettier-plugin-astro#483](https://github.com/withastro/prettier-plugin-astro/issues/483),
+    still open). Revisit when that issue closes.
+  - `typescript` stays on 6.x. The 7.x native port ships no programmatic API,
+    `@astrojs/check` peers `^5 || ^6`, and typescript-eslint caps below 6.1.
+    Type-checking an Astro site *is* `astro check`, so there is no partial win.
+  Also: `npm outdated` reports `eslint-plugin-astro` as behind at "1.7.0". It
+  is not — 3.1.0 is latest; that line is an artefact of peer resolution.
+- **Every indexed page carries a `BreadcrumbList`**, built in
+  `src/shared/breadcrumbs.ts` from the URL and emitted by `base-layout.astro`,
+  so no page template has to pass one. Only the first two segments become
+  links: deeper ones are not always pages — `/updates/ksw/m600/<build>` is a
+  route but `/updates/ksw/m600` is not. `check:links` validates the URLs inside
+  the JSON-LD, which the attribute sweep cannot see.
 - **Use `astro/zod`, not `astro:schema`** — the latter is deprecated in
   Astro 7 and removed in Astro 8.
 - **Factory-settings `configKey` values are checked at build time.**
