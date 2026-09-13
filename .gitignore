@@ -351,3 +351,9 @@ public/bin/*
 
 # Local planning documents — deliberately not tracked.
 docs/
+
+### Playwright ###
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

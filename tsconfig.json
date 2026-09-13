@@ -18,6 +18,8 @@
     ".astro/types.d.ts",
     "astro.config.ts",
     "eslint.config.js",
+    "playwright.config.ts",
+    "e2e",
     "src"
   ],
   "exclude": ["dist"]

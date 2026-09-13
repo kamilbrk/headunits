@@ -78,5 +78,12 @@ export default [
   },
 
   // Prettier must be last to override conflicting rules
-  eslintPluginPrettierRecommended
+  eslintPluginPrettierRecommended,
+  {
+    // `page.evaluate` callbacks run in the browser, where `document` and
+    // `navigator` do exist; the rule cannot see across that boundary. Flat
+    // config is last-wins, so this has to stay at the end.
+    files: ['e2e/**/*.ts'],
+    rules: { 'unicorn/isolated-functions': 'off' }
+  }
 ];

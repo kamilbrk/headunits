@@ -205,6 +205,15 @@ check. All must pass before deploy. Don't merge if any is red.
   ships. `tsconfig` sets `allowImportingTsExtensions` so those modules can
   import each other with an explicit `.ts`, which is what Node's own resolver
   needs.
+- **`npm run test:e2e` runs Playwright over the builder**, the one part of the
+  site with real client state. It tests the **built** site: `playwright.config.ts`
+  starts `npm run preview`, so run `npm run build` first or the server has
+  nothing to serve. Specs live in `e2e/` and use role-based locators, per
+  Playwright's own guidance — the single exception is the file listing, which is
+  raw text with no accessible representation and is reached by attribute. Two
+  projects, desktop Chromium and mobile WebKit; the clipboard test is Chromium
+  only, since that permission does not exist elsewhere. It runs as its own CI
+  job so a flaky browser cannot hold up the deploy, which `verify` alone gates.
 - **Controls on the factory-settings pages start decorative.** They mirror
   what the car screen looks like, so until a reader loads their own file they
   carry `disabled`, `tabindex="-1"` and `aria-hidden="true"` and have no `id`
