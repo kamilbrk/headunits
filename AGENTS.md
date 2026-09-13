@@ -221,6 +221,10 @@ check. All must pass before deploy. Don't merge if any is red.
   download. **Bump the image tag whenever `@playwright/test` moves**; a step in
   the job fails loudly if the two drift apart, which is what Dependabot will
   otherwise cause.
+- **`e2e/accessibility.spec.ts` runs axe-core over one page per template**,
+  against WCAG 2.1 AA, plus the factory-settings page with its controls live.
+  All 19 pass today, so a violation in a new page means that page, not a
+  backlog. Add a row to `PAGES` whenever a template is added.
 - **Controls on the factory-settings pages start decorative.** They mirror
   what the car screen looks like, so until a reader loads their own file they
   carry `disabled`, `tabindex="-1"` and `aria-hidden="true"` and have no `id`
