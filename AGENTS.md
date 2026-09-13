@@ -241,6 +241,11 @@ check. All must pass before deploy. Don't merge if any is red.
   against WCAG 2.1 AA, plus the factory-settings page with its controls live.
   All 19 pass today, so a violation in a new page means that page, not a
   backlog. Add a row to `PAGES` whenever a template is added.
+- **`e2e/site-interactions.spec.ts` covers the colour scheme, the sidebar and
+  search** — the client-side features outside the config builder. Note the
+  sidebar: the panel has its own "Close sidebar" button, but the sticky header
+  paints over it, so the header's toggle is the only one a reader can reach and
+  it both opens and closes. The buried button is unreachable markup.
 - **Controls on the factory-settings pages start decorative.** They mirror
   what the car screen looks like, so until a reader loads their own file they
   carry `disabled`, `tabindex="-1"` and `aria-hidden="true"` and have no `id`
