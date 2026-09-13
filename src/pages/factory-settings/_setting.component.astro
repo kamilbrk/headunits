@@ -43,7 +43,10 @@ if (setting.configValue !== undefined) {
   data-config-value={setting.configValue}
   data-editable={editable && configKey ? undefined : 'false'}
 >
-  <div class="flex items-center space-x-2">
+  <div
+    class="flex items-center space-x-2"
+    class:list={{ 'flex-wrap gap-y-1': setting.control === 'select' }}
+  >
     {
       setting.control === 'checkbox' && (
         <input
@@ -74,6 +77,21 @@ if (setting.configValue !== undefined) {
     <span id={uniqueId} title={setting.nameOld ? `Old name: ${setting.nameOld}` : undefined}>
       {setting.name}
     </span>
+
+    {
+      setting.control === 'select' && (
+        <select
+          disabled
+          tabindex="-1"
+          aria-hidden="true"
+          aria-labelledby={uniqueId}
+          data-options-path={setting.optionsFrom?.path}
+          data-options-attribute={setting.optionsFrom?.attribute}
+          data-options-label={setting.optionsFrom?.labelAttribute}
+          class="max-w-full min-w-0 flex-1 basis-full rounded-md border border-gray-300 px-2 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none sm:basis-auto dark:border-gray-600 dark:bg-gray-900"
+        />
+      )
+    }
 
     {
       setting.max && (

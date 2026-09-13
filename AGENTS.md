@@ -187,7 +187,12 @@ check. All must pass before deploy. Don't merge if any is red.
   not marked `editable: false`; enabling one swaps `disabled` /
   `tabindex="-1"` / `aria-hidden` for a real tab stop named by
   `aria-labelledby`. Radios carry a `name` so the group behaves as one — the
-  exception to the no-`id`/no-`name` rule below. There is no download: the
+  exception to the no-`id`/no-`name` rule below. A `select` gets its choices
+  from a list section of the reader's own file via `optionsFrom` in the
+  markdown, never from anything we ship, so a firmware carrying themes we have
+  never seen still gets a correct dropdown; a current value the list does not
+  offer keeps an option of its own rather than being silently swapped for the
+  first one. There is no download: the
   example listing at the foot of the page becomes the reader's own file with
   their changes in it, reusing the Shiki `<pre>` so it keeps that block's
   colours and padding and only loses the highlighting. The original markup is

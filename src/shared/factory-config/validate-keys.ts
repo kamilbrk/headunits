@@ -1,7 +1,7 @@
 import type { SettingItem } from '../../data/factory-settings';
 import type { ScalarElement } from './xml-scan.ts';
 
-import { findScalarElements } from './xml-scan.ts';
+import { findListItems, findScalarElements } from './xml-scan.ts';
 
 type Elements = ReadonlyMap<string, readonly ScalarElement[]>;
 
@@ -27,6 +27,26 @@ const controlProblems = (setting: SettingItem) => {
   }
 
   return problems;
+};
+
+const optionProblems = (setting: SettingItem, xml: string) => {
+  const source = setting.optionsFrom;
+  if (!source) return [];
+
+  const items = findListItems(xml, source.path);
+  if (items.length === 0) return [`names the list "${source.path}", which resolves to nothing`];
+
+  const missing = items.filter((item) => item.attributes[source.attribute] === undefined);
+  if (missing.length > 0) {
+    return [`names "${source.attribute}", which ${missing.length} of ${items.length} items lack`];
+  }
+
+  const label = source.labelAttribute;
+  if (label && items.some((item) => item.attributes[label] === undefined)) {
+    return [`names the label "${label}", which not every item in "${source.path}" carries`];
+  }
+
+  return [];
 };
 
 const keyProblems = (setting: SettingItem, key: string, elements: Elements) => {
@@ -65,9 +85,11 @@ export function validateConfigKeys(vendor: string, settings: readonly SettingIte
     if (key) {
       claims.set(key, [...(claims.get(key) ?? []), setting.name]);
       problems.push(
-        ...[...controlProblems(setting), ...keyProblems(setting, key, elements)].map(
-          (problem) => `${vendor}: ${path} ${problem}`
-        )
+        ...[
+          ...controlProblems(setting),
+          ...keyProblems(setting, key, elements),
+          ...optionProblems(setting, xml)
+        ].map((problem) => `${vendor}: ${path} ${problem}`)
       );
     }
 
