@@ -357,3 +357,6 @@ docs/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Python bytecode (tools/firmware)
+__pycache__/
