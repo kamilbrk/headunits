@@ -58,6 +58,9 @@ export default [
       'unicorn/consistent-boolean-name': 'off',
       'unicorn/prefer-type-literal-last': 'off',
       'unicorn/max-nested-calls': 'off',
+      // unicorn 76 also flags a trailing `if (…) return a; return b;`, which
+      // would break up the guard-clause chains used throughout.
+      'unicorn/prefer-ternary': 'off',
       // `exactOptionalPropertyTypes` makes `?` + `| undefined` meaningful,
       // not redundant — required for zod `.optional()` output types.
       'sonarjs/no-redundant-optional': 'off',
