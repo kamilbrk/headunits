@@ -161,8 +161,10 @@ check. All must pass before deploy. Don't merge if any is red.
 - **Two upgrades are held back on purpose. Don't re-propose them.**
   - `prettier-plugin-astro` stays on 0.14.x. 1.0.0 silently disables
     `prettier-plugin-tailwindcss` class sorting
-    ([withastro/prettier-plugin-astro#483](https://github.com/withastro/prettier-plugin-astro/issues/483),
-    still open). Revisit when that issue closes.
+    ([withastro/prettier-plugin-astro#483](https://github.com/withastro/prettier-plugin-astro/issues/483)).
+    The fix is on the Tailwind side
+    ([tailwindlabs/prettier-plugin-tailwindcss#473](https://github.com/tailwindlabs/prettier-plugin-tailwindcss/pull/473),
+    merged, unreleased as of 0.8.1). Revisit once a release after 0.8.1 ships it.
   - `typescript` stays on 6.x. The 7.x native port ships no programmatic API,
     `@astrojs/check` peers `^5 || ^6`, and typescript-eslint caps below 6.1.
     Type-checking an Astro site *is* `astro check`, so there is no partial win.
