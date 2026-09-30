@@ -38,6 +38,7 @@ Output goes to `~/Dev/firmwares/_work` unless `FW_WORK` says otherwise.
 tools/firmware/fw.py extract ~/Dev/firmwares/zxw\ gt7/*.zip
 tools/firmware/fw.py frontmatter 20250718GT_KSW        # paste into src/data/updates/...
 tools/firmware/fw.py diff 20250325GT_KSW 20250718GT_KSW
+tools/firmware/fw.py score 20250325GT_KSW 20250718GT_KSW  # vs src/data/updates/.../20250718GT_KSW.md
 ```
 
 `extract` writes `<id>/fs/<partition>/`, `<id>/manifest.tsv` (every file's
@@ -47,16 +48,26 @@ disk each.
 
 `diff` writes `diffs/<old>..<new>/`:
 
-- `REPORT.md`: build property changes, apps added/removed/changed with
-  versions and *what* changed inside each (code, resources, manifest, native
-  libs), changed JARs, and added/removed/changed files. Files rebuilt on every
-  build (`.odex`, `.vdex`, `build.prop`) and APKs that were only re-signed
-  are left out.
+- `REPORT.md`, which opens with **Highlights**: new theme ids and names, new
+  and renamed UI labels, factory config keys, settings keys, system
+  properties, screen types, model names, media extensions, new layouts and
+  resource folders, manifest changes, Android `config_*` values and factory
+  defaults. All of it is pattern matching over the diffs and the apps' dex
+  string tables, so it needs no model. After that come build properties,
+  vendor and Android apps with versions and *what* changed inside each, JARs,
+  and files. Files rebuilt on every build (`.odex`, `.vdex`, `build.prop`) and
+  APKs that were only re-signed are left out.
+- `facts.json`: the highlights as data.
 - `files/text.diff`: unified diff of every changed text file (XML, `.rc`,
   configs), including `zxw_factory_config.xml`.
-- `apps/<package>.diff`: decompiled-source diff for each changed app or JAR.
-  Decompiled trees are cached under `<id>/src/`, so the next diff against the
-  same firmware is quicker.
+- `apps/<name>.code.diff` / `.resources.diff`: decompiled vendor code and
+  resources for each changed app or JAR. Library code, translations and
+  binaries are only counted. Decompiled trees are cached under `<id>/src/`.
+
+`score` checks a hand-written changelog against the report: the share of its
+`identifiers`, "labels" and version numbers that the report finds, which ones
+only the diffs contain, which were already in the old firmware (context rather
+than changes), and which appear nowhere.
 
 The diffs are plain `git diff` output. To browse one side by side, point a
 diff tool at the two cached trees, e.g.
