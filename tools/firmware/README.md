@@ -9,14 +9,14 @@ them. It replaces `public/script.sh`: no `sudo`, no macFUSE, no compiled
 macOS (Homebrew):
 
 ```sh
-brew install uv payload-dumper-go e2fsprogs jadx
+brew install uv payload-dumper-go e2fsprogs jadx ripgrep
 brew install erofs-utils   # only for firmwares that ship EROFS partitions
 ```
 
 Debian / Ubuntu / WSL:
 
 ```sh
-sudo apt install e2fsprogs erofs-utils openjdk-21-jre git
+sudo apt install e2fsprogs erofs-utils openjdk-21-jre git ripgrep
 # plus uv (https://docs.astral.sh/uv/), payload-dumper-go and jadx from their GitHub releases
 ```
 
@@ -61,8 +61,10 @@ disk each.
 - `files/text.diff`: unified diff of every changed text file (XML, `.rc`,
   configs), including `zxw_factory_config.xml`.
 - `apps/<name>.code.diff` / `.resources.diff`: decompiled vendor code and
-  resources for each changed app or JAR. Library code, translations and
-  binaries are only counted. Decompiled trees are cached under `<id>/src/`.
+  resources for each changed vendor or Android app and JAR. Third-party
+  preinstalls (TingCar, Kugou...) get a version line only. Library code,
+  translations and binaries are only counted. Decompiled trees are cached
+  under `<id>/src/`; jadx gives up on one app after 20 minutes.
 
 `score` checks a hand-written changelog against the report: the share of its
 `identifiers`, "labels" and version numbers that the report finds, which ones

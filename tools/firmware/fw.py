@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures as cf
+import functools
 import hashlib
 import json
 import os
@@ -27,6 +28,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -406,8 +408,20 @@ def classify_zip_change(a: Path, b: Path) -> list[str]:
     return sorted(kinds)
 
 
-def jadx(src: Path, out: Path) -> Path | None:
-    """Decompile once per firmware and cache under WORK/<id>/src/. None if jadx crashed."""
+_jadx_locks: dict[Path, threading.Lock] = {}
+_jadx_locks_guard = threading.Lock()
+
+
+def jadx(src: Path, out: Path) -> Path | str:
+    """Decompile once per firmware and cache under WORK/<id>/src/. A reason string if jadx failed."""
+    # Two added apps can share one removed predecessor (media -> music and video).
+    with _jadx_locks_guard:
+        lock = _jadx_locks.setdefault(out, threading.Lock())
+    with lock:
+        return _jadx(src, out)
+
+
+def _jadx(src: Path, out: Path) -> Path | str:
     # --no-debug-info drops line numbers, which otherwise shift on every rebuild and bury real changes.
     # --show-bad-code keeps methods jadx can't fully decompile instead of replacing them with a stub.
     flags = ["--no-debug-info", "--show-bad-code", "--comments-level", "none"]
@@ -416,16 +430,29 @@ def jadx(src: Path, out: Path) -> Path | None:
         return out
     shutil.rmtree(out, ignore_errors=True)
     env = {**os.environ, "JAVA_OPTS": os.environ.get("JAVA_OPTS", "-Xmx4g")}
-    res = subprocess.run([tool("jadx"), "-q", *flags, "--threads-count", "2", "-d", str(out), str(src)],
-                         env=env, capture_output=True, text=True, errors="replace")
+    try:
+        res = subprocess.run([tool("jadx"), "-q", *flags, "--threads-count", "2", "-d", str(out), str(src)],
+                             env=env, capture_output=True, text=True, errors="replace", timeout=JADX_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        shutil.rmtree(out, ignore_errors=True)
+        return f"jadx timed out after {JADX_TIMEOUT // 60} min"
     # jadx exits non-zero for every method it can't decompile, so the exit code alone means little.
     log = res.stdout + res.stderr
     if res.returncode < 0 or "OutOfMemoryError" in log or 'Exception in thread "main"' in log or not (
             (out / "sources").exists() or (out / "resources").exists()):
         shutil.rmtree(out, ignore_errors=True)
-        return None
+        return "jadx crashed or ran out of memory; try a larger JAVA_OPTS=-Xmx"
     done.write_text(" ".join(flags))
     return out
+
+
+JADX_TIMEOUT = 20 * 60
+
+
+def worth_decompiling(package: str | None) -> bool:
+    """Vendor apps and Android's own; third-party preinstalls (TingCar, Kugou...) cost the most and matter least."""
+    return bool(package) and package.startswith(
+        tuple(ns.replace("/", ".") for ns in VENDOR_NAMESPACES) + ("com.android.", "android", "com.qualcomm.", "com.qti."))
 
 
 def mb_size(n: int) -> str:
@@ -641,6 +668,30 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
         return found
 
     new_themes = theme_consts([b for _, (_, b) in apps]) - theme_consts([a for _, (a, _) in apps])
+
+    # KSW keeps theme names as `static final String BMW_EVO_ID7_V2 = "BMW_EVO_ID7_V2";` in a UiThemeUtils
+    # class per app; plenty of them don't start with UI_, so the class is the signal, not the name.
+    def theme_strings(trees: list[Path]) -> set[str]:
+        found = set()
+        for tree in trees:
+            if (tree / "sources").is_dir():
+                # The value is the theme name; the constant name sometimes differs (ID7_ALS_V2 = "PEMP_ID7_UI_V2").
+                res = subprocess.run([tool("rg", "/opt/homebrew/bin/rg"), "-o", "-N", "--no-filename",
+                                      "--glob", "UiThemeUtils.java", r'static final String \w+ = "[A-Za-z][A-Za-z0-9_]*_[A-Za-z0-9_]+";',
+                                      str(tree / "sources")], capture_output=True, text=True, errors="replace")
+                found |= set(re.findall(r'= "(\w+)";', res.stdout))
+        return found
+
+    # Per app: the launcher gaining a theme is news; only the Bluetooth app gaining its name is not the same.
+    theme_rows, all_new = [], set()
+    for name, (a_src, b_src) in apps:
+        added_here = theme_strings([b_src]) - theme_strings([a_src])
+        if added_here:
+            all_new |= added_here
+            theme_rows.append(f"  - `{name}`: {fmt_list(added_here)}")
+    if theme_rows:
+        rows += ["- Theme names added (UiThemeUtils), per app:", *theme_rows]
+        facts["theme_strings"] = sorted(all_new)
     if new_themes:
         rows.append(f"- Theme ids added: {fmt_list(new_themes)}")
         facts["themes"] = sorted(new_themes)
@@ -749,6 +800,21 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     if new_dirs:
         rows += ["- New resource folders (screen sizes, orientations, themes):", *new_dirs]
 
+    # New locale folders: a language the app didn't have before (Ukrainian, Croatian...).
+    langs: dict[str, list[str]] = {}
+    for name, (a_src, b_src) in apps:
+        def locales(src: Path) -> set[str]:
+            return {m[1] for d in (src / "resources/res").glob("values-*")
+                    if d.is_dir() and (m := LOCALE_VALUES.match(f"resources/res/{d.name}/"))}
+        old = locales(a_src)
+        if not old:
+            continue
+        for lang in locales(b_src) - old:
+            langs.setdefault(lang, []).append(name)
+    if langs:
+        rows.append("- New translation languages: " + ", ".join(
+            f"`{lang}` ({apps_[0]}{f' +{len(apps_) - 1}' if len(apps_) > 1 else ''})" for lang, apps_ in sorted(langs.items())))
+
     # New layouts name new screens: kesaiwei_id6_activity_main, layout_bmw_hw_screen_reverse.
     new_layouts = []
     for name, (a_src, b_src) in apps:
@@ -765,12 +831,14 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     def read(path: Path) -> str:
         return path.read_text(errors="replace") if path.is_file() else ""
 
-    items_added, items_removed, flag_rows, cfg_rows = set(), set(), [], []
+    item_rows, flag_rows, cfg_rows = [], [], []
     for name, (a_src, b_src) in apps:
         ma_, mb_ = read(a_src / "resources/AndroidManifest.xml"), read(b_src / "resources/AndroidManifest.xml")
         ia, ib = {m[1] for m in MANIFEST_ITEM.findall(ma_)}, {m[1] for m in MANIFEST_ITEM.findall(mb_)}
-        items_added |= ib - ia
-        items_removed |= (ia - ib) if mb_ else set()
+        if ib - ia:
+            item_rows.append(f"  - `{name}` added: {fmt_list(ib - ia, 30)}")
+        if mb_ and ia - ib:
+            item_rows.append(f"  - `{name}` removed: {fmt_list(ia - ib, 30)}")
         fa_, fb_ = {f"{k}={v}" for k, v in MANIFEST_FLAG.findall(ma_)}, {f"{k}={v}" for k, v in MANIFEST_FLAG.findall(mb_)}
         if ma_ and fa_ != fb_:
             flag_rows.append(f"  - `{name}`: added {fmt_list(fb_ - fa_)}; removed {fmt_list(fa_ - fb_)}")
@@ -784,10 +852,8 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
                 cfg_rows.append(f"- Android `{k}` (`{name}`): `{ca.get(k, '(unset)')}` -> `{cb[k]}`")
     if flag_rows:
         rows += ["- Manifest flags changed:", *flag_rows]
-    if items_added:
-        rows.append(f"- Manifest entries added (permissions, activities, services): {fmt_list(items_added, 40)}")
-    if items_removed:
-        rows.append(f"- Manifest entries removed: {fmt_list(items_removed, 40)}")
+    if item_rows:
+        rows += ["- Manifest entries (permissions, activities, services, receivers, actions), per app:", *item_rows]
     rows += cfg_rows
 
     # key=value config files (Wi-Fi driver .ini, .conf, .prop): which keys changed.
@@ -826,6 +892,7 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
 
 
 def cmd_diff(args) -> None:
+    tool("rg", "/opt/homebrew/bin/rg")  # needed by the highlights, after all the decompiling
     a_id, b_id = args.old, args.new
     fa, fb = WORK / a_id / "fs", WORK / b_id / "fs"
     ma, mb = load_manifest(a_id), load_manifest(b_id)
@@ -865,11 +932,28 @@ def cmd_diff(args) -> None:
     with cf.ThreadPoolExecutor(2) as pool:
         fa_apks, fb_apks = pool.map(apks, (fa, fb), (ma, mb))
     app_rows, to_decompile = [], []
+
+    # A vendor app split or renamed (com.wits.ksw.media -> .music and .video) is diffed against the app
+    # it replaced, not against nothing, or every string in it looks new.
+    def family(package: str | None) -> str | None:
+        parts = (package or "").split(".")
+        return ".".join(parts[:-1]) if len(parts) >= 4 else None
+
+    removed_by_family: dict[str, list[str]] = {}
+    for k, v in fa_apks.items():
+        if k not in fb_apks and (fam := family(v[1].get("package"))):
+            removed_by_family.setdefault(fam, []).append(v[0])
+    # Two apps gone from one family leaves no way to tell which one an added app replaced.
+    removed_by_family = {fam: paths[0] for fam, paths in removed_by_family.items() if len(paths) == 1}
     for pkg in sorted(fa_apks.keys() | fb_apks.keys()):
         a, b = fa_apks.get(pkg), fb_apks.get(pkg)
         if not a:
-            app_rows.append(f"- **added** `{pkg}` {b[1].get('version_name')} (`{b[0]}`)")
-            to_decompile.append((pkg, b[1].get("package"), None, b[0]))
+            predecessor = removed_by_family.get(family(b[1].get("package"))) if worth_decompiling(b[1].get("package")) \
+                and b[1].get("package", "").startswith(tuple(ns.replace("/", ".") for ns in VENDOR_NAMESPACES)) else None
+            note = f", diffed against removed `{predecessor}`" if predecessor else ""
+            app_rows.append(f"- **added** `{pkg}` {b[1].get('version_name')} (`{b[0]}`{note})")
+            if worth_decompiling(b[1].get("package")):
+                to_decompile.append((pkg, b[1].get("package"), predecessor, b[0]))
         elif not b:
             app_rows.append(f"- **removed** `{pkg}` {a[1].get('version_name')} (`{a[0]}`)")
         elif ma[a[0]].value != mb[b[0]].value:
@@ -881,7 +965,8 @@ def cmd_diff(args) -> None:
             moved = f", moved from `{a[0]}`" if a[0] != b[0] else ""
             size = f", {mb_size(ma[a[0]].size)} -> {mb_size(mb[b[0]].size)}" if abs(ma[a[0]].size - mb[b[0]].size) > 1 << 20 else ""
             app_rows.append(f"- **changed** `{pkg}` {ver} [{', '.join(kinds)}] (`{b[0]}`{moved}{size})")
-            to_decompile.append((pkg, b[1].get("package"), a[0], b[0]))
+            if worth_decompiling(b[1].get("package")):
+                to_decompile.append((pkg, b[1].get("package"), a[0], b[0]))
     is_vendor = lambda row: any(f"`{ns.replace('/', '.')}" in row for ns in VENDOR_NAMESPACES)
     vendor_rows = [r for r in app_rows if is_vendor(r)]
     android_rows = [r for r in app_rows if not is_vendor(r)]
@@ -897,8 +982,17 @@ def cmd_diff(args) -> None:
     lines += ["## Framework and other JARs", "", *(jar_rows or ["- none"]), ""]
 
     # Plain files: text files are listed and diffed; binaries are only counted per folder.
+    @functools.cache
     def is_text(p: str) -> bool:
-        return Path(p).suffix in TEXT_SUFFIXES
+        if Path(p).suffix in TEXT_SUFFIXES:
+            return True
+        # Any other small file without NUL bytes, e.g. vendor/etc/fstab.emmc (where /data encryption is switched off).
+        f = fb / p if (fb / p).is_file() else fa / p
+        if f.is_symlink() or not f.is_file() or f.stat().st_size > 1 << 20 or Path(p).suffix in (".so", ".ko", ".apk", ".jar"):
+            return False
+        with f.open("rb") as fh:
+            head = fh.read(8192)
+        return bool(head) and b"\0" not in head
 
     def by_folder(paths: list[str]) -> list[str]:
         folders: dict[str, int] = {}
@@ -936,8 +1030,9 @@ def cmd_diff(args) -> None:
         la = dex_literals(fa / pa_) if pa_ else set()
         lb = dex_literals(fb / pb_)
         lits = (name, package, la, lb)
-        if a_src is None or b_src is None:
-            return name, "**decompile failed** (jadx crashed or ran out of memory; try a larger JAVA_OPTS=-Xmx)", None, lits
+        if isinstance(a_src, str) or isinstance(b_src, str):
+            reason = a_src if isinstance(a_src, str) else b_src
+            return name, f"**decompile failed** ({reason})", None, lits
         return name, write_app_diff(name, package, a_src, b_src, out / "apps"), (a_src, b_src), lits
 
     with cf.ThreadPoolExecutor(args.jobs) as pool:
@@ -998,17 +1093,30 @@ def cmd_score(args) -> None:
     if rest:
         ma = load_manifest(args.old)
         for p in ma:
-            if p.endswith((".apk", ".jar")) and ma[p].kind == "file":
-                old_literals |= {x.lower() for x in dex_literals(WORK / args.old / "fs" / p)}
+            f = WORK / args.old / "fs" / p
+            if p.endswith((".apk", ".jar")) and ma[p].kind == "file" and f.is_file():
+                old_literals |= {x.lower() for x in dex_literals(f)}
     in_diffs = [t for t in rest if t.lower() in evidence]
 
-    def in_old_sources(term: str) -> bool:
-        # Constant names such as UI_NUM_KSW_BENZ_NTG7 aren't dex literals; the old decompiled code has them.
-        src = WORK / args.old / "src"
-        return src.is_dir() and subprocess.run(["grep", "-rqiF", term, str(src)]).returncode == 0
+    # Constant names such as UI_NUM_KSW_BENZ_NTG7 aren't dex literals, but the old decompiled code has
+    # them. One search for all remaining terms: a search per term rescanned the whole tree each time.
+    unresolved = [t for t in rest if t.lower() not in old_literals]
+    in_old_src: set[str] = set()
+    src = WORK / args.old / "src"
+    if unresolved and src.is_dir():
+        with tempfile.NamedTemporaryFile("w", suffix=".txt") as patterns:
+            patterns.write("\n".join(unresolved) + "\n")
+            patterns.flush()
+            # ripgrep: BSD grep takes minutes on a case-insensitive multi-pattern search of a big tree.
+            # Whole lines, not -o: -o reports one of two overlapping terms (UI_NUM_KSW in UI_NUM_KSW_BENZ_NTG7).
+            res = subprocess.run([tool("rg", "/opt/homebrew/bin/rg", "/usr/bin/rg"), "-i", "-F", "-N",
+                                  "--no-filename", "-f", patterns.name, str(src)],
+                                 capture_output=True, text=True, errors="replace")
+            hits = res.stdout.lower()
+            in_old_src = {t.lower() for t in unresolved if t.lower() in hits}
 
     # Anything the old firmware already had is context: the score is about new identifiers.
-    context = [t for t in rest if t.lower() in old_literals or in_old_sources(t)]
+    context = [t for t in rest if t.lower() in old_literals or t.lower() in in_old_src]
     in_diffs = [t for t in in_diffs if t not in context]
     missing = [t for t in rest if t not in context and t not in in_diffs]
     n = (len(terms) - len(context)) or 1

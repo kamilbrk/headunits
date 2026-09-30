@@ -10,7 +10,7 @@ ARG JADX_SHA256=545ea2be9c242511bc145755cf4bda2485ade42966e096f8b4d3da2a230e8974
 ARG TARGETARCH
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends e2fsprogs erofs-utils git curl unzip ca-certificates python3 \
+  && apt-get install -y --no-install-recommends e2fsprogs erofs-utils git ripgrep curl unzip ca-certificates python3 \
   && rm -rf /var/lib/apt/lists/*
 
 RUN case "$TARGETARCH" in \
