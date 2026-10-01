@@ -9,6 +9,7 @@
   fw.py frontmatter <id>                print the YAML frontmatter for src/data/updates
   fw.py diff <old-id> <new-id>          write WORK/diffs/<old>..<new>/ (report + source diffs)
   fw.py score <old-id> <new-id>         how much of the hand-written changelog the report finds
+  fw.py batch <zip-folder>...           diff every zip against its predecessor; write WORK/diffs/INDEX.md
 
 WORK defaults to ~/Dev/firmwares/_work and can be changed with FW_WORK.
 Nothing here needs root, FUSE or a mounted filesystem: ext4 images are read by
@@ -218,47 +219,60 @@ def write_manifest(fs: Path, out: Path) -> None:
 def cmd_extract(args) -> None:
     for zip_path in map(Path, args.zips):
         fw_id = zip_path.name.removesuffix(".zip")
-        dest = WORK / fw_id
-        if (dest / "meta.json").exists() and not args.force:
+        if extracted(fw_id) and not args.force:
             print(f"{fw_id}: already extracted, skipping (use --force to redo)")
             continue
-        print(f"{fw_id}: extracting")
-        shutil.rmtree(dest, ignore_errors=True)
-        img_dir = dest / "img"
-        img_dir.mkdir(parents=True)
-        with cf.ThreadPoolExecutor(1) as pool:
-            signatures = pool.submit(hash_file, zip_path)
-            images_from_zip(zip_path, img_dir)
-            for img in sorted(img_dir.glob("*.img")):
-                print(f"  unpacking {img.stem}")
-                unpack_image(img, dest / "fs" / img.stem)
-            if not args.keep_images:
-                shutil.rmtree(img_dir)
-            props = all_props(dest / "fs")
-            display_id = prop(props, "ro.build.display.id")
-            vendor, platform = vendor_platform(display_id or fw_id)
-            meta = {
-                "id": fw_id,
-                "vendor": vendor,
-                "platform": platform,
-                "android": prop(props, "ro.system.build.version.release", "ro.build.version.release"),
-                "date": int(prop(props, "ro.build.date.utc", "ro.system.build.date.utc") or 0),
-                "display_id": display_id,
-                "signatures": signatures.result(),
-            }
-        write_manifest(dest / "fs", dest / "manifest.tsv")
-        (dest / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
-        print(f"  done: {meta['vendor']} {meta['platform']} android {meta['android']}")
+        extract(zip_path, args.keep_images)
+
+
+def extract(zip_path: Path, keep_images: bool = False) -> None:
+    """Unpack one zip into WORK/<id>/, replacing whatever is there. meta.json is written last."""
+    fw_id = zip_path.name.removesuffix(".zip")
+    dest = WORK / fw_id
+    print(f"{fw_id}: extracting")
+    shutil.rmtree(dest, ignore_errors=True)
+    img_dir = dest / "img"
+    img_dir.mkdir(parents=True)
+    with cf.ThreadPoolExecutor(1) as pool:
+        signatures = pool.submit(hash_file, zip_path)
+        images_from_zip(zip_path, img_dir)
+        for img in sorted(img_dir.glob("*.img")):
+            print(f"  unpacking {img.stem}")
+            unpack_image(img, dest / "fs" / img.stem)
+        if not keep_images:
+            shutil.rmtree(img_dir)
+        props = all_props(dest / "fs")
+        display_id = prop(props, "ro.build.display.id")
+        vendor, platform = vendor_platform(display_id or fw_id)
+        meta = {
+            "id": fw_id,
+            "vendor": vendor,
+            "platform": platform,
+            "android": prop(props, "ro.system.build.version.release", "ro.build.version.release"),
+            "date": int(prop(props, "ro.build.date.utc", "ro.system.build.date.utc") or 0),
+            "display_id": display_id,
+            "signatures": signatures.result(),
+        }
+    write_manifest(dest / "fs", dest / "manifest.tsv")
+    (dest / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
+    print(f"  done: {meta['vendor']} {meta['platform']} android {meta['android']}")
 
 
 def cmd_frontmatter(args) -> None:
+    print(frontmatter(args.id), end="")
+
+
+def frontmatter(fw_id: str) -> str:
+    m = json.loads((WORK / fw_id / "meta.json").read_text())
+    sig = m["signatures"]
+    return (f'---\nid: "{m["id"]}"\nvendor: {m["vendor"]}\nplatform: {m["platform"]}\nandroid: {m["android"]}\n'
+            f"date: {utc(m['date'])}\nsignatures:\n  md5: {sig['md5']}\n  sha1: {sig['sha1']}\n  sha256: {sig['sha256']}\n---\n")
+
+
+def utc(ts: int) -> str:
     from datetime import datetime, timezone
 
-    m = json.loads((WORK / args.id / "meta.json").read_text())
-    date = datetime.fromtimestamp(m["date"], timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    sig = m["signatures"]
-    print(f'---\nid: "{m["id"]}"\nvendor: {m["vendor"]}\nplatform: {m["platform"]}\nandroid: {m["android"]}\ndate: {date}')
-    print(f"signatures:\n  md5: {sig['md5']}\n  sha1: {sig['sha1']}\n  sha256: {sig['sha256']}\n---")
+    return datetime.fromtimestamp(ts, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 # --------------------------------------------------------------------------- diff
@@ -335,10 +349,108 @@ def _encoded_value(b: bytes, i: int, found: set[int]) -> int:
     return i + arg + 1
 
 
-def dex_literals(path: Path) -> set[str]:
-    """String constants in an APK/JAR's dex files: every string that isn't a type, method, field or proto name.
+# Bundled libraries, as dex class descriptor prefixes. A string literal that only these classes use is
+# the library's (blankj's list of ROM version properties, okhttp's URLs), not the vendor's.
+LIBRARY_PACKAGES = (
+    "android/support/", "androidx/", "kotlin/", "kotlinx/", "javax/", "org/apache/", "org/json/", "org/xmlpull/",
+    "org/intellij/", "org/jetbrains/", "com/google/", "com/android/volley/", "okhttp3/", "okio/", "retrofit2/",
+    "com/squareup/", "io/reactivex/", "rx/", "com/blankj/", "com/tencent/", "com/umeng/", "com/alibaba/",
+    "com/bumptech/glide/", "org/greenrobot/", "de/greenrobot/", "com/airbnb/lottie/", "com/facebook/",
+    "com/jakewharton/", "butterknife/", "dagger/", "com/github/", "com/chad/library/", "com/scwang/",
+    "com/orhanobut/", "com/nostra13/", "com/lzy/", "com/liulishuo/", "com/yalantis/", "com/luck/", "com/hjq/",
+    "com/zhy/", "com/danikula/", "tv/danmaku/ijk/", "com/shuyu/", "org/videolan/", "io/netty/", "org/eclipse/",
+    "org/jsoup/", "org/litepal/", "net/sqlcipher/", "com/j256/ormlite/", "cn/jpush/", "cn/jiguang/",
+    "com/baidu/", "com/amap/", "com/autonavi/", "com/iflytek/", "com/xiaomi/push/", "me/jessyan/",
+)
 
-    Read straight from the dex string table, so it still works where jadx fails to decompile a method.
+# Code units per Dalvik opcode (1 unless listed), to walk a method's instructions.
+_WIDTH = bytearray([1] * 256)
+for _ops, _w in (([0x02, 0x05, 0x08, 0x13, 0x15, 0x16, 0x19, 0x1A, 0x1C, 0x1F, 0x20, 0x22, 0x23, 0x29, 0xFE, 0xFF,
+                   *range(0x2D, 0x3E), *range(0x44, 0x6E), *range(0x90, 0xB0), *range(0xD0, 0xE3)], 2),
+                 ([0x03, 0x06, 0x09, 0x14, 0x17, 0x1B, 0x24, 0x25, 0x26, 0x2A, 0x2B, 0x2C, 0xFC, 0xFD,
+                   *range(0x6E, 0x73), *range(0x74, 0x79)], 3),
+                 ([0xFA, 0xFB], 4), ([0x18], 5)):
+    for _op in _ops:
+        _WIDTH[_op] = _w
+
+
+def _code_strings(b: bytes, off: int, found: set[int]) -> None:
+    """String indices a code_item loads with const-string or const-string/jumbo."""
+    import struct
+
+    (units,) = struct.unpack_from("<I", b, off + 12)
+    i, end = off + 16, off + 16 + 2 * units
+    while i < end:
+        op = b[i]
+        if op == 0x1A:
+            found.add(b[i + 2] | b[i + 3] << 8)
+        elif op == 0x1B:
+            found.add(struct.unpack_from("<I", b, i + 2)[0])
+        elif op == 0 and b[i + 1] in (1, 2, 3):  # switch and array-data payloads sit inline in the code
+            size = struct.unpack_from("<H", b, i + 2)[0]
+            if b[i + 1] == 1:
+                i += (size * 2 + 4) * 2
+            elif b[i + 1] == 2:
+                i += (size * 4 + 2) * 2
+            else:
+                i += ((struct.unpack_from("<I", b, i + 4)[0] * size + 1) // 2 + 4) * 2
+            continue
+        i += _WIDTH[op] * 2
+
+
+def _dex_strings(b: bytes, libraries: bool) -> set[str]:
+    import struct
+
+    ssz, soff, tsz, toff, psz, poff, fsz, foff, msz, moff, csz, coff = struct.unpack_from("<12I", b, 0x38)
+
+    def string(k: int) -> str:
+        start = _uleb128(b, struct.unpack_from("<I", b, soff + 4 * k)[0])
+        return b[start:b.index(0, start)].decode("utf-8", "replace")
+
+    types = [struct.unpack_from("<I", b, toff + 4 * k)[0] for k in range(tsz)]
+    names = set(types)
+    names |= {struct.unpack_from("<I", b, poff + 12 * k)[0] for k in range(psz)}
+    names |= {struct.unpack_from("<I", b, foff + 8 * k + 4)[0] for k in range(fsz)}
+    names |= {struct.unpack_from("<I", b, moff + 8 * k + 4)[0] for k in range(msz)}
+    # `static final String KSW_X = "KSW_X"` shares one table entry between the field's name and
+    # its value, which is how the vendor writes nearly every settings key: keep those.
+    values: set[int] = set()
+    own: set[int] = set()
+    lib: set[int] = set()
+    for k in range(csz):
+        class_idx, _, _, _, source_file, _, class_data, static_values = struct.unpack_from("<8I", b, coff + 32 * k)
+        names.add(source_file)
+        refs = lib if string(types[class_idx])[1:].startswith(LIBRARY_PACKAGES) else own
+        if static_values:
+            found: set[int] = set()
+            _static_strings(b, static_values, found)
+            values |= found
+            refs |= found
+        if class_data and not libraries:
+            i = class_data
+            counts = []
+            for _ in range(4):
+                n, i = _read_uleb128(b, i)
+                counts.append(n)
+            for _ in range(counts[0] + counts[1]):
+                i = _uleb128(b, _uleb128(b, i))
+            for _ in range(counts[2] + counts[3]):
+                i = _uleb128(b, _uleb128(b, i))
+                code, i = _read_uleb128(b, i)
+                if code:
+                    _code_strings(b, code, refs)
+    keep = set(range(ssz)) - (names - values)
+    if not libraries:
+        keep -= lib - own
+    return {string(k) for k in keep}
+
+
+def dex_literals(path: Path, libraries: bool = False) -> set[str]:
+    """String constants in an APK/JAR's dex files: every string that isn't a type, method, field or proto name.
+    Unless `libraries`, strings that only LIBRARY_PACKAGES classes load (in code or static field values) are
+    left out.
+
+    Read straight from the dex, so it still works where jadx fails to decompile a method.
     """
     import struct
 
@@ -348,30 +460,69 @@ def dex_literals(path: Path) -> set[str]:
     except zipfile.BadZipFile:
         return out
     with zf:
-        for name in zf.namelist():
+        for name in sorted(zf.namelist()):
             if not re.fullmatch(r"classes\d*\.dex", name):
                 continue
-            b = zf.read(name)
-            ssz, soff, tsz, toff, psz, poff, fsz, foff, msz, moff, csz, coff = struct.unpack_from("<12I", b, 0x38)
-            names = {struct.unpack_from("<I", b, toff + 4 * k)[0] for k in range(tsz)}
-            names |= {struct.unpack_from("<I", b, poff + 12 * k)[0] for k in range(psz)}
-            names |= {struct.unpack_from("<I", b, foff + 8 * k + 4)[0] for k in range(fsz)}
-            names |= {struct.unpack_from("<I", b, moff + 8 * k + 4)[0] for k in range(msz)}
-            # `static final String KSW_X = "KSW_X"` shares one table entry between the field's name and
-            # its value, which is how the vendor writes nearly every settings key: keep those.
-            values: set[int] = set()
-            for k in range(csz):
-                source_file, _, _, static_values = struct.unpack_from("<4I", b, coff + 32 * k + 16)
-                names.add(source_file)
-                if static_values:
-                    _static_strings(b, static_values, values)
-            names -= values
-            for k in range(ssz):
-                if k not in names:
-                    (data,) = struct.unpack_from("<I", b, soff + 4 * k)
-                    start = _uleb128(b, data)
-                    out.add(b[start:b.index(0, start)].decode("utf-8", "replace"))
+            try:
+                out |= _dex_strings(zf.read(name), libraries)
+            except (struct.error, IndexError, ValueError):
+                print(f"warning: {path.name} {name} is not a dex fw.py can read; its strings are left out", file=sys.stderr)
     return out
+
+
+def _der(b: bytes, i: int) -> tuple[int, int, int]:
+    """One DER element at i: (tag, content start, content end)."""
+    tag, n, i = b[i], b[i + 1], i + 2
+    if n & 0x80:
+        k = n & 0x7F
+        n, i = int.from_bytes(b[i:i + k], "big"), i + k
+    return tag, i, i + n
+
+
+def signing_cert(path: Path) -> str | None:
+    """sha256 of an APK's first signing certificate, from the v2/v3 signing block or else the v1 PKCS#7."""
+    import struct
+
+    try:
+        with path.open("rb") as fh:
+            size = fh.seek(0, 2)
+            fh.seek(max(0, size - 65558))
+            tail = fh.read()
+            eocd = tail.rfind(b"PK\x05\x06")
+            cd = struct.unpack_from("<I", tail, eocd + 16)[0] if eocd >= 0 else 0
+            fh.seek(max(0, cd - 24))
+            head = fh.read(24)
+            if cd >= 32 and head[8:] == b"APK Sig Block 42":
+                block_size = struct.unpack_from("<Q", head)[0]
+                fh.seek(cd - block_size - 8 + 8)
+                pairs, i = fh.read(block_size - 24), 0
+                while i + 12 <= len(pairs):
+                    n, pid = struct.unpack_from("<QI", pairs, i)
+                    if pid in (0x7109871A, 0xF05368C0):  # v2, v3
+                        def lp(b: bytes, j: int) -> tuple[bytes, int]:
+                            k = struct.unpack_from("<I", b, j)[0]
+                            return b[j + 4:j + 4 + k], j + 4 + k
+                        signed = lp(lp(lp(pairs[i + 12:i + 8 + n], 0)[0], 0)[0], 0)[0]
+                        _, j = lp(signed, 0)  # digests
+                        return hashlib.sha256(lp(lp(signed, j)[0], 0)[0]).hexdigest()
+                    i += 8 + n
+        with zipfile.ZipFile(path) as zf:
+            sig = next((n for n in sorted(zf.namelist()) if re.fullmatch(r"META-INF/[^/]+\.(RSA|DSA|EC)", n)), None)
+            if not sig:
+                return None
+            b = zf.read(sig)
+        # ContentInfo { oid, [0] { SignedData { version, digestAlgorithms, contentInfo, [0] certificates ... } } }
+        _, i, _ = _der(b, 0)
+        _, i, _ = _der(b, _der(b, i)[2])
+        _, i, end = _der(b, i)
+        while i < end:
+            tag, start, stop = _der(b, i)
+            if tag == 0xA0:
+                return hashlib.sha256(b[start:_der(b, start)[2]]).hexdigest()
+            i = stop
+    except (OSError, ValueError, zipfile.BadZipFile, struct.error, IndexError):
+        pass
+    return None
 
 
 SIGNATURE_FILE = re.compile(r"META-INF/([^/]+\.(SF|RSA|EC|DSA)|MANIFEST\.MF)$")
@@ -424,14 +575,16 @@ def jadx(src: Path, out: Path) -> Path | str:
 def _jadx(src: Path, out: Path) -> Path | str:
     # --no-debug-info drops line numbers, which otherwise shift on every rebuild and bury real changes.
     # --show-bad-code keeps methods jadx can't fully decompile instead of replacing them with a stub.
-    flags = ["--no-debug-info", "--show-bad-code", "--comments-level", "none"]
+    # --no-finally: jadx 1.5.6 places extracted finally blocks differently from run to run on the same
+    # input (SettingsProvider.apk), which made two diffs of one pair disagree.
+    flags = ["--no-debug-info", "--show-bad-code", "--no-finally", "--comments-level", "none"]
     done = out / ".done"
     if done.exists() and done.read_text() == " ".join(flags):
         return out
     shutil.rmtree(out, ignore_errors=True)
     env = {**os.environ, "JAVA_OPTS": os.environ.get("JAVA_OPTS", "-Xmx4g")}
     try:
-        res = subprocess.run([tool("jadx"), "-q", *flags, "--threads-count", "2", "-d", str(out), str(src)],
+        res = subprocess.run([tool("jadx"), "-q", *flags, "--threads-count", "1", "-d", str(out), str(src)],
                              env=env, capture_output=True, text=True, errors="replace", timeout=JADX_TIMEOUT)
     except subprocess.TimeoutExpired:
         shutil.rmtree(out, ignore_errors=True)
@@ -449,10 +602,37 @@ def _jadx(src: Path, out: Path) -> Path | str:
 JADX_TIMEOUT = 20 * 60
 
 
-def worth_decompiling(package: str | None) -> bool:
-    """Vendor apps and Android's own; third-party preinstalls (TingCar, Kugou...) cost the most and matter least."""
-    return bool(package) and package.startswith(
-        tuple(ns.replace("/", ".") for ns in VENDOR_NAMESPACES) + ("com.android.", "android", "com.qualcomm.", "com.qti."))
+# Preinstalled apps from outside the firmware's makers: a version line only, since they cost the most to
+# decompile and matter least. Built from the third-party apps in the KSW and ZXW reports.
+THIRD_PARTY_PACKAGES = (
+    "com.google.", "com.android.chrome", "com.android.vending", "com.spotify.", "com.ximalaya.", "com.kugou.",
+    "com.tencent.", "com.autonavi.", "com.baidu.", "com.mxtech.", "com.estrongs.", "com.sohu.inputmethod.",
+    "com.iflytek.inputmethod", "com.zoulou.", "com.dede.android_eggs", "com.waze", "ru.yandex.", "com.netease.",
+    "cn.kuwo.", "com.ss.android.", "com.here.", "com.sygic.", "com.tomtom.", "org.telegram.", "com.whatsapp",
+    "com.facebook.", "com.microsoft.", "com.amazon.", "org.mozilla.",
+)
+# AOSP and the chip makers' own apps.
+STOCK_PACKAGES = ("com.android.", "android", "com.qualcomm.", "com.qti.", "org.codeaurora.", "vendor.qti.",
+                  "com.quicinc.", "com.mediatek.", "com.sprd.", "com.unisoc.")
+
+
+def app_group(package: str | None, cert: str | None, platform_cert: str | None) -> str:
+    """stock, vendor, third-party or unrecognised (a maker fw.py doesn't know yet). Third-party apps are not decompiled.
+
+    Vendor and stock names come before the certificate: KSW's ZLink carries its own key, and AOSP signs
+    its apps with four (platform, shared, media, testkey). Anything else not signed like framework-res.apk
+    was built outside the firmware.
+    """
+    package = package or ""
+    if package.startswith(THIRD_PARTY_PACKAGES):
+        return "third-party"
+    if package.startswith(tuple(ns.replace("/", ".") for ns in VENDOR_NAMESPACES)):
+        return "vendor"
+    if package.startswith(STOCK_PACKAGES):
+        return "stock"
+    if platform_cert and cert and cert != platform_cert:
+        return "third-party"
+    return "unrecognised"
 
 
 def mb_size(n: int) -> str:
@@ -530,8 +710,8 @@ def tier(path: str, own_prefixes: tuple[str, ...]) -> str:
     return "other"
 
 
-def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out: Path) -> str:
-    """Write <slug>.code.diff / .resources.diff and return a one-paragraph summary for the report."""
+def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out: Path) -> tuple[str, dict]:
+    """Write <slug>.code.diff / .resources.diff; return a one-paragraph summary for the report and its numbers."""
     own = VENDOR_NAMESPACES + ((package.replace(".", "/"),) if package else ())
     # SystemUI carries com.android.wm.shell and com.android.keyguard, Launcher3 com.android.quickstep:
     # platform code the vendor patches, not libraries.
@@ -544,6 +724,7 @@ def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out
     counts: dict[str, int] = {}
     library_pkgs: dict[str, int] = {}
     oversized: list[str] = []
+    large_files: list[str] = []
     for path, chunk in split_diff(git_diff(a_src, b_src)):
         t = tier(path, own)
         counts[t] = counts.get(t, 0) + 1
@@ -559,14 +740,19 @@ def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out
                 big.parent.mkdir(parents=True, exist_ok=True)
                 big.write_text(chunk)
                 oversized.append(f"{path}` -> `apps/{slugify(name)}/{big.name}")
+                large_files.append(f"apps/{slugify(name)}/{big.name}")
             else:
                 tiers[t].append((path, chunk))
     slug = slugify(name)
     parts = []
+    info: dict = {f"{t}_{k}": 0 for t in tiers for k in ("files", "lines")} | {"diff_file": None, "large_files": []}
     for t, chunks in tiers.items():
         if not chunks:
             continue
         n = sum(c.count("\n") for _, c in chunks)
+        info[f"{t}_files"], info[f"{t}_lines"] = len(chunks), n
+        if t == "code":
+            info["diff_file"] = f"apps/{slug}.code.diff"
         if n > MAX_TIER_DIFF_LINES:
             # Keep the main file readable; the larger per-file hunks go next to it, not away.
             large = [(p, c) for p, c in chunks if c.count("\n") > 200]
@@ -580,13 +766,14 @@ def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out
         if counts.get(t):
             parts.append(f"{t}: {counts[t]} files")
     if library_pkgs:
-        top = sorted(library_pkgs.items(), key=lambda kv: -kv[1])[:6]
+        top = sorted(library_pkgs.items(), key=lambda kv: (-kv[1], kv[0]))[:6]
         parts.append("libraries: " + ", ".join(f"{k} ({v})" for k, v in top)
                      + (f" +{len(library_pkgs) - 6} more" if len(library_pkgs) > 6 else ""))
     if oversized:
         parts.append(f"large files diffed separately (>{MAX_FILE_DIFF_LINES} lines): " + ", ".join(f"`{p}`" for p in oversized[:12])
                      + (f" +{len(oversized) - 12} more" if len(oversized) > 12 else ""))
-    return "; ".join(parts) or "no source-level changes"
+    info["large_files"] = large_files
+    return "; ".join(parts) or "no source-level changes", info
 
 
 # --------------------------------------------------------------------------- highlights
@@ -602,7 +789,7 @@ LIBRARY_STRING = re.compile(r"^(abc_|mtrl_|material_|m3_|exo_|common_google|fab_
                             r"google_|library_|srl_|brvah_|ucrop_|picture_)")
 PROP_KEY = re.compile(r"^(persist|ro|sys|vendor|debug|service|ctl|init|cpuinfo|wifi|bluetooth|net|hw|dev|media|audio|"
                       r"camera|gsm|dalvik|log)\.[\w.]+$")
-URL_REF = re.compile(r"^(https?|wss?|mqtt|tcp)://\S+$")
+URL_REF = re.compile(r"(?:https?|wss?|mqtt|tcp|ftp)://[^\s\"'<>\\]+")
 # KEYCODE_SYSRQ, android.intent.action.MEDIA_MOUNTED, com.wits.ksw.action.FOO
 INTENT_OR_KEY = re.compile(r"^(KEYCODE_[A-Z0-9_]+|[a-z][\w.]*\.(action|intent)\.[A-Z0-9_]+)$")
 SETTINGS_KEY = re.compile(r"^(KSW|ZXW|WITS|CAR|SAILOR|BENZ|BMW|AUDI|LEXUS|LANDROVER)[-_][A-Z0-9_-]+$")
@@ -643,14 +830,16 @@ CONFIG_KEY = re.compile(r"^[a-z][a-z0-9]*[A-Z][A-Za-z0-9]*$")  # camelCase: fact
 
 def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: list[tuple[str, tuple[Path, Path]]],
                        lits: list[tuple[str, str | None, set[str], set[str]]], added_files: list[str],
-                       removed_files: list[str]) -> list[str]:
+                       removed_files: list[str], facts: dict) -> list[str]:
+    """The Highlights rows; writes them, with `facts` from cmd_diff, to facts.json."""
     rows: list[str] = []
-    facts: dict = {}
+    facts["build"] = {}
 
     # Build identity: the type/user flip (userdebug -> user, ubuntu -> jenkins) matters to readers.
     for key in ("ro.build.display.id", "ro.build.type", "ro.build.user", "ro.build.version.security_patch",
                 "ro.build.version.sdk"):
         va, vb = prop(pa, key), prop(pb, key)
+        facts["build"][key] = {"old": va, "new": vb}
         if va != vb:
             rows.append(f"- Build `{key}`: `{va}` -> `{vb}`")
         elif key in ("ro.build.type", "ro.build.user") and vb:
@@ -659,15 +848,22 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
 
     # Theme ids from the whole decompiled trees, not the diff: shared code copying a constant into
     # one more app would otherwise look like a new theme.
-    def theme_consts(trees: list[Path]) -> set[str]:
-        found = set()
-        for tree in trees:
-            res = subprocess.run(["grep", "-rhoE", r"UI_[A-Za-z0-9_]+ = [0-9]+;", str(tree / "sources")],
+    def theme_consts(trees: list[tuple[str, Path]]) -> dict[str, set[str]]:
+        """"UI_X = 41" -> {"<app>: <source file>", ...}"""
+        found: dict[str, set[str]] = {}
+        for name, tree in trees:
+            res = subprocess.run(["grep", "-rHoE", r"UI_[A-Za-z0-9_]+ = [0-9]+;", str(tree / "sources")],
                                  capture_output=True, text=True, errors="replace")
-            found |= {f"{m[1]} = {m[2]}" for m in THEME_CONST.finditer(res.stdout)}
+            for line in res.stdout.splitlines():
+                file, _, text = line.rpartition(":")
+                if m := THEME_CONST.search(text):
+                    found.setdefault(f"{m[1]} = {m[2]}", set()).add(f"{name}: {Path(file).relative_to(tree / 'sources')}")
         return found
 
-    new_themes = theme_consts([b for _, (_, b) in apps]) - theme_consts([a for _, (a, _) in apps])
+    new_consts = theme_consts([(n, b) for n, (_, b) in apps])
+    old_consts = theme_consts([(n, a) for n, (a, _) in apps])
+    new_themes = new_consts.keys() - old_consts.keys()
+    facts["themes_removed"] = sorted(old_consts.keys() - new_consts.keys())
 
     # KSW keeps theme names as `static final String BMW_EVO_ID7_V2 = "BMW_EVO_ID7_V2";` in a UiThemeUtils
     # class per app; plenty of them don't start with UI_, so the class is the signal, not the name.
@@ -682,19 +878,28 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
                 found |= set(re.findall(r'= "(\w+)";', res.stdout))
         return found
 
-    # Per app: the launcher gaining a theme is news; only the Bluetooth app gaining its name is not the same.
-    theme_rows, all_new = [], set()
+    # A name is new only when no app had it before: the Bluetooth app catching up with names the
+    # launcher already carried is not a new theme. The per-app detail stays in facts.json.
+    theme_rows, by_app, names_old, names_new = [], {}, set(), set()
     for name, (a_src, b_src) in apps:
-        added_here = theme_strings([b_src]) - theme_strings([a_src])
-        if added_here:
-            all_new |= added_here
-            theme_rows.append(f"  - `{name}`: {fmt_list(added_here)}")
-    if theme_rows:
-        rows += ["- Theme names added (UiThemeUtils), per app:", *theme_rows]
-        facts["theme_strings"] = sorted(all_new)
+        old_here, new_here = theme_strings([a_src]), theme_strings([b_src])
+        names_old |= old_here
+        names_new |= new_here
+        if new_here - old_here:
+            by_app[name] = sorted(new_here - old_here)
+            theme_rows.append(f"  - `{name}`: {fmt_list(new_here - old_here)}")
+    if names_new - names_old:
+        rows += [f"- Theme names added (UiThemeUtils): {fmt_list(names_new - names_old)}"]
+    elif theme_rows:
+        rows += ["- Theme names added to some apps' UiThemeUtils, already in others:", *theme_rows]
+    facts["theme_strings"] = sorted(names_new - names_old)
+    facts["theme_strings_by_app"] = by_app
+    facts["theme_strings_removed"] = sorted(names_old - names_new)
+    facts["theme_strings_before"] = sorted(names_old)
     if new_themes:
         rows.append(f"- Theme ids added: {fmt_list(new_themes)}")
-        facts["themes"] = sorted(new_themes)
+    facts["themes"] = sorted(new_themes)
+    facts["theme_sources"] = {t: sorted(new_consts[t]) for t in sorted(new_themes)}
 
     # String constants straight from the dex files, compared across all changed apps at once so a
     # shared library moving a key from one app to another doesn't count as a change.
@@ -706,9 +911,14 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     readers = [(la, lb) for *_, la, lb in lits if any(x.endswith("factory_config.xml") for x in lb)]
     config_added = {x for _, lb in readers for x in lb} - {x for la, _ in readers for x in la}
     compared_re = re.compile(r'\.equals\("(\w+)"\)|\bcase "(\w+)":')
-    compared = {a or b for f in (out / "apps").glob("*.code.diff") for line in f.read_text(errors="replace").splitlines()
+    compared = {a or b for f in sorted((out / "apps").rglob("*.diff")) for line in f.read_text(errors="replace").splitlines()
                 if line.startswith("+") for a, b in compared_re.findall(line)}
     config_added &= compared
+    # URLs inside longer strings ("http://host/api?id=" + id) count too, compared as whole sets so a
+    # changed string around an unchanged URL adds nothing.
+    urls_old = {u for x in old_all for u in URL_REF.findall(x)}
+    urls_new = {u for x in new_all for u in URL_REF.findall(x)}
+    url_add, url_rem = urls_new - urls_old, urls_old - urls_new
     for label, pattern, key, pool_add, pool_rem in (
             ("System properties", PROP_KEY, "props", added_lits, removed_lits),
             ("Settings keys", SETTINGS_KEY, "settings_keys", added_lits, removed_lits),
@@ -718,12 +928,12 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
             ("Other apps' package names", PACKAGE_REF, "packages", {x for x in added_lits if not PROP_KEY.match(x)},
              {x for x in removed_lits if not PROP_KEY.match(x)}),
             ("Intent actions and key codes", INTENT_OR_KEY, "intents", added_lits, removed_lits),
-            ("URLs", URL_REF, "urls", added_lits, removed_lits),
+            ("URLs", URL_REF, "urls", url_add, url_rem),
 
             ("Factory config keys", CONFIG_KEY, "config_keys", config_added, set()),
             ("Screen types", SCREEN_TYPE, "screens", added_lits, removed_lits)):
-        add = {x for x in pool_add if pattern.match(x)}
-        rem = {x for x in pool_rem if pattern.match(x)}
+        add = {x for x in pool_add if pattern.match(x)} if key != "urls" else pool_add
+        rem = {x for x in pool_rem if pattern.match(x)} if key != "urls" else pool_rem
         if add:
             rows.append(f"- {label} added: {fmt_list(add, 60)}")
         if rem:
@@ -742,6 +952,9 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
                    if p.endswith(".so") and re.search(r"/(priv-app|app|PreInstall)/", p) and not packed_before(p)})
     if libs:
         rows.append(f"- Native libraries added to apps: {fmt_list(libs)}")
+    facts["native_libs"] = libs
+    facts["native_libs_removed"] = sorted({Path(p).name for p in removed_files
+                                           if p.endswith(".so") and re.search(r"/(priv-app|app|PreInstall)/", p)})
 
     # Executables are few and every one matters (su -> ksu); the rest of the binaries stay counted per folder.
     exe = re.compile(r"/(s?bin|xbin)/[^/]+$")
@@ -751,14 +964,17 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
         rows.append(f"- Executables added: {fmt_list(exe_added)}")
     if exe_removed:
         rows.append(f"- Executables removed: {fmt_list(exe_removed)}")
+    facts["executables"] = {"added": exe_added, "removed": exe_removed}
 
     # Framework/services starting to read a property the vendor apps already used is still news:
     # Android itself now honours it.
+    facts["jar_props"] = {}
     for name, _, la, lb in lits:
         if name.endswith(".jar"):
             newly = {x for x in lb - la if PROP_KEY.match(x)} - added_lits
             if newly:
                 rows.append(f"- System properties now read by `{name}`: {fmt_list(newly)}")
+                facts["jar_props"][name] = sorted(newly)
 
     def extensions(pool: set[str]) -> set[str]:
         return {e for x in pool if MEDIA_EXT.match(x) for e in x.strip(".").split(".")}
@@ -766,63 +982,83 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     new_ext = {e for *_, la, lb in lits for e in extensions(lb) - extensions(la)}
     if new_ext:
         rows.append(f"- File extensions added to media lists: {fmt_list('.' + e for e in new_ext)}")
+    facts["media_extensions"] = sorted(new_ext)
 
     # UI strings per app, from the full decompiled trees: a label moved between lines isn't "new".
     by_text: dict[tuple[str, str], list[str]] = {}
-    renamed: list[str] = []
+    gone_text: dict[tuple[str, str], list[str]] = {}
+    renamed: list[dict] = []
     for name, (a_src, b_src) in apps:
         sa, sb = read_strings(a_src), read_strings(b_src)
-        for k in sb.keys() - sa.keys():
+        for k in sorted(sb.keys() - sa.keys()):
             by_text.setdefault((k, sb[k]), []).append(name)
-        for k in sb.keys() & sa.keys():
+        if sb:
+            for k in sorted(sa.keys() - sb.keys()):
+                gone_text.setdefault((k, sa[k]), []).append(name)
+        for k in sorted(sb.keys() & sa.keys()):
             if sa[k] != sb[k] and sa[k] and sb[k]:
-                renamed.append(f'  - `{name}` `{k}`: "{sa[k]}" -> "{sb[k]}"')
+                renamed.append({"app": name, "name": k, "old": sa[k], "new": sb[k]})
     if by_text:
         rows.append(f"- New UI strings ({len(by_text)}):")
-        for (k, v), names in sorted(by_text.items(), key=lambda kv: (kv[1][0], kv[0][0]))[:600]:
+        for (k, v), names in sorted(by_text.items(), key=lambda kv: (kv[1][0], kv[0]))[:600]:
             where = names[0] if len(names) == 1 else f"{names[0]} +{len(names) - 1} apps"
             rows.append(f'  - "{v[:120]}" (`{k}`, {where})')
         if len(by_text) > 600:
             rows.append(f"  - ... {len(by_text) - 600} more, all in facts.json")
     if renamed:
         rows.append(f"- Changed UI strings ({len(renamed)}):")
-        rows += renamed[:60]
-    facts["strings"] = [{"name": k, "text": v, "apps": n} for (k, v), n in by_text.items()]
+        rows += [f'  - `{r["app"]}` `{r["name"]}`: "{r["old"]}" -> "{r["new"]}"' for r in renamed[:60]]
+    facts["strings"] = [{"name": k, "text": v, "apps": n} for (k, v), n in sorted(by_text.items())]
+    facts["strings_changed"] = renamed
+    facts["strings_removed"] = [{"name": k, "text": v, "apps": n} for (k, v), n in sorted(gone_text.items())]
 
     # Resource folders an app didn't have before: layout-1024x592 means a new screen size is handled.
     new_dirs = []
+    facts["resource_dirs"], facts["resource_dirs_removed"] = {}, {}
     for name, (a_src, b_src) in apps:
         old = {d.name for d in (a_src / "resources/res").glob("*") if d.is_dir()}
         new = {d.name for d in (b_src / "resources/res").glob("*") if d.is_dir()}
         added_dirs = {d for d in new - old if not LOCALE_VALUES.match(f"resources/res/{d}/")}
         if added_dirs and old:
             new_dirs.append(f"  - `{name}`: {fmt_list(added_dirs, 15)}")
+            facts["resource_dirs"][name] = sorted(added_dirs)
+        if new and (gone_dirs := {d for d in old - new if not LOCALE_VALUES.match(f"resources/res/{d}/")}):
+            facts["resource_dirs_removed"][name] = sorted(gone_dirs)
     if new_dirs:
         rows += ["- New resource folders (screen sizes, orientations, themes):", *new_dirs]
 
     # New locale folders: a language the app didn't have before (Ukrainian, Croatian...).
     langs: dict[str, list[str]] = {}
+    langs_gone: dict[str, list[str]] = {}
     for name, (a_src, b_src) in apps:
         def locales(src: Path) -> set[str]:
             return {m[1] for d in (src / "resources/res").glob("values-*")
                     if d.is_dir() and (m := LOCALE_VALUES.match(f"resources/res/{d.name}/"))}
-        old = locales(a_src)
+        old, new = locales(a_src), locales(b_src)
         if not old:
             continue
-        for lang in locales(b_src) - old:
+        for lang in new - old:
             langs.setdefault(lang, []).append(name)
+        for lang in old - new if new else ():
+            langs_gone.setdefault(lang, []).append(name)
+    facts["languages"] = dict(sorted(langs.items()))
+    facts["languages_removed"] = dict(sorted(langs_gone.items()))
     if langs:
         rows.append("- New translation languages: " + ", ".join(
             f"`{lang}` ({apps_[0]}{f' +{len(apps_) - 1}' if len(apps_) > 1 else ''})" for lang, apps_ in sorted(langs.items())))
 
     # New layouts name new screens: kesaiwei_id6_activity_main, layout_bmw_hw_screen_reverse.
     new_layouts = []
+    facts["layouts"], facts["layouts_removed"] = {}, {}
     for name, (a_src, b_src) in apps:
         def layouts(src: Path) -> set[str]:
             return {f.stem for f in (src / "resources/res").glob("layout*/*.xml")}
-        added_layouts = layouts(b_src) - layouts(a_src)
-        if added_layouts and layouts(a_src):
-            new_layouts.append(f"  - `{name}` ({len(added_layouts)}): {fmt_list(added_layouts, 12)}")
+        la_, lb_ = layouts(a_src), layouts(b_src)
+        if lb_ - la_ and la_:
+            new_layouts.append(f"  - `{name}` ({len(lb_ - la_)}): {fmt_list(lb_ - la_, 12)}")
+            facts["layouts"][name] = sorted(lb_ - la_)
+        if la_ - lb_ and lb_:
+            facts["layouts_removed"][name] = sorted(la_ - lb_)
     if new_layouts:
         rows += ["- New layouts:", *new_layouts]
 
@@ -832,9 +1068,11 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
         return path.read_text(errors="replace") if path.is_file() else ""
 
     item_rows, flag_rows, cfg_rows = [], [], []
+    facts["manifest"], facts["android_config"] = {}, []
     for name, (a_src, b_src) in apps:
         ma_, mb_ = read(a_src / "resources/AndroidManifest.xml"), read(b_src / "resources/AndroidManifest.xml")
         ia, ib = {m[1] for m in MANIFEST_ITEM.findall(ma_)}, {m[1] for m in MANIFEST_ITEM.findall(mb_)}
+        entry = {"added": sorted(ib - ia), "removed": sorted(ia - ib) if mb_ else [], "flags_added": [], "flags_removed": []}
         if ib - ia:
             item_rows.append(f"  - `{name}` added: {fmt_list(ib - ia, 30)}")
         if mb_ and ia - ib:
@@ -842,6 +1080,9 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
         fa_, fb_ = {f"{k}={v}" for k, v in MANIFEST_FLAG.findall(ma_)}, {f"{k}={v}" for k, v in MANIFEST_FLAG.findall(mb_)}
         if ma_ and fa_ != fb_:
             flag_rows.append(f"  - `{name}`: added {fmt_list(fb_ - fa_)}; removed {fmt_list(fa_ - fb_)}")
+            entry["flags_added"], entry["flags_removed"] = sorted(fb_ - fa_), sorted(fa_ - fb_)
+        if any(entry.values()):
+            facts["manifest"][name] = entry
 
         def configs(src: Path) -> dict[str, str]:
             return {k: re.sub(r"\s+", " ", v).strip() for f in sorted((src / "resources/res/values").glob("*.xml"))
@@ -850,6 +1091,7 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
         for k in sorted(cb):
             if ca and ca.get(k) != cb[k]:
                 cfg_rows.append(f"- Android `{k}` (`{name}`): `{ca.get(k, '(unset)')}` -> `{cb[k]}`")
+                facts["android_config"].append({"app": name, "key": k, "old": ca.get(k), "new": cb[k]})
     if flag_rows:
         rows += ["- Manifest flags changed:", *flag_rows]
     if item_rows:
@@ -858,6 +1100,7 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
 
     # key=value config files (Wi-Fi driver .ini, .conf, .prop): which keys changed.
     kv_rows = []
+    facts["config_files"] = []
     for path, chunk in split_diff((out / "files" / "text.diff").read_text(errors="replace")):
         if not path.endswith((".ini", ".conf", ".cfg", ".prop", ".properties")):
             continue
@@ -868,12 +1111,15 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
                 (new if m[1] == "+" else old)[m[2]] = m[3]
         changes = [f"`{k}` {old.get(k, '(unset)')} -> {new.get(k, '(removed)')}" for k in sorted(old.keys() | new.keys())
                    if old.get(k) != new.get(k)]
+        facts["config_files"] += [{"path": path, "key": k, "old": old.get(k), "new": new.get(k)}
+                                  for k in sorted(old.keys() | new.keys()) if old.get(k) != new.get(k)]
         if changes:
             kv_rows.append(f"  - `{path}`: " + ", ".join(changes[:20]) + (f" +{len(changes) - 20} more" if len(changes) > 20 else ""))
     if kv_rows:
         rows += ["- Config file settings changed:", *kv_rows]
 
     # Factory settings: leaf elements of the vendor's config XML (zxw_factory_config.xml and the like).
+    facts["factory_settings"] = []
     for rel in sorted({p.relative_to(fb).as_posix() for p in fb.glob("*/**/*factory_config*.xml")}):
         a_file, b_file = fa / rel, fb / rel
         old = dict(XML_LEAF.findall(a_file.read_text(errors="replace"))) if a_file.is_file() else {}
@@ -883,9 +1129,13 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
             rows.append(f"- Factory settings added in `{rel}`: {fmt_list(f'<{k}>' for k in added)}")
         if old.keys() - new.keys():
             rows.append(f"- Factory settings removed in `{rel}`: {fmt_list(f'<{k}>' for k in old.keys() - new.keys())}")
-        for k in sorted(old.keys() & new.keys()):
-            if old[k] != new[k]:
-                rows.append(f"- Factory default `<{k}>` in `{rel}`: `{old[k]}` -> `{new[k]}`")
+        changed = [{"key": k, "old": old[k], "new": new[k]} for k in sorted(old.keys() & new.keys()) if old[k] != new[k]]
+        for c in changed:
+            rows.append(f"- Factory default `<{c['key']}>` in `{rel}`: `{c['old']}` -> `{c['new']}`")
+        if added or old.keys() - new.keys() or changed:
+            facts["factory_settings"].append({"file": rel, "file_added": not a_file.is_file(), "added": sorted(added),
+                                              "removed": sorted(old.keys() - new.keys()),
+                                              "changed": changed})
 
     (out / "facts.json").write_text(json.dumps(facts, indent=2, ensure_ascii=False) + "\n")
     return rows
@@ -894,6 +1144,9 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
 def cmd_diff(args) -> None:
     tool("rg", "/opt/homebrew/bin/rg")  # needed by the highlights, after all the decompiling
     a_id, b_id = args.old, args.new
+    for fw_id in (a_id, b_id):
+        if not extracted(fw_id):
+            sys.exit(f"error: {fw_id} is not extracted (or its tree was freed); run `fw.py extract` on its zip")
     fa, fb = WORK / a_id / "fs", WORK / b_id / "fs"
     ma, mb = load_manifest(a_id), load_manifest(b_id)
     out = WORK / "diffs" / f"{a_id}..{b_id}"
@@ -909,12 +1162,18 @@ def cmd_diff(args) -> None:
 
     # build.prop: noisy keys (dates, fingerprints) are kept because the version strings live there too.
     pa, pb = all_props(fa), all_props(fb)
-    prop_lines = []
+    prop_lines, prop_facts = [], []
     for file in sorted(pa.keys() | pb.keys()):
         a, b = pa.get(file, {}), pb.get(file, {})
         for k in sorted(a.keys() | b.keys()):
-            if a.get(k) != b.get(k) and not re.search(r"(^|\.)date(\.utc)?$|fingerprint|incremental|display\.id$|build\.id$|description$", k):
-                prop_lines.append(f"- `{file}` `{k}`: `{a.get(k, '(none)')}` -> `{b.get(k, '(none)')}`")
+            if a.get(k) == b.get(k) or re.search(r"(^|\.)date(\.utc)?$|incremental|display\.id$|build\.id$|description$", k):
+                continue
+            # A fingerprint changes every build; only its last part, the build type and signing keys
+            # (userdebug/test-keys -> user/release-keys), is news.
+            if "fingerprint" in k and a.get(k, "").rpartition(":")[2] == b.get(k, "").rpartition(":")[2]:
+                continue
+            prop_lines.append(f"- `{file}` `{k}`: `{a.get(k, '(none)')}` -> `{b.get(k, '(none)')}`")
+            prop_facts.append({"file": file, "key": k, "old": a.get(k), "new": b.get(k)})
     lines += ["## Build properties", "", *(prop_lines or ["- no changes besides build dates/fingerprints"]), ""]
 
     # Apps: inventory by package so a moved/renamed APK still pairs up.
@@ -922,7 +1181,7 @@ def cmd_diff(args) -> None:
         by_pkg: dict[str, list[tuple[str, dict]]] = {}
         for p in manifest:
             if p.endswith(".apk") and manifest[p].kind == "file":
-                info = apk_info(fs / p)
+                info = apk_info(fs / p) | {"cert": signing_cert(fs / p)}
                 pkg = info.get("package")
                 by_pkg.setdefault(pkg if pkg and pkg != "?" else p, []).append((p, info))
         # A package shipped at several paths (overlays, per-model variants) pairs up by path instead.
@@ -931,7 +1190,9 @@ def cmd_diff(args) -> None:
     print("reading app manifests")
     with cf.ThreadPoolExecutor(2) as pool:
         fa_apks, fb_apks = pool.map(apks, (fa, fb), (ma, mb))
-    app_rows, to_decompile = [], []
+    platform_a, platform_b = (next((i["cert"] for _, i in side.values() if i.get("package") == "android"), None)
+                              for side in (fa_apks, fb_apks))
+    app_rows, to_decompile, app_facts = [], [], []
 
     # A vendor app split or renamed (com.wits.ksw.media -> .music and .video) is diffed against the app
     # it replaced, not against nothing, or every string in it looks new.
@@ -945,17 +1206,24 @@ def cmd_diff(args) -> None:
             removed_by_family.setdefault(fam, []).append(v[0])
     # Two apps gone from one family leaves no way to tell which one an added app replaced.
     removed_by_family = {fam: paths[0] for fam, paths in removed_by_family.items() if len(paths) == 1}
+    labels = {"third-party": ", third-party: not decompiled", "unrecognised": ", unrecognised maker"}
     for pkg in sorted(fa_apks.keys() | fb_apks.keys()):
         a, b = fa_apks.get(pkg), fb_apks.get(pkg)
+        path, info = b or a
+        group = app_group(info.get("package"), info.get("cert"), platform_b if b else platform_a)
+        fact = {"key": pkg, "package": info.get("package"), "name": Path(path).stem, "path": path, "old_path": None,
+                "version_old": a and a[1].get("version_name"), "version_new": b and b[1].get("version_name"),
+                "kinds": [], "group": group, "is_vendor": group == "vendor", "decompiled": group != "third-party"}
         if not a:
-            predecessor = removed_by_family.get(family(b[1].get("package"))) if worth_decompiling(b[1].get("package")) \
-                and b[1].get("package", "").startswith(tuple(ns.replace("/", ".") for ns in VENDOR_NAMESPACES)) else None
+            predecessor = removed_by_family.get(family(info.get("package"))) if group == "vendor" else None
             note = f", diffed against removed `{predecessor}`" if predecessor else ""
-            app_rows.append(f"- **added** `{pkg}` {b[1].get('version_name')} (`{b[0]}`{note})")
-            if worth_decompiling(b[1].get("package")):
-                to_decompile.append((pkg, b[1].get("package"), predecessor, b[0]))
+            app_rows.append((group, f"- **added** `{pkg}` {info.get('version_name')} (`{path}`{note}{labels.get(group, '')})"))
+            fact |= {"action": "added", "old_path": predecessor}
+            if group != "third-party":
+                to_decompile.append((pkg, info.get("package"), predecessor, path))
         elif not b:
-            app_rows.append(f"- **removed** `{pkg}` {a[1].get('version_name')} (`{a[0]}`)")
+            app_rows.append((group, f"- **removed** `{pkg}` {info.get('version_name')} (`{path}`{labels.get(group, '')})"))
+            fact |= {"action": "removed", "decompiled": False}
         elif ma[a[0]].value != mb[b[0]].value:
             kinds = classify_zip_change(fa / a[0], fb / b[0])
             if not kinds:
@@ -964,12 +1232,15 @@ def cmd_diff(args) -> None:
             ver = f"{va} -> {vb}" if va != vb else f"{va} (version unchanged)"
             moved = f", moved from `{a[0]}`" if a[0] != b[0] else ""
             size = f", {mb_size(ma[a[0]].size)} -> {mb_size(mb[b[0]].size)}" if abs(ma[a[0]].size - mb[b[0]].size) > 1 << 20 else ""
-            app_rows.append(f"- **changed** `{pkg}` {ver} [{', '.join(kinds)}] (`{b[0]}`{moved}{size})")
-            if worth_decompiling(b[1].get("package")):
-                to_decompile.append((pkg, b[1].get("package"), a[0], b[0]))
-    is_vendor = lambda row: any(f"`{ns.replace('/', '.')}" in row for ns in VENDOR_NAMESPACES)
-    vendor_rows = [r for r in app_rows if is_vendor(r)]
-    android_rows = [r for r in app_rows if not is_vendor(r)]
+            app_rows.append((group, f"- **changed** `{pkg}` {ver} [{', '.join(kinds)}] (`{path}`{moved}{size}{labels.get(group, '')})"))
+            fact |= {"action": "changed", "old_path": a[0] if a[0] != b[0] else None, "kinds": kinds}
+            if group != "third-party":
+                to_decompile.append((pkg, info.get("package"), a[0], path))
+        else:
+            continue
+        app_facts.append(fact)
+    vendor_rows = [r for g, r in app_rows if g == "vendor"]
+    android_rows = [r for g, r in app_rows if g != "vendor"]
     lines += ["## Vendor apps", "", *(vendor_rows or ["- none"]), "",
               "## Android apps", "", *(android_rows or ["- none"]), ""]
 
@@ -1032,16 +1303,23 @@ def cmd_diff(args) -> None:
         lits = (name, package, la, lb)
         if isinstance(a_src, str) or isinstance(b_src, str):
             reason = a_src if isinstance(a_src, str) else b_src
-            return name, f"**decompile failed** ({reason})", None, lits
+            return name, (f"**decompile failed** ({reason})", {"failed": reason}), None, lits
         return name, write_app_diff(name, package, a_src, b_src, out / "apps"), (a_src, b_src), lits
 
     with cf.ThreadPoolExecutor(args.jobs) as pool:
         stats = list(pool.map(decompile, to_decompile))
     lines += ["## Decompiled source diffs", "", "Full diffs in `apps/<name>.code.diff` and `apps/<name>.resources.diff`.", "",
-              *[f"- `{n}`: {s}" for n, s, _, _ in stats], ""]
+              *[f"- `{n}`: {s}" for n, (s, _), _, _ in stats], ""]
 
+    identity = [{k: v for k, v in json.loads((WORK / i / "meta.json").read_text()).items() if k != "signatures"}
+                for i in (a_id, b_id)]
+    for fact in app_facts:
+        if fact["decompiled"] and not next(srcs for n, _, srcs, _ in stats if n == fact["key"]):
+            fact["decompiled"] = False
+    facts = {"old": identity[0], "new": identity[1], "apps": app_facts, "build_props": prop_facts,
+             "decompiled": {n: info for n, (_, info), _, _ in stats}}
     highlights = collect_highlights(out, pa, pb, fa, fb, [(n, srcs) for n, _, srcs, _ in stats if srcs],
-                                    [lits for *_, lits in stats], added, removed)
+                                    [lits for *_, lits in stats], added, removed, facts)
     shutil.rmtree(out / ".empty", ignore_errors=True)
     lines[2:2] = ["## Highlights", "", *(highlights or ["- nothing matched the known patterns"]), ""]
     (out / "REPORT.md").write_text("\n".join(lines))
@@ -1075,15 +1353,22 @@ def changelog_terms(md: str) -> list[str]:
     return out
 
 
+SITE_UPDATES = Path(__file__).resolve().parents[2] / "src/data/updates"
+
+
+def site_page(fw_id: str) -> Path | None:
+    """The site's changelog for a firmware, when fw.py runs from a checkout of the site."""
+    return next(iter(sorted(SITE_UPDATES.glob(f"*/*/{fw_id}.md"))), None)
+
+
 def cmd_score(args) -> None:
     """How much of a hand-written changelog the report finds, with no model involved."""
     out = WORK / "diffs" / f"{args.old}..{args.new}"
-    changelog = Path(args.changelog) if args.changelog else next(
-        Path(__file__).resolve().parents[2].glob(f"src/data/updates/*/*/{args.new}.md"), None)
+    changelog = Path(args.changelog) if args.changelog else site_page(args.new)
     if not changelog or not changelog.is_file():
         sys.exit(f"error: no changelog found for {args.new}; pass one with --changelog")
     report = (out / "REPORT.md").read_text(errors="replace").lower()
-    evidence = report + "".join(f.read_text(errors="replace").lower() for f in out.rglob("*.diff"))
+    evidence = report + "".join(f.read_text(errors="replace").lower() for f in sorted(out.rglob("*.diff")))
     terms = changelog_terms(changelog.read_text())
     in_report = [t for t in terms if t.lower() in report]
     rest = [t for t in terms if t.lower() not in report]
@@ -1095,7 +1380,7 @@ def cmd_score(args) -> None:
         for p in ma:
             f = WORK / args.old / "fs" / p
             if p.endswith((".apk", ".jar")) and ma[p].kind == "file" and f.is_file():
-                old_literals |= {x.lower() for x in dex_literals(f)}
+                old_literals |= {x.lower() for x in dex_literals(f, libraries=True)}
     in_diffs = [t for t in rest if t.lower() in evidence]
 
     # Constant names such as UI_NUM_KSW_BENZ_NTG7 aren't dex literals, but the old decompiled code has
@@ -1127,6 +1412,180 @@ def cmd_score(args) -> None:
     print(f"  not found at all: {len(missing):3}  {', '.join(missing)}")
 
 
+# --------------------------------------------------------------------------- batch
+
+
+def zip_build(zip_path: Path) -> tuple[int, str] | None:
+    """Build date (UTC seconds, 0 if unknown) and product line, from the OTA metadata without unpacking.
+    None for a zip without a system partition fw.py can read (a persist backup, a super.img flash kit)."""
+    try:
+        with zipfile.ZipFile(zip_path) as zf:
+            names = set(zf.namelist())
+            text = zf.read("META-INF/com/android/metadata").decode(errors="replace") if "META-INF/com/android/metadata" in names else ""
+    except zipfile.BadZipFile:
+        return None
+    if not names & {"payload.bin", "system.transfer.list", "system.img"}:
+        return None
+    meta = dict(line.partition("=")[::2] for line in text.splitlines())
+    fw_id = zip_path.name.removesuffix(".zip")
+    # KSW names the line in the id (Ksw-R-M600_OS_v1.8.6-ota, Witstek-T-M600_OS_v1.8.6-ota) and every
+    # M600/M700 is `bengal`; ZXW ids are dates, but the device name tells GT6-CAR from GT7-CAR.
+    return int(meta.get("post-timestamp") or 0), ksw_line(fw_id) or meta.get("pre-device") or fw_id
+
+
+def ksw_line(fw_id: str) -> str | None:
+    """R-M600, or R-M600 NEXAI: a letter suffix on the version (v1.7.2NEXAI) is a variant with its own line."""
+    m = re.search(r"-([A-Z]-M\d{3}|Q-Userdebug)_OS_v[\d.]+([A-Za-z]*)", fw_id)
+    return f"{m[1]} {m[2]}".strip() if m else None
+
+
+def pair_up(builds: dict[str, tuple[str, int, Path]]) -> list[tuple[str, str, str]]:
+    """(line, old, new): each build against the one before it in its line, by build date. The first build of
+    a variant line ("R-M600 NEXAI") is compared with the latest earlier build of its base line ("R-M600")."""
+    pairs = []
+    for line in sorted({v[0] for v in builds.values()}):
+        ids = [i for _, i in sorted((d, i) for i, (l, d, _) in builds.items() if l == line)]
+        base = line.split(" ")[0]
+        if base != line:
+            first = builds[ids[0]][1]
+            earlier = sorted((d, i) for i, (l, d, _) in builds.items() if l == base and d < first)
+            if earlier:
+                pairs.append((line, earlier[-1][1], ids[0]))
+        pairs += [(line, a, b) for a, b in zip(ids, ids[1:])]
+    return pairs
+
+
+def extracted(fw_id: str) -> bool:
+    # extract() wipes the folder first and writes meta.json last, so both together mean complete.
+    return (WORK / fw_id / "fs").is_dir() and (WORK / fw_id / "meta.json").is_file()
+
+
+def free_trees(ids: set[str], needed: set[str]) -> None:
+    for fw_id in sorted(ids - needed):
+        if (WORK / fw_id / "fs").exists():
+            for sub in ("fs", "src", "img"):
+                shutil.rmtree(WORK / fw_id / sub, ignore_errors=True)
+            print(f"freed {fw_id}")
+
+
+def site_date(page: Path | None) -> str:
+    m = re.search(r"^date:\s*(\S+)", page.read_text(), re.M) if page else None
+    return m[1] if m else ""
+
+
+def skipped_releases(old: str, new: str) -> list[str]:
+    """Site changelogs dated strictly between two firmwares of one platform: releases never downloaded."""
+    old_page, new_page = site_page(old), site_page(new)
+    if not old_page or not new_page:
+        return []
+    lo, hi = site_date(old_page), site_date(new_page)
+    # One site folder holds several lines (ksw/m600: R, S, T and NEXAI).
+    return [p.stem for d, p in sorted((site_date(p), p) for p in new_page.parent.glob("*.md"))
+            if lo < d < hi and ksw_line(p.stem) == ksw_line(new)]
+
+
+def bullet_count(md: Path | None) -> int | None:
+    if not md or not md.is_file():
+        return None
+    return sum(1 for line in md.read_text().split("---", 2)[-1].splitlines() if re.match(r"\s*- ", line))
+
+
+def cmd_batch(args) -> None:
+    import contextlib
+    import io
+    import time
+
+    zips = sorted({z for d in map(Path, args.folders) for z in (sorted(d.glob("*.zip")) if d.is_dir() else [d])})
+    builds: dict[str, tuple[str, int, Path]] = {}
+    for z in zips:
+        fw_id = z.name.removesuffix(".zip")
+        if not (build := zip_build(z)):
+            print(f"{z.name}: not an OTA zip, skipped")
+            continue
+        date, line = build
+        meta = WORK / fw_id / "meta.json"
+        if not date and not meta.is_file() and not args.dry_run:
+            if shutil.disk_usage(WORK).free < args.min_free_gb << 30:
+                sys.exit(f"error: less than {args.min_free_gb} GB free under {WORK}; can't extract {z.name} for its date")
+            try:
+                extract(z)
+            except (Exception, SystemExit) as exc:  # noqa: BLE001 - one broken zip shouldn't stop the rest
+                print(f"{z.name}: no build date and extraction failed ({exc}), skipped")
+                continue
+        if not date and meta.is_file():
+            date = json.loads(meta.read_text())["date"]
+        builds[fw_id] = (line, date, z)
+    pairs = pair_up(builds)
+    print(f"{len(builds)} zips, {len(pairs)} pairs")
+    if args.dry_run:
+        for line, a, b in pairs:
+            done = (WORK / "diffs" / f"{a}..{b}" / "frontmatter.md").exists()
+            unknown = [x for x in (a, b) if not builds[x][1]]
+            print(f"  {line}: {a} -> {b}{' (done)' if done else ''}"
+                  + (f" (no build date for {', '.join(unknown)} until extracted; order may change)" if unknown else ""))
+        return
+
+    def log(msg: str) -> None:
+        print(time.strftime("%H:%M:%S"), msg, flush=True)
+
+    status: dict[tuple[str, str], str] = {}
+    for n, (line, a, b) in enumerate(pairs):
+        out = WORK / "diffs" / f"{a}..{b}"
+        # frontmatter.md is written after REPORT.md, so it marks a finished pair.
+        if (out / "frontmatter.md").exists():
+            status[a, b] = "done before"
+        else:
+            missing = [x for x in (a, b) if not extracted(x)]
+            if missing:
+                free_trees(set(builds), {x for _, p, q in pairs[n:] for x in (p, q) if (p, q) not in status})
+                if shutil.disk_usage(WORK).free < args.min_free_gb << 30:
+                    log(f"less than {args.min_free_gb} GB free under {WORK}; stopping before {a} -> {b}")
+                    break
+            try:
+                for fw_id in missing:
+                    log(f"extract {fw_id}")
+                    extract(builds[fw_id][2])
+                log(f"diff {a} -> {b}")
+                cmd_diff(argparse.Namespace(old=a, new=b, jobs=args.jobs))
+                if site_page(b):
+                    text = io.StringIO()
+                    with contextlib.redirect_stdout(text):
+                        cmd_score(argparse.Namespace(old=a, new=b, changelog=None))
+                    (out / "score.txt").write_text(text.getvalue())
+                (out / "frontmatter.md").write_text(frontmatter(b))
+                status[a, b] = "done"
+            except (Exception, SystemExit) as exc:  # noqa: BLE001 - one broken zip shouldn't stop the rest
+                status[a, b] = f"failed: {(str(exc).splitlines() or [type(exc).__name__])[0][:200]}"
+                log(f"FAILED {a} -> {b}: {exc}")
+        free_trees(set(builds), {x for _, p, q in pairs if (p, q) not in status for x in (p, q)})
+
+    rows = ["# Firmware diffs", "",
+            "One row per pair from `fw.py batch`. **Skipped** = site releases between the two builds that "
+            "were never downloaded; **site** = bullets in the site's changelog (0 = frontmatter only); "
+            "**highlights** = top-level lines in the report's Highlights.", "",
+            "| Line | Old | New | Built | Skipped | Site | Highlights | Status |", "|---|---|---|---|---|---|---|---|"]
+    for line, a, b in pairs:
+        report = WORK / "diffs" / f"{a}..{b}" / "REPORT.md"
+        highlights = ""
+        if report.is_file():
+            section = report.read_text().split("## Highlights", 1)[-1].split("\n## ", 1)[0]
+            highlights = str(sum(1 for l in section.splitlines() if l.startswith("- ")))
+        site = bullet_count(site_page(b))
+        rows.append(f"| {line} | {a} | [{b}]({a}..{b}/REPORT.md) | {utc(builds[b][1])[:10]} | "
+                    f"{', '.join(skipped_releases(a, b))} | {'' if site is None else site} | {highlights} | {status.get((a, b), 'not run')} |")
+    (WORK / "diffs").mkdir(parents=True, exist_ok=True)
+    (WORK / "diffs" / "INDEX.md").write_text("\n".join(rows) + "\n")
+    print(f"index: {WORK / 'diffs' / 'INDEX.md'}")
+
+
+SCRIPTS = {
+    "rules": "security and privacy checks over a diff folder",
+    "sitecheck": "compare a diff folder with the site's themes, factory settings and frontmatter",
+    "draft": "write a site-format changelog draft from a diff folder",
+    "evaluate": "score reports against the analysed evidence files; snapshot and compare reports",
+}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(required=True)
@@ -1148,6 +1607,17 @@ def main() -> None:
     p.add_argument("new")
     p.add_argument("--changelog", help="defaults to src/data/updates/*/*/<new>.md")
     p.set_defaults(func=cmd_score)
+    p = sub.add_parser("batch", help="extract and diff every zip against its predecessor in its product line")
+    p.add_argument("folders", nargs="+", help="folders of OTA zips, or zips")
+    p.add_argument("--jobs", type=int, default=3)
+    p.add_argument("--min-free-gb", type=int, default=25, help="stop before an extraction below this much free disk")
+    p.add_argument("--dry-run", action="store_true", help="list the pairs and stop")
+    p.set_defaults(func=cmd_batch)
+    # The checks that read a finished diff folder live in their own scripts; fw.py only passes the arguments on.
+    for script, help_ in SCRIPTS.items():
+        sub.add_parser(script, help=help_, add_help=False)
+    if len(sys.argv) > 1 and sys.argv[1] in SCRIPTS:
+        sys.exit(subprocess.run([sys.executable, str(Path(__file__).resolve().with_name(f"{sys.argv[1]}.py")), *sys.argv[2:]]).returncode)
     args = ap.parse_args()
     args.func(args)
 

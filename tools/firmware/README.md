@@ -27,8 +27,19 @@ docker build -t headunits-fw tools/firmware
 alias fw='docker run --rm --user "$(id -u):$(id -g)" -v ~/Dev/firmwares:/fw -e FW_WORK=/fw/_work headunits-fw'
 ```
 
+The image has no checkout of the site or analysis tree, so mount them and name
+them: `fw sitecheck <diff> --site /site` with `-v "$PWD":/site`, and
+`fw evaluate --analysis /fw/_analysis run`. Both stop with an error when the
+folder is missing rather than checking against nothing.
+
 `uv` fetches the two Python dependencies (`brotli`, `pyaxmlparser`) on first
 run; nothing is installed globally.
+
+Versions the reports were checked against: jadx 1.5.6, payload-dumper-go
+2.1.0, git 2.43, ripgrep 14.1, e2fsprogs 1.47.0, erofs-utils 1.7.1, Python
+3.11. The Dockerfile pins jadx and payload-dumper-go by version and checksum
+and the base image and uv by digest. A different jadx version decompiles
+differently, so compare reports only when they come from the same one.
 
 ## Use
 
@@ -39,6 +50,7 @@ tools/firmware/fw.py extract ~/Dev/firmwares/zxw\ gt7/*.zip
 tools/firmware/fw.py frontmatter 20250718GT_KSW        # paste into src/data/updates/...
 tools/firmware/fw.py diff 20250325GT_KSW 20250718GT_KSW
 tools/firmware/fw.py score 20250325GT_KSW 20250718GT_KSW  # vs src/data/updates/.../20250718GT_KSW.md
+tools/firmware/fw.py batch ~/Dev/firmwares/zxw\ gt7 ~/Dev/firmwares/ksw   # everything, pair by pair
 ```
 
 `extract` writes `<id>/fs/<partition>/`, `<id>/manifest.tsv` (every file's
@@ -61,10 +73,92 @@ disk each.
 - `files/text.diff`: unified diff of every changed text file (XML, `.rc`,
   configs), including `zxw_factory_config.xml`.
 - `apps/<name>.code.diff` / `.resources.diff`: decompiled vendor code and
-  resources for each changed vendor or Android app and JAR. Third-party
-  preinstalls (TingCar, Kugou...) get a version line only. Library code,
-  translations and binaries are only counted. Decompiled trees are cached
-  under `<id>/src/`; jadx gives up on one app after 20 minutes.
+  resources for each changed app and JAR that is not third-party. Library
+  code, translations and binaries are only counted. Decompiled trees are
+  cached under `<id>/src/`; jadx gives up on one app after 20 minutes.
+
+Each app falls in one group, shown in `facts.json` and, for third-party and
+unrecognised apps, in the report's app line:
+
+- **third-party**: its package is on `THIRD_PARTY_PACKAGES` (Google, Kugou,
+  TingCar, MX Player...), or it is not a vendor or stock package and is not
+  signed with the same certificate as `framework-res.apk`. Version line only,
+  not decompiled.
+- **vendor**: a package under `VENDOR_NAMESPACES` (`com.wits`, `com.szchoiceway`,
+  `com.zjinnova`...). Listed under "Vendor apps". The certificate is not
+  checked for these: ZLink carries its own key on KSW units.
+- **stock**: AOSP and chip-maker packages (`com.android.`, `com.qualcomm.`,
+  `com.mediatek.`...). AOSP signs its apps with several keys, so the
+  certificate is not checked for these either.
+- **unrecognised**: everything else, decompiled. A new maker's namespace
+  shows up here first; add it to `VENDOR_NAMESPACES`.
+
+The string highlights (system properties, paths, URLs, package names, intent
+actions) come from the apps' dex string tables. A string that only classes
+under `LIBRARY_PACKAGES` load (blankj utilcode, androidx, Google, okhttp,
+Tencent, Umeng...) is left out, so a bundled library's list of ROM version
+properties is not reported as the vendor's. `score` still uses every string.
+
+Two runs over the same trees give byte-identical output: every list is
+sorted, and jadx runs single-threaded with `--no-finally`, since jadx 1.5.6
+otherwise decompiles some methods differently from run to run. Parallelism
+comes from `--jobs` (apps decompiled at once) instead.
+
+`batch` takes folders of OTA zips (or zips) and, for each product line, diffs
+every build against the one before it:
+
+- The build date and line come from the zip's `META-INF/com/android/metadata`
+  without unpacking (`post-timestamp`; the line from KSW's id, such as
+  `R-M600`, or else `pre-device`, such as `GT7-CAR`). A zip without that date
+  is extracted to read it. Zips without a system partition fw.py can read
+  (persist backups, `super.img` flash kits) are skipped.
+- A letter suffix on the version starts a line of its own (`R-M600 NEXAI`),
+  whose first build is compared with the latest earlier build of the base line.
+- A pair whose `diffs/<old>..<new>/frontmatter.md` exists is skipped, so a
+  stopped batch resumes where it left off. A pair that fails is noted and
+  the batch moves on.
+- Each finished pair also gets `frontmatter.md` and, when the site has a page
+  for the new firmware, `score.txt`.
+- Extracted trees are deleted (`fs/`, `src/`, `img/`; `meta.json` and
+  `manifest.tsv` stay) once no remaining pair needs them, and the batch stops
+  before an extraction that would start below `--min-free-gb` (25).
+- `diffs/INDEX.md` lists every pair with its build date, the site releases
+  between the two builds that were never downloaded, the site page's bullet
+  count and the number of highlights.
+
+`batch --dry-run` lists the pairs without extracting anything. A zip with no
+date in its metadata that was never extracted is listed with date 0, so its
+place in the order is only known after a real run extracts it.
+
+### facts.json
+
+The highlights as data, for scripts that read a diff without parsing
+REPORT.md. Every top-level key is always present, and every list comes in a
+fixed order (sorted, or in app and file order).
+
+| Key | Contents |
+|---|---|
+| `old`, `new` | `meta.json` of each side without signatures: `id`, `vendor`, `platform`, `android`, `date`, `display_id` |
+| `apps` | one object per added, removed or changed app: `key`, `package`, `action`, `name`, `path`, `old_path` (moved from, or the removed app it was diffed against), `version_old`, `version_new`, `kinds`, `group`, `is_vendor`, `decompiled` (false for third-party apps and when jadx failed) |
+| `build_props` | changed build properties: `file`, `key`, `old`, `new` |
+| `decompiled` | per decompiled app or JAR: `code_files`, `code_lines`, `resources_files`, `resources_lines`, `diff_file`, `large_files`, or `failed` |
+| `build` | `ro.build.display.id`, `.type`, `.user`, `.version.security_patch`, `.version.sdk`: `old`, `new` |
+| `themes`, `themes_removed` | theme id constants (`UI_NUM_KSW_X = 41`) |
+| `theme_sources` | per added theme id: the `app: source file` lines that define it |
+| `theme_strings`, `theme_strings_by_app`, `theme_strings_removed` | theme names from `UiThemeUtils.java` |
+| `props`, `settings_keys`, `theme_names`, `models`, `files`, `packages`, `intents`, `urls`, `config_keys`, `screens` | dex string highlights: `added`, `removed` |
+| `jar_props` | per JAR: system properties it reads for the first time |
+| `native_libs`, `native_libs_removed` | `.so` files added to or removed from app folders |
+| `executables` | `added`, `removed` under `bin/`, `sbin/`, `xbin/` |
+| `media_extensions` | extensions added to media file lists |
+| `strings`, `strings_removed` | UI strings: `name`, `text`, `apps` |
+| `strings_changed` | UI strings whose text changed: `app`, `name`, `old`, `new` |
+| `resource_dirs`, `resource_dirs_removed`, `layouts`, `layouts_removed` | per app: resource folders and layouts |
+| `languages`, `languages_removed` | per locale: apps |
+| `manifest` | per app: `added`, `removed` (permissions, components, actions), `flags_added`, `flags_removed` |
+| `android_config` | Android `config_*` values: `app`, `key`, `old`, `new` |
+| `config_files` | key=value config files: `path`, `key`, `old`, `new` |
+| `factory_settings` | per factory config XML: `file`, `file_added`, `added`, `removed`, `changed` (`key`, `old`, `new`) |
 
 `score` checks a hand-written changelog against the report: the share of its
 `identifiers`, "labels" and version numbers that the report finds, which ones

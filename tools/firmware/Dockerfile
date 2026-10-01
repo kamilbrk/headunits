@@ -2,7 +2,9 @@
 #   docker build -t headunits-fw tools/firmware
 #   docker run --rm --user "$(id -u):$(id -g)" -v ~/Dev/firmwares:/fw -e FW_WORK=/fw/_work headunits-fw extract "/fw/zxw gt7/20250718GT_KSW.zip"
 # --user matters: as root, debugfs hands files Android's uids and the host user can't read or delete them.
-FROM eclipse-temurin:21-jre-noble
+# The base image and uv are pinned by digest and the downloads by version and checksum, so every build gets
+# the same jadx (whose output the reports are made of). The apt tools follow Ubuntu noble's updates.
+FROM eclipse-temurin:21-jre-noble@sha256:0c324fbe2e1455c3159184717440f3b52906ef82a39c4a6efc9edb401d31971a
 
 ARG PAYLOAD_DUMPER_VERSION=2.1.0
 ARG JADX_VERSION=1.5.6
@@ -29,9 +31,11 @@ RUN curl -fsSL -o /tmp/jadx.zip "https://github.com/skylot/jadx/releases/downloa
   && ln -s /opt/jadx/bin/jadx /usr/local/bin/jadx \
   && rm /tmp/jadx.zip
 
-COPY --from=ghcr.io/astral-sh/uv:0.11.21 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.11.21@sha256:ff07b86af50d4d9391d9daf4ff89ce427bc544f9aae87057e69a1cc0aa369946 /uv /usr/local/bin/uv
 ENV UV_CACHE_DIR=/opt/uv-cache HOME=/tmp
-COPY fw.py /opt/fw/fw.py
+# fw.py runs rules, sitecheck, draft and evaluate as the scripts beside it. sitecheck needs --site and
+# evaluate --analysis in here: the image carries no site checkout or analysis tree.
+COPY *.py /opt/fw/
 # Resolve the script's pinned Python deps at build time, not on every run.
 RUN uv run --script /opt/fw/fw.py --help > /dev/null && chmod -R a+rwX /opt/uv-cache
 
