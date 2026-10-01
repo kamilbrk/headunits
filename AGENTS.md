@@ -272,6 +272,23 @@ check. All must pass before deploy. Don't merge if any is red.
 6. Run `npm run lint && npx astro check && npm run build &&
    npm run check:html && npm run check:links` before pushing.
 
+## Firmware analysis
+
+`tools/firmware/fw.py` unpacks OTA zips, diffs two builds and runs the
+checkers (`rules`, `sitecheck`, `draft`, `score`); see
+`tools/firmware/README.md`. Two procedures, written as Claude Code skills but
+plain instructions any agent can follow:
+
+- `.claude/skills/firmware-diff/SKILL.md`: analyse new firmware zips and write
+  `claude.md` (site-format changelog) and `claude.evidence.md` (every claim with
+  a diff quote and a confidence), reading only what the scripts flag.
+- `.claude/skills/firmware-site-update/SKILL.md`: turn that analysis into edits
+  under `src/data/` (update pages, theme `since`, factory settings), then run
+  the verification commands above.
+
+Hand-written changelogs are not ground truth, and nothing goes on the site that
+the evidence file does not support.
+
 ## Things to avoid
 
 - Removing the `vite: ^8` override.
