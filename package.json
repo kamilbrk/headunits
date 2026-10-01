@@ -57,7 +57,7 @@
     "github-slugger": "2.0.0",
     "html-validate": "11.16.1",
     "prettier": "3.9.9",
-    "prettier-plugin-astro": "0.14.1",
+    "prettier-plugin-astro": "1.1.0",
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.3",
     "typescript-eslint": "8.71.0"
