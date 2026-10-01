@@ -9,3 +9,23 @@ signatures:
   sha1: 15476ae9604898c6467f1e2a0cbba209cb5c3417
   sha256: b1dbd17e96f87d3fb13b6088594e80f2150339ab831e90c17a5801bdb5c66b92
 ---
+#### Summary
+- "Select Music App" and "Select Video App" for most themes, followed by the home-screen music and video tiles
+- Encryption options removed from the `/data` mount settings
+- QQ Music and Kugou are no longer installed on first boot
+- A system update file with `force-update` in its name installs without asking
+
+#### Changes
+- New "Select Music App" and "Select Video App" entries in system settings for `Audi_MMI_4G`, `Benz_NTG5`, `Audi_mib3`, the Benz themes, `BMW_EVO_ID7` and the themes using its settings, `LAND_ROVER`, `LEXUS_UI`, `LEXUS_LS_UI` and `Alfa_Romeo`
+- The larger-screen layouts of the `PEMP_ID7_UI` and ID6-style settings also gain both entries
+- The home-screen music and video tiles open the app chosen in those settings (falling back to the built-in player) on most themes; the music tile no longer follows the factory "Launcher's Music App" button
+- `PEMP_ID7_UI` larger-screen layout: the left menu gets the three assignable shortcut buttons that `1.4.0` added
+- `fileencryption=` and `metadata_encryption=` are removed from the `/data` entries in `fstab.default` and `fstab.emmc`. The effect on units whose data is already encrypted is not known
+- First-boot setup no longer installs QQ Music (`qqmusiccar.apk`) or Kugou (`KugouAuto.apk`); it copies both to internal storage as installer files instead
+- A system update file whose name contains `force-update` installs straight away, without the "update?" question
+- The USB recovery script `dual_clear_ota.sh` now runs at every boot and looks for `Ksw-R-M600` file names instead of `Ksw-Q-Userdebug`
+- CenterService drops key code `1318`, the factory reset without wiping internal storage that `1.4.0` added
+- Bluetooth: while the car's original system is shown, Bluetooth appears to no longer change its own volume on audio focus changes (not tested)
+- Status bar: the USB/SD indicator appears to update when a drive is mounted, but ignores USB drives of 1.5 GB or less
+- Android Settings: the search bar is hidden
+- Audio calibration files and the audio policy library changed; what changed inside them is not known
