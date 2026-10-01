@@ -710,8 +710,8 @@ def tier(path: str, own_prefixes: tuple[str, ...]) -> str:
     return "other"
 
 
-def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out: Path) -> tuple[str, dict]:
-    """Write <slug>.code.diff / .resources.diff; return a one-paragraph summary for the report and its numbers."""
+def own_prefixes(name: str, package: str | None) -> tuple[str, ...]:
+    """Source roots that are the vendor's or the app's own code; everything else under sources/ is libraries."""
     own = VENDOR_NAMESPACES + ((package.replace(".", "/"),) if package else ())
     # SystemUI carries com.android.wm.shell and com.android.keyguard, Launcher3 com.android.quickstep:
     # platform code the vendor patches, not libraries.
@@ -720,6 +720,12 @@ def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out
     # framework.jar / services.jar: every class is platform code the vendor may have patched.
     if name.endswith(".jar"):
         own = ("",)
+    return own
+
+
+def write_app_diff(name: str, package: str | None, a_src: Path, b_src: Path, out: Path) -> tuple[str, dict]:
+    """Write <slug>.code.diff / .resources.diff; return a one-paragraph summary for the report and its numbers."""
+    own = own_prefixes(name, package)
     tiers: dict[str, list[str]] = {"code": [], "resources": []}
     counts: dict[str, int] = {}
     library_pkgs: dict[str, int] = {}
@@ -826,6 +832,323 @@ def fmt_list(items, limit: int = 30) -> str:
 
 
 CONFIG_KEY = re.compile(r"^[a-z][a-z0-9]*[A-Z][A-Za-z0-9]*$")  # camelCase: factory XML tags such as externalMicOutput
+
+# Keys the app's own code reads or writes, by call shape: (call up to its "(", index of the key argument).
+CONST_DECL = re.compile(r"\bstatic final (String|int|long|short|byte|boolean|float|double|char) ([A-Za-z_]\w*) = ([^;]{1,200});")
+SETTINGS_CALLS = (
+    (re.compile(r"\bSettings\.(?:System|Global|Secure)\.(?:get(?!UriFor)|put)\w*\("), 1),
+    (re.compile(r"\bSettings\.(?:System|Global|Secure)\.getUriFor\("), 0),
+    # KSW wrappers: PowerManagerApp.getSettingsInt("key"), mEvtService.putSettingInt("key", v),
+    # SysProviderOpt.getRecordInteger("key", d) / updateRecord("key", v).
+    (re.compile(r"\.(?:get|put|set)Settings?(?:Int|String|Long|Float|Boolean)\("), 0),
+    (re.compile(r"\.(?:getRecord(?:Integer|Value|Boolean|Float|Long|String)?|updateRecord)\("), 0),
+)
+PREFS_CALL = re.compile(r"(?:\b(\w+)|(edit\(\)|[gG]et(?:Default)?SharedPreferences\([^()]*(?:\([^()]*\))?[^()]*\)))"
+                        r"\.(?:get|put)(?:String|Int|Boolean|Long|Float|StringSet)\(")
+# sp.getInt, SpfUtils.getBoolean, sharedPreferences.getString, editor.putString: not jSONObject.getString.
+PREFS_RECEIVER = re.compile(r"(?i)^(m?sps?|\w*spf\w*|\w*sputils?|\w*pref\w*|\w*editor\w*)$")
+SYSPROP_CALLS = ((re.compile(r"\b\w*SystemProperties\w*\.(?:get|set)\w*\("), 0),)
+SHELL_PROP = re.compile(r'"(?:getprop|setprop)\s+([\w.\-]+)')
+KEY_SHAPE = re.compile(r"^[A-Za-z_][\w.\-]{1,79}$")
+ENUM_HEAD = re.compile(r"\benum (\w+)[^{\n]*\{\n")
+ENUM_ITEM = re.compile(r"^\s+([A-Z][A-Za-z0-9_]*)\s*(?:\(.*\))?\s*([,;])\s*$")
+# Logging tags, AIDL transaction codes and BuildConfig fields change with every build and say nothing.
+NOISE_CONST = re.compile(r"^(TAG|\w*_TAG|TAG_\w*|serialVersionUID|DEBUG|TRANSACTION_\w+|VERSION_NAME|VERSION_CODE|APPLICATION_ID|"
+                         r"BUILD_TYPE|FLAVOR|LIBRARY_PACKAGE_NAME|BUILD_(TIME|DATE)\w*|LAST_COMMIT|PACKTIME|SVNVERSION|COMPUTER|"
+                         r"GIT_\w+|[A-Za-z]\d?|\$\w*)$")
+# Build-generated classes renumber their constants on every build: BuildConfig, data binding's BR and mapper.
+GENERATED_CLASS = re.compile(r"/(BuildConfig|BR|DataBinderMapperImpl|DataBindingComponent)\.java$")
+LITERAL = re.compile(r'^("[^"\\]{0,78}"|-?[\d.]+[LlFfDd]?|0x[0-9a-fA-F]+[Ll]?|true|false|\'.\')$')  # not expressions
+RESOURCE_ID = re.compile(r"^(21[34]\d{7}|16[89]\d{5})$")  # 0x7f......, 0x0101.... inlined resource ids
+CODE_SCAN = (r"Settings\.|Settings?(Int|String|Long|Float|Boolean)\(|Record\w*\(|SystemProperties|getprop|setprop|"
+             r"static final |\.(get|put)(String|Int|Boolean|Long|Float|StringSet)\(|\benum \w+")
+
+
+def call_args(text: str, i: int) -> list[str]:
+    """Top-level arguments of the call whose "(" is just before text[i]; jadx keeps a call on one line."""
+    args, depth, cur, quote = [], 1, [], False
+    while i < len(text) and text[i] != "\n":
+        c = text[i]
+        cur.append(c)
+        if quote:
+            if c == "\\":
+                i += 1
+                cur.append(text[i:i + 1])
+            elif c == '"':
+                quote = False
+        elif c == '"':
+            quote = True
+        elif c == "'":
+            end = text.find("'", i + 2 if text[i + 1:i + 2] == "\\" else i + 1)
+            if end == -1:
+                break
+            cur.append(text[i + 1:end + 1])
+            i = end
+        elif c in "([{":
+            depth += 1
+        elif c in ")]}":
+            depth -= 1
+            if depth == 0:
+                args.append("".join(cur[:-1]).strip())
+                return args
+        elif c == "," and depth == 1:
+            args.append("".join(cur[:-1]).strip())
+            cur = []
+        i += 1
+    if "".join(cur).strip():
+        args.append("".join(cur).strip())  # a call that wraps onto the next line: keep what this line has
+    return args
+
+
+def key_of(arg: str, consts: dict[str, str]) -> str | None:
+    """A key argument as text: a literal, or a constant resolved through the app's own declarations."""
+    if re.fullmatch(r'"[^"\\]*"', arg):
+        key = arg[1:-1]
+    elif m := re.fullmatch(r"(?:[A-Za-z_]\w*\.)*([A-Za-z_]\w*)", arg):
+        value = consts.get(m[1])
+        if value is not None and re.fullmatch(r'"[^"\\]*"', value):
+            key = value[1:-1]
+        elif value is None and re.fullmatch(r"[A-Z][A-Z0-9_]{2,}", m[1]):
+            key = m[1]  # declared outside the scanned code (Settings.System.SCREEN_BRIGHTNESS): the name says enough
+        else:
+            return None  # a local variable
+    else:
+        return None
+    return key if KEY_SHAPE.match(key) else None
+
+
+def call_keys(text: str, consts: dict[str, str], calls) -> set[str]:
+    found = set()
+    for pattern, n in calls:
+        for m in pattern.finditer(text):
+            args = call_args(text, m.end())
+            if len(args) > n and (key := key_of(args[n], consts)):
+                found.add(key)
+    return found
+
+
+def code_facts(src: Path, own: tuple[str, ...]) -> dict[str, set[str]]:
+    """What an app's own code uses, from the whole decompiled tree: settings, SharedPreferences and
+    system property keys, string/number constants and enum values. Library classes are left out."""
+    facts: dict[str, set[str]] = {k: set() for k in ("settings", "prefs", "props", "constants", "enums")}
+    if not (src / "sources").is_dir():
+        return facts
+    res = subprocess.run([tool("rg", "/opt/homebrew/bin/rg"), "-N", "--no-heading", "--with-filename", "--null",
+                          "--sort", "path", "-g", "*.java", "-e", CODE_SCAN, str(src / "sources")],
+                         capture_output=True, text=True, errors="replace")
+    lines: dict[str, list[str]] = {}
+    for row in res.stdout.split("\n"):
+        if "\0" not in row:
+            continue
+        path, _, text = row.partition("\0")
+        rel = Path(path).relative_to(src).as_posix()
+        cls = rel[len("sources/"):].removeprefix("src/")
+        if tier(rel, own) == "code" and not cls.startswith(LIBRARY_PACKAGES) and not GENERATED_CLASS.search(cls):
+            lines.setdefault(rel, []).append(text)
+    text = "\n".join(t for rel in sorted(lines) for t in lines[rel])
+    consts = {m[2]: m[3].strip() for m in CONST_DECL.finditer(text)}
+    facts["settings"] = call_keys(text, consts, SETTINGS_CALLS)
+    facts["props"] = call_keys(text, consts, SYSPROP_CALLS) | set(SHELL_PROP.findall(text))
+    for m in PREFS_CALL.finditer(text):
+        if (m[2] or PREFS_RECEIVER.match(m[1])) and (args := call_args(text, m.end())) and (key := key_of(args[0], consts)):
+            facts["prefs"].add(key)
+    for m in CONST_DECL.finditer(text):
+        if not NOISE_CONST.match(m[2]) and LITERAL.match(m[3].strip()) and not RESOURCE_ID.match(m[3].strip()):
+            facts["constants"].add(f"{m[2]} = {m[3].strip()}")
+    for rel in sorted(r for r, ts in lines.items() if any(ENUM_HEAD.search(t + "\n") for t in ts)):
+        body = (src / rel).read_text(errors="replace")
+        for m in ENUM_HEAD.finditer(body):
+            for line in body[m.end():].split("\n", 2000)[:2000]:
+                if not (item := ENUM_ITEM.match(line)):
+                    break
+                facts["enums"].add(f"{m[1]}.{item[1]}")
+                if item[2] == ";":
+                    break
+    return facts
+
+
+ANDROID_NS = "{http://schemas.android.com/apk/res/android}"
+RESOURCE_VALUE = re.compile(r"^(#[0-9a-fA-F]{3,8}|@(drawable|color|dimen|mipmap|anim|raw)/\w+|-?\d+(\.\d+)?(dp|sp|px|dip)?)$")
+
+
+def layout_facts(src: Path) -> dict:
+    """Per app: view ids per layout name ("main: btn"), @string labels its layouts use, layout files by folder, and the visibility and
+    text of each named view, keyed by file and the view's id (or label, or its first named child)."""
+    import xml.etree.ElementTree as ET
+    out = {"ids": set(), "labels": set(), "files": set(), "views": {}}
+    for f in sorted((src / "resources/res").glob("layout*/*.xml")):
+        rel = f"{f.parent.name}/{f.stem}"
+        out["files"].add(rel)
+        text = f.read_text(errors="replace")
+        out["ids"] |= {f"{f.stem}: {i}" for i in re.findall(r'android:id="@\+id/(\w+)"', text)}
+        out["labels"] |= set(re.findall(r'"@string/(\w+)"', text))
+        try:
+            root = ET.fromstring(text)
+        except ET.ParseError:
+            continue
+        seen: dict[str, int] = {}
+        for el in root.iter():
+            def name_of(e) -> str | None:
+                ident = e.get(ANDROID_NS + "id", "").removeprefix("@+id/").removeprefix("@id/")
+                return ident or e.get(ANDROID_NS + "text")
+            name = name_of(el)
+            if not name:
+                # A row container: name it by the first child that has an id or a label.
+                if not (child := next((n for n in (name_of(c) for c in el.iter()) if n), None)):
+                    continue
+                name = f"{el.tag.rsplit('.', 1)[-1]} around {child}"
+            n = seen[name] = seen.get(name, 0) + 1
+            key = f"{rel}: {name}" + (f" #{n}" if n > 1 else "")
+            # No visibility attribute means visible.
+            out["views"][key] = {"visibility": el.get(ANDROID_NS + "visibility") or "visible", "text": el.get(ANDROID_NS + "text")}
+    return out
+
+
+def array_items(src: Path, strings: dict[str, str]) -> dict[str, list[str]]:
+    """values/arrays.xml and friends: each named array's items, @string references resolved."""
+    arrays = {}
+    for f in sorted((src / "resources/res/values").glob("*.xml")):
+        for kind, name, body in re.findall(r'<(string-array|array|integer-array) name="(\w+)"[^>]*>(.*?)</\1>',
+                                           f.read_text(errors="replace"), re.S):
+            items = [re.sub(r"\s+", " ", x).strip() for x in re.findall(r"<item>(.*?)</item>", body, re.S)]
+            arrays[name] = [strings.get(x[len("@string/"):], x) if x.startswith("@string/") else x for x in items]
+    return arrays
+
+
+def usage_highlights(apps: list[tuple[str, tuple[Path, Path]]], facts: dict) -> list[str]:
+    """Highlights rows for what each app's own code and layouts use, and the matching facts.json keys.
+    Whole old tree against whole new tree, so a key moved from one class to another is not new. Apps added
+    without a predecessor are skipped: everything in them is new, and the app's own line already says so."""
+    rows: list[str] = []
+    app_info = {a["key"]: a for a in facts["apps"]}
+    code_rows: dict[str, list[str]] = {k: [] for k in ("settings", "prefs", "props", "constants", "enums")}
+    for key in ("code_settings_keys", "code_prefs_keys", "code_props", "code_constants", "code_enums", "view_ids",
+                "layout_labels", "layout_variants", "layout_views", "arrays"):
+        facts[key] = {}
+    view_rows, label_rows, variant_rows, change_rows, array_rows = [], [], [], [], []
+    for name, (a_src, b_src) in apps:
+        if not any((a_src / d).is_dir() for d in ("sources", "resources")):
+            continue
+        own = own_prefixes(name, app_info.get(name, {}).get("package"))
+        ca, cb = code_facts(a_src, own), code_facts(b_src, own)
+        if not (a_src / "sources").is_dir() or not (b_src / "sources").is_dir():
+            ca = cb = {k: set() for k in ca}  # one side has no code to compare with
+        # A stock app's own constants, enums and new arrays change with every Android update (com.android.egg);
+        # its settings and property keys and changed arrays are still where a vendor patch shows.
+        stock = not name.endswith(".jar") and app_info.get(name, {}).get("group") != "vendor"
+        if stock:
+            for kind in ("constants", "enums"):
+                ca[kind] = cb[kind] = set()
+        for kind, fact_key in (("settings", "code_settings_keys"), ("prefs", "code_prefs_keys"), ("props", "code_props"),
+                               ("enums", "code_enums")):
+            add, rem = cb[kind] - ca[kind], ca[kind] - cb[kind]
+            if add or rem:
+                facts[fact_key][name] = {"added": sorted(add), "removed": sorted(rem)}
+                code_rows[kind].append(f"  - `{name}`: {fmt_list(add, 40) or '-'}" + (f"; no longer: {fmt_list(rem, 20)}" if rem else ""))
+        add, rem = cb["constants"] - ca["constants"], ca["constants"] - cb["constants"]
+        # NAME = 1 -> NAME = 2 is one change, not an addition and a removal.
+        by_name: dict[str, tuple[list[str], list[str]]] = {}
+        for side, pool in ((0, add), (1, rem)):
+            for c in pool:
+                by_name.setdefault(c.split(" = ", 1)[0], ([], []))[side].append(c.split(" = ", 1)[1])
+        once = {n: (a[0], r[0]) for n, (a, r) in by_name.items() if len(a) == len(r) == 1}
+        changed = sorted(f"{n}: {r} -> {a}" for n, (a, r) in once.items())
+        add = {c for c in add if c.split(" = ", 1)[0] not in once}
+        rem = {c for c in rem if c.split(" = ", 1)[0] not in once}
+        if add or rem or changed:
+            facts["code_constants"][name] = {"added": sorted(add), "removed": sorted(rem), "changed": changed}
+            # Strings first: keys, actions and names say more than message numbers.
+            shown = sorted(add, key=lambda c: (not c.split(" = ", 1)[1].startswith('"'), c))[:15]
+            parts = [", ".join(f"`{c}`" for c in shown) + (" ..." if len(add) > 15 else "")] if add else []
+            if changed:
+                parts.append("changed: " + ", ".join(f"`{c}`" for c in changed[:10]) + (" ..." if len(changed) > 10 else ""))
+            if rem and not add:
+                parts.append(f"removed: {fmt_list(rem, 10)}")
+            code_rows["constants"].append(f"  - `{name}` ({len(add)} added, {len(changed)} changed, {len(rem)} removed): "
+                                          + "; ".join(parts))
+
+        sa, sb = read_strings(a_src), read_strings(b_src)
+        arr_a, arr_b = array_items(a_src, sa), array_items(b_src, sb)
+        for arr in sorted(arr_a.keys() & arr_b.keys()):
+            plus = [x for x in arr_b[arr] if x not in arr_a[arr]]
+            minus = [x for x in arr_a[arr] if x not in arr_b[arr]]
+            if plus or minus:
+                facts["arrays"].setdefault(name, []).append({"name": arr, "added": plus, "removed": minus})
+                array_rows.append(f"  - `{name}` `{arr}`: added {fmt_list(plus, 15) or '-'}; removed {fmt_list(minus, 15) or '-'}")
+        for arr in sorted(arr_b.keys() - arr_a.keys()):
+            if stock or all(RESOURCE_VALUE.match(x) for x in arr_b[arr]):
+                continue  # colours, sizes and drawables of a new screen, not settings
+            facts["arrays"].setdefault(name, []).append({"name": arr, "added": arr_b[arr], "removed": []})
+            array_rows.append(f"  - `{name}` `{arr}` (new): {fmt_list(arr_b[arr], 15)}")
+
+        la, lb = layout_facts(a_src), layout_facts(b_src)
+        if not la["files"]:
+            continue
+        # Ids added to a layout the app already had (in any folder): a new button on an existing screen.
+        # Ids in brand-new layouts come with the layout's own row.
+        stems = {f.split("/", 1)[1] for f in la["files"]}
+        by_layout: dict[str, list[str]] = {}
+        for pair in sorted(lb["ids"] - la["ids"]):
+            stem, ident = pair.split(": ")
+            if stem in stems:
+                by_layout.setdefault(stem, []).append(ident)
+        if by_layout:
+            facts["view_ids"][name] = by_layout
+            # One id added to every size variant of a screen is one row.
+            same: dict[tuple[str, ...], list[str]] = {}
+            for stem, ids in by_layout.items():
+                same.setdefault(tuple(ids), []).append(stem)
+            groups = sorted(same.items(), key=lambda kv: kv[1][0])
+            view_rows += [f"  - `{name}`: {fmt_list(ids, 12)} in {fmt_list(stems_, 6)}" for ids, stems_ in groups[:15]]
+            if len(groups) > 15:
+                view_rows.append(f"  - `{name}`: ... {len(groups) - 15} more layouts, all in facts.json")
+        # Existing labels put on screen somewhere new; brand-new strings are already under New UI strings.
+        if labels := {x for x in lb["labels"] - la["labels"] if x in sa}:
+            facts["layout_labels"][name] = sorted(labels)
+            label_rows.append(f"  - `{name}`: " + ", ".join(f'`{x}` "{sb.get(x, sa[x])[:60]}"' for x in sorted(labels)[:30])
+                              + (f" +{len(labels) - 30} more" if len(labels) > 30 else ""))
+        if variants := {f for f in lb["files"] - la["files"] if f.split("/", 1)[1] in stems}:
+            facts["layout_variants"][name] = sorted(variants)
+            variant_rows.append(f"  - `{name}` ({len(variants)}): {fmt_list(variants, 20)}")
+
+        def label(v: str | None) -> str:
+            if v and v.startswith("@string/"):
+                return f'{v} "{sb.get(v[8:], sa.get(v[8:], "?"))[:60]}"'
+            return v or "(unset)"
+
+        views = []
+        for k in sorted(la["views"].keys() & lb["views"].keys()):
+            old, new = la["views"][k], lb["views"][k]
+            for attr in ("visibility", "text"):
+                # Literal text in a layout is the designer's placeholder; the screen shows what code sets.
+                if old[attr] != new[attr] and (attr == "visibility" or "@string/" in f"{old[attr]}{new[attr]}"):
+                    views.append({"view": k, "attribute": attr, "old": old[attr], "new": new[attr]})
+        if views:
+            facts["layout_views"][name] = views
+            # The same change in every size variant of a layout is one row.
+            folders: dict[tuple, list[str]] = {}
+            for v in views:
+                folder, _, rest = v["view"].partition("/")
+                folders.setdefault((rest, v["attribute"], v["old"] or "", v["new"] or ""), []).append(folder)
+            for (view, attr, old, new), where in list(folders.items())[:40]:
+                change_rows.append(f"  - `{name}` `{view}`: {attr} `{label(old)}` -> `{label(new)}` (in {fmt_list(where, 4)})")
+            if len(folders) > 40:
+                change_rows.append(f"  - `{name}`: ... {len(folders) - 40} more, all in facts.json")
+
+    for title, kind in (("Settings keys newly used in code (Settings.System/Global/Secure, vendor settings providers)", "settings"),
+                        ("SharedPreferences keys newly used in code", "prefs"),
+                        ("System properties newly read or set in code", "props"),
+                        ("Constants in vendor code (15 per app, strings first; all in facts.json)", "constants"),
+                        ("Enum values added", "enums")):
+        if code_rows[kind]:
+            rows += [f"- {title}:", *code_rows[kind]]
+    for title, block in (("View ids added to existing layouts", view_rows), ("Existing labels newly used in layouts", label_rows),
+                         ("Layout variants added (a layout the app had, in a new folder)", variant_rows),
+                         ("Views shown, hidden or relabelled in layouts", change_rows),
+                         ("String arrays changed", array_rows)):
+        if block:
+            rows += [f"- {title}:", *block]
+    return rows
 
 
 def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: list[tuple[str, tuple[Path, Path]]],
@@ -998,13 +1321,31 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
         for k in sorted(sb.keys() & sa.keys()):
             if sa[k] != sb[k] and sa[k] and sb[k]:
                 renamed.append({"app": name, "name": k, "old": sa[k], "new": sb[k]})
+    # A stock app arriving whole (com.android.emergency: 846 strings) would crowd out the vendor's labels.
+    app_info = {a["key"]: a for a in facts["apps"]}
+
+    def whole_app(name: str) -> bool:
+        return app_info.get(name, {}).get("action") == "added" and app_info[name].get("group") == "stock"
+
     if by_text:
         rows.append(f"- New UI strings ({len(by_text)}):")
-        for (k, v), names in sorted(by_text.items(), key=lambda kv: (kv[1][0], kv[0]))[:600]:
+        listed = sorted(((k, v), n) for (k, v), n in by_text.items() if not all(map(whole_app, n)))
+        for (k, v), names in sorted(listed, key=lambda kv: (kv[1][0], kv[0]))[:600]:
             where = names[0] if len(names) == 1 else f"{names[0]} +{len(names) - 1} apps"
             rows.append(f'  - "{v[:120]}" (`{k}`, {where})')
-        if len(by_text) > 600:
-            rows.append(f"  - ... {len(by_text) - 600} more, all in facts.json")
+        if len(listed) > 600:
+            rows.append(f"  - ... {len(listed) - 600} more, all in facts.json")
+        bulk: dict[str, int] = {}
+        for names in by_text.values():
+            if all(map(whole_app, names)):
+                bulk[names[0]] = bulk.get(names[0], 0) + 1
+        rows += [f"  - `{n}` (added app): {c} strings, all in facts.json" for n, c in sorted(bulk.items())]
+    gone_listed = sorted((n[0], k, v) for (k, v), n in gone_text.items() if app_info.get(n[0], {}).get("group") == "vendor")
+    if gone_listed:
+        rows.append(f"- Removed UI strings in vendor apps ({len(gone_listed)}):")
+        rows += [f'  - "{v[:80]}" (`{k}`, {n})' for n, k, v in gone_listed[:60]]
+        if len(gone_listed) > 60:
+            rows.append(f"  - ... {len(gone_listed) - 60} more, all in facts.json")
     if renamed:
         rows.append(f"- Changed UI strings ({len(renamed)}):")
         rows += [f'  - `{r["app"]}` `{r["name"]}`: "{r["old"]}" -> "{r["new"]}"' for r in renamed[:60]]
@@ -1061,6 +1402,8 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
             facts["layouts_removed"][name] = sorted(la_ - lb_)
     if new_layouts:
         rows += ["- New layouts:", *new_layouts]
+
+    rows += usage_highlights(apps, facts)
 
     # Manifests and config values from the whole files: jadx puts each attribute on its own line,
     # so an element rarely fits in one diff line.

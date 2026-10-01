@@ -64,8 +64,11 @@ disk each.
   and renamed UI labels, factory config keys, settings keys, system
   properties, screen types, model names, media extensions, new layouts and
   resource folders, manifest changes, Android `config_*` values and factory
-  defaults. All of it is pattern matching over the diffs and the apps' dex
-  string tables, so it needs no model. After that come build properties,
+  defaults. Per app, from its own code and layouts: settings, SharedPreferences
+  and system property keys it starts or stops using, new constants and enum
+  values, view ids added to existing layouts, views shown, hidden or
+  relabelled, and changed string arrays. All of it is pattern matching over
+  the decompiled trees and the apps' dex string tables, so it needs no model. After that come build properties,
   vendor and Android apps with versions and *what* changed inside each, JARs,
   and files. Files rebuilt on every build (`.odex`, `.vdex`, `build.prop`) and
   APKs that were only re-signed are left out.
@@ -98,6 +101,15 @@ actions) come from the apps' dex string tables. A string that only classes
 under `LIBRARY_PACKAGES` load (blankj utilcode, androidx, Google, okhttp,
 Tencent, Umeng...) is left out, so a bundled library's list of ROM version
 properties is not reported as the vendor's. `score` still uses every string.
+
+The per-app code and layout rows compare the app's whole old tree with its
+whole new tree, not diff lines, so a key or constant that only moved between
+classes is not new. They skip library classes (`LIBRARY_PACKAGES`),
+build-generated ones (`BuildConfig`, data binding's `BR` and mapper), logging
+tags, AIDL transaction codes, inlined resource ids, and apps added without a
+predecessor. A key passed as a constant is resolved through the app's own
+declarations. The strings of a stock app added whole (an AOSP app the
+vendor started shipping) are counted in one line instead of listed.
 
 Two runs over the same trees give byte-identical output: every list is
 sorted, and jadx runs single-threaded with `--no-finally`, since jadx 1.5.6
@@ -152,6 +164,13 @@ fixed order (sorted, or in app and file order).
 | `executables` | `added`, `removed` under `bin/`, `sbin/`, `xbin/` |
 | `media_extensions` | extensions added to media file lists |
 | `strings`, `strings_removed` | UI strings: `name`, `text`, `apps` |
+| `code_settings_keys`, `code_prefs_keys`, `code_props`, `code_enums` | per app: `added`, `removed` keys its own code passes to `Settings.System/Global/Secure` (and KSW's `getSettingsInt` / `SysProviderOpt` wrappers), `SharedPreferences`, `SystemProperties` (and `getprop`/`setprop` strings); enum values as `Enum.VALUE` |
+| `code_constants` | per app: `static final` constants in its own code as `NAME = value`: `added`, `removed`, `changed` (`NAME: old -> new`) |
+| `view_ids` | per app: layout name -> ids added to a layout the app already had |
+| `layout_labels` | per app: existing `@string` labels newly used in its layouts |
+| `layout_variants` | per app: `folder/layout` files for a layout it already had in another folder |
+| `layout_views` | per app: views whose `visibility` or `@string` text changed: `view` (`folder/layout: id`, or `Tag around <first named child>`), `attribute`, `old`, `new` |
+| `arrays` | per app: `values/` arrays that changed or are new: `name`, `added`, `removed` items (`@string` resolved) |
 | `strings_changed` | UI strings whose text changed: `app`, `name`, `old`, `new` |
 | `resource_dirs`, `resource_dirs_removed`, `layouts`, `layouts_removed` | per app: resource folders and layouts |
 | `languages`, `languages_removed` | per locale: apps |
