@@ -32,7 +32,7 @@ test('the page works without loading anything', async ({ page }) => {
 test('a loaded file drives the controls, the diff and the listing', async ({ page }) => {
   await page.getByLabel('Choose your factory_config.xml').setInputFiles(KSW_FILE);
 
-  await expect(page.getByRole('status')).toContainText('31 settings found');
+  await expect(page.getByRole('status')).toContainText('36 settings found');
 
   // <USB_HOST>1</USB_HOST> in the file, so the box arrives ticked and live.
   const usbHost = page.getByRole('checkbox', { name: 'USB HOST' });
