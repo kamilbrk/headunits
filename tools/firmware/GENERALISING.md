@@ -222,11 +222,22 @@ January 2022 build.
 
 ## 5. Order of work
 
-1. Generic identity fallback in `vendor_platform()` from props, never the fingerprint (1 h).
-2. Computed vendor tiers: baseline list + shared-namespace + build-user match + cert, stored in `meta.json` (half a day).
-3. Hash and version-string every non-filesystem image in the OTA (boot, U-Boot, modem, DTB) into the report (2 h).
-4. Magic-byte dispatcher with recursion, replacing name-based detection in `images_from_zip` (half a day).
-5. Stdlib sparse + `super.img` + boot-header unpackers (half a day).
+1. **Done** (`vendors.py`). Generic identity fallback from props, never the fingerprint: on s9863a `george` / `sp9863a`.
+2. **Done in part** (`vendors.py`, `platform_packages.json`). Computed vendor namespaces from a prefix baseline (AOSP,
+   Google, chip makers) + shared namespace (2+ apps, one platform-signed) + build-identity match, stored in
+   `meta.json` and used by `diff` for any maker other than KSW/ZXW; `VENDOR_NAMESPACES` stays the override for
+   those two. Not done: an exact per-Android-version AOSP package list taken from GSIs (the baseline is prefixes
+   only, so an OEM app named `com.android.*` still counts as stock), a separate SoC tier in the report (SoC apps
+   are grouped as stock), and corpus frequency (signal 5).
+3. **Done** (`images.py`). Every non-filesystem image is hashed into `images.json` with its version strings and
+   listed in REPORT.md ("Images outside the filesystems") and `facts.json` (`images`).
+4. **Done in part** (`formats.py`). Images are typed by magic (sparse, super, boot, vbmeta, dtbo, DHTB, SPRD, SCI1,
+   ELF and the other magics in section 1 for detection); sparse and super are unpacked, recursively. Partitions are
+   still picked out of the zip by name (`system.img`, `super.img`, `payload.bin`), and the detected-only formats
+   (RKFW, IMAGEWTY, squashfs...) have no unpacker yet.
+5. **Done** (`formats.py`). Stdlib sparse expansion, single-device `super.img` split (lpunpack) and boot header
+   v0-v4 parsing (kernel, os version, patch level; gzip and xz kernels in Python, lz4 through the `lz4`
+   binary). Not done: ramdisk unpacking, and `batch` still skips `super.img` flash kits.
 6. Generic signals pass: rc/init services, accounts, certs, hosts, setuid, SELinux, kernel version (1 day).
 7. ELF export and library-version diff via `nm -D` and a regex table (half a day).
 8. Embedded Linux: squashfs, UBI/UBIFS, JFFS2, cpio, uImage/FIT via pinned tools in the Dockerfile (1 day).

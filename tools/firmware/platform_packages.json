@@ -1,0 +1,39 @@
+{
+  "about": "Package name prefixes that are never the unit maker's own: AOSP and Google (platform), and the chip makers' Android layers (soc). vendors.py reads this to find the maker's namespace in a firmware fw.py has no hand-written list for.",
+  "platform": [
+    "android.",
+    "com.android.",
+    "com.google.",
+    "com.example.android.",
+    "org.chromium.",
+    "com.svox.",
+    "jp.co.omronsoft.",
+    "org.lineageos.",
+    "com.breel."
+  ],
+  "soc": [
+    "com.sprd.",
+    "plugin.sprd.",
+    "addon.sprd.",
+    "com.unisoc.",
+    "com.spreadtrum.",
+    "com.mediatek.",
+    "com.mtk.",
+    "com.rockchip.",
+    "android.rockchip.",
+    "com.softwinner.",
+    "com.allwinner.",
+    "com.amlogic.",
+    "com.droidlogic.",
+    "com.qualcomm.",
+    "com.qti.",
+    "org.codeaurora.",
+    "vendor.qti.",
+    "com.quicinc."
+  ],
+  "generic_identity": [
+    "alps", "allwinner", "amlogic", "android", "android-build", "build", "builder", "generic", "google", "jenkins",
+    "mediatek", "mtk", "qcom", "qualcomm", "rockchip", "root", "softwinner", "sprd", "spreadtrum", "ubuntu",
+    "unisoc", "unknown", "user", "ota", "eng", "userdebug", "full", "update", "release", "test"
+  ]
+}

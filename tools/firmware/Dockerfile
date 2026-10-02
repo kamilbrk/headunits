@@ -12,7 +12,7 @@ ARG JADX_SHA256=545ea2be9c242511bc145755cf4bda2485ade42966e096f8b4d3da2a230e8974
 ARG TARGETARCH
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends e2fsprogs erofs-utils git ripgrep curl unzip ca-certificates python3 \
+  && apt-get install -y --no-install-recommends e2fsprogs erofs-utils git ripgrep lz4 curl unzip ca-certificates python3 \
   && rm -rf /var/lib/apt/lists/*
 
 RUN case "$TARGETARCH" in \
@@ -35,7 +35,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.11.21@sha256:ff07b86af50d4d9391d9daf4ff89ce42
 ENV UV_CACHE_DIR=/opt/uv-cache HOME=/tmp
 # fw.py runs rules, sitecheck, draft and evaluate as the scripts beside it. sitecheck needs --site and
 # evaluate --analysis in here: the image carries no site checkout or analysis tree.
-COPY *.py /opt/fw/
+COPY *.py *.json /opt/fw/
 # Resolve the script's pinned Python deps at build time, not on every run.
 RUN uv run --script /opt/fw/fw.py --help > /dev/null && chmod -R a+rwX /opt/uv-cache
 
