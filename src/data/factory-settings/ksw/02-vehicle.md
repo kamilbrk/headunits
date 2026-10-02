@@ -74,12 +74,17 @@ settings:
     - name: "280km/h"
       control: radio
   - name: "Gear Selection"
+    configKey: HandsetAutomaticSelect
+    description: "Older firmware used the same key for a two-way Automatic / Manual choice, which is what the comment in the example config file still says."
     children:
     - name: "Gear Type 1"
+      configValue: 0
       control: radio
     - name: "Gear Type 2"
+      configValue: 1
       control: radio
     - name: "Gear Type 3"
+      configValue: 2
       control: radio
   - name: "MAP Key Selection"
     configKey: Map_key
@@ -184,29 +189,49 @@ settings:
     unverified: true
     children:
     - name: "No camera use"
+      configValue: 0
       control: radio
     - name: "Retrofit camera"
+      configValue: 1
       control: radio
     - name: "Original car camera"
+      configValue: 2
       control: radio
   - name: "Turn signal control"
+    configKey: TurnSignalControl
+    unverified: true
     children:
     - name: "Uncontrolled"
+      configValue: 0
       control: radio
     - name: "Controlled"
+      configValue: 1
       control: radio
   - name: "MIC external built-in toggle switch"
     configKey: MicControl
     unverified: true
     children:
     - name: "External"
+      configValue: 0
       control: radio
     - name: "Built-in"
+      configValue: 1
       control: radio
   - name: "Original radar display reverse"
+    configKey: OriginalRadar
+    unverified: true
     children:
     - name: "Normal"
+      configValue: 0
       control: radio
     - name: "Reverse"
+      configValue: 1
       control: radio
+  - name: "Air Conditioning"
+    nameOld: "Air Conditioner"
+    configKey: air_conditioner
+    control: checkbox
+    onValue: 1
+    offValue: 0
+    description: "Shown for Mercedes-Benz and Lexus, and for Audi on some firmware."
 ---
