@@ -13,5 +13,5 @@ signatures:
 - New theme `UI_NTG6_FY_V3`
 
 #### Changes
-- New theme `UI_NTG6_FY_V3` with 8 colour schemes, possibly with similar popup/overlay functionality to `UI_GS_ID8` and `UI_PEMP_ID8` themes since it appears to have its own custom music state observer like the other two. To activate it, add `<Item id="1" name="UI_NTG6_FY_V3" display="Benz NTG6 FY V3" />` to your `factory_config.xml` file.
-- Extended Zlink broadcast receiver to handle wired and wireless Huawei HiCar
+- New theme `UI_NTG6_FY_V3` with 8 colour schemes, an all-apps pop-up grid and its own music play state observer. To activate it, add `<Item id="1" name="UI_NTG6_FY_V3" display="Benz NTG6 FY V3" />` to your `factory_config.xml` file.
+- Extended KswBt's Zlink broadcast receiver to handle wired and wireless Huawei HiCar

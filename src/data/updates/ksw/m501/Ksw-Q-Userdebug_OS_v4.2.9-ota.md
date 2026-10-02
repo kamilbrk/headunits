@@ -22,8 +22,9 @@ signatures:
     - Added intents for adding/removing/replacing apps, together with performance improvements around detecting changes to installed apps
     - Added permission to receive boot completed event
     - Improvements to handling available locales/languages
+    - Firmware version now has a `Witstek-` prefix in launcher settings
 - TxzOta (`com.txznet.ota`) app updated from `1.1.3` to `1.1.5`
     - Same updates as in M600 A13 1.3.8
-    - Added a class for "multi file download manager" using okhttp3
+    - Added a class for "multi file download manager" using okhttp3, although nothing uses it yet
 - Framework and system utils
     - Added code to check RAM information from `/mnt/vendor/persist/OEM/memoryvalue_501a`

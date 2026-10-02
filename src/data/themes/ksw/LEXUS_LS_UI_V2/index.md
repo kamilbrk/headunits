@@ -6,5 +6,5 @@ tags:
 images:
   - ./home.png
   - ./settings.png
-since: ksw/m501/ksw-q-userdebug_os_v394-ota
+since: ksw/m501/ksw-q-userdebug_os_v391-ota
 ---

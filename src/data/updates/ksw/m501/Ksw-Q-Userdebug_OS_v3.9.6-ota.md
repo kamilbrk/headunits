@@ -19,7 +19,7 @@ date: 2022-12-16T05:37:01Z
 - CenterService (`com.wits.pms`) app updated from `1.0_221117` to `1.0_221213`
     - Changes to support TXZ voice (?)
     - Split mic gain settings to separate values for M501 and M600 chipsets, where M600 is for Android 11 and 12 based units
-    - Added new NetOTAUpdate class that handles firmware upgrades from USB storage
+    - Added new NetOTAUpdate class that installs firmware upgrades downloaded by TXZ OTA to `/sdcard/otapackage`
 - KswBt (`com.wits.ksw.bt`) app updated from `1.0.22_221124_goc` to `1.0.22_221213_goc`
     - Changes to music playback state detection
     - Changes to dimensions of dialogs/popups

@@ -11,6 +11,3 @@ signatures:
 ---
 #### Summary
 - Nothing interesting
-
-#### Changes
-- Screen resolution is now shown in Android settings

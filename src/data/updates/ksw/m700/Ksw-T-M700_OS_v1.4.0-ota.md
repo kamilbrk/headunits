@@ -13,4 +13,4 @@ signatures:
 - Minor updates to the new `EVOID9_ALS` theme
 
 #### Changes
-- Further additions for `EVOID9_ALS` theme including "one-click access to original car interface" option, updated graphics, music observer/controls functionality, new "app" option, fixes for Bluetooth calling
+- Further additions for `EVOID9_ALS` theme including updated graphics, music observer functionality, new grid layout for the apps screen, a scrollbar on the apps view, fix for hanging up on the Bluetooth call screen (the "one-click access to original car interface" card was already in 1.3.9)

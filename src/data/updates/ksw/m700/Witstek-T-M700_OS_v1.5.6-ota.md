@@ -17,5 +17,5 @@ signatures:
 - Ksw360Camera: New "Function button display" setting with "Left and right ends" and "Bottom" options
 - Fixed missing version information display on Audi theme
 - New `witssudo` service with a corresponding `/system/bin/wits_sudo.sh` script that can swap some files via `getprop wits.logo1` (splash), `getprop wits.logo2` (bootlogo and bootanimation) and `getprop wits.item` (?)
-- Some new code to replace returned Android and Android SDK versions. There are mentions of at least AnTuTu Benchmark (`com.antutu.ABenchMark`) and 3DMark (`com.futuremark.dmandroid.application`) apps, althought it's hard to say if this is to fake/spoof shown versions or fix/correct their values. There's also a `ksw_android11` value that could be shown in places, yet to test on a real device.
+- Some new code in the framework to raise the returned Android and Android SDK versions (spoofing) in nine benchmark and system-info apps, including AnTuTu Benchmark (`com.antutu.ABenchMark`) and 3DMark (`com.futuremark.dmandroid.application`). There's also a `ksw_android11` value that could be shown in places, yet to test on a real device.
 - New factory setting `<cpu_firmware_version>`

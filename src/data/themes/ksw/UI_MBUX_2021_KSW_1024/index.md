@@ -8,4 +8,6 @@ tags:
 images:
   - ./home.png
   - ./settings.png
+since:
+  - ksw/m600/ksw-s-m600_os_v132nexai-ota
 ---

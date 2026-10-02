@@ -15,9 +15,10 @@ signatures:
 #### Changes
 - Zlink updated from `5.4.54` to `5.4.58`, potentially supporting split screen since all activities are now marked as resizable
 - OTA updates with Android 13 can now be also prefixed with `Witstek-T-` in addition to existing `Ksw-T-`, for example `Witstek-T-M785_OS_v1.4.2-ota.zip`
-- Added a scrollbar to the apps view on `EVOID9_ALS` theme
-- The `<Screen_cast>` option in factory config is now read on boot to start capture service (?)
-- The `su` binary has been swapped for `witsu`
+- Replaced the apps view scrollbar on `EVOID9_ALS` theme with a custom one
+- Added play/pause button to the music card on `EVOID9_ALS` theme
+- The `<Screen_cast>` option in factory config is now read on boot, but it starts the TXZ OTA service instead of a capture service (the capture app is not in the firmware), so it does nothing
+- The `su` binary has been renamed to `witsu`
 - Build property `ro.build.tags` was changed from `test-keys` to `release-keys`
 - GoogleTTS (text-to-speech) engine package is now pre-installed
 - Other minor user interface adjustments across a handful of apps, e.g. changed fonts and sizes, resized elements and graphics, etc.

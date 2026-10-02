@@ -22,8 +22,8 @@ date: 2023-07-17T05:58:17Z
 - TXZAdapter (`com.txznet.adapter`) app is now installed automatically (?)
 - Added two additional default, KSW-themed boot logos
 - CenterService (`com.wits.pms`) app updated from `1.0_221213` to `1.0_230715`
-    - Added a silent package installer module
-    - Added MCU reboot option
+    - Added a silent package installer module, which only runs on M600 with Android above 12 (never on M501)
+    - Added MCU reboot command, used by a new "MCU restart" quick settings tile
     - Added internal code and checks for Android 13 based firmware
 - KswBt (`com.wits.ksw.bt`) app updated from `1.0.22_230323_goc` to `1.0.22_230710_goc`
 - TXZOta (`com.txznet.ota`) app updated from `3.0.0` (version code `1`) to `1.1.2` (version code `101020`)

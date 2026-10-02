@@ -9,5 +9,7 @@ tags:
 images:
   - ./home.png
   - ./settings.png
+since:
+  - zxw/gt6/20240406gt_ksw
 ---
 Appears to be broken, at least as of April 2024. Settings and factory settings screens are not usable.

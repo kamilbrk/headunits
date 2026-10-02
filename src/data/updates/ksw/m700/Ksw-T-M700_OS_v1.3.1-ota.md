@@ -15,9 +15,9 @@ Summary:
 
 Changes since `Ksw-T-M700_OS_v1.1.5-ota` built 5 months earlier:
 - Zlink: Updated to `5.4.34`, same as [M600 1.5.8](/updates/ksw/m600/ksw-t-m600_os_v158-ota)
-- Ksw360Camera: Removed some labels to do with activation process
+- Ksw360Camera: Removed activation code entry (QR code activation stays), licence plate settings, the shop and picture-in-picture
 - APKInstaller: Added ability to check versions and update apps, although only on devices with `M610` in their version string
-- KswPLauncher: Added more graphics, labels and functionality for `UI_NTG6_FY_V3` theme, including ability to change wallpaper, display temperature, etc.
+- KswPLauncher: Added new `UI_NTG6_FY_V3` theme, including ability to change wallpaper, display temperature, etc.
 - KswBt (Bluetooth app): Fixes around displaying contact book, caller name and properly finishing call activity
 - Launcher3QuickStep: Potential changes to recent apps and split views
 - Added more French translations
