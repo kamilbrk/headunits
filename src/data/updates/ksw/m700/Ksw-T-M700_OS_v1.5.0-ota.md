@@ -20,5 +20,5 @@ signatures:
 - Memory management optimisations on `EVOID8_UG_2mode` theme
 - Updated English translations (mostly spelling and grammar) across main launcher, media apps, factory settings, etc.
 - Added Ukrainian language option
-- Ksw360Camera app: changes to limit the amount of "open" cameras to three
+- Ksw360Camera app: appears to retry opening the camera once more after three failed attempts
 - WitsScreencast app: new prompts to grant read and write storage permissions

@@ -18,7 +18,7 @@ signatures:
     - Removed `android.permission.GET_TASKS` permission that allowed Zlink to retrieve information about running apps - that permission was effectively deprecated since Android 5.0 Lollipop and only returned tasks from Zlink, perhaps to discover when Zlink was running or put into background
     - Added permissions (`android.permission.RECEIVE_BOOT_COMPLETED`) and broadcast receivers (`android.intent.action.LOCKED_BOOT_COMPLETED`) that allow Zlink to use Direct Boot mode and better handle itself between device restarts
     - Added explicit layouts for 1024x592 and 1150x720 screen resolutions
-    - Added a bluetooth search button on the Huawei HiCar mode
+    - Added a bluetooth name badge with a search icon on the Huawei HiCar mode (no click handler visible)
 - Ksw360Camera (`com.ivicar.avm`) app updated from `1.0.1_240124` to `1.0.1_240301`
     - Improved logic around starting/stopping of video recordings
     - Improved handling of storage being removed/ejected
@@ -32,5 +32,5 @@ signatures:
     - Fixed an issue where clicking on hang up button did not properly finish the call activity
     - Improved error handling on contacts page
 - WitsSystemUI updated
-    - Exiting split screen will now send a broadcast to close Ksw360Camera app
+    - Exiting split screen now appears to tell the recents screen to forget the split pair, so it is not restored when Ksw360Camera closes
 - The `ro.build.user` has changed from `lijun` to `robot`, although it's still built from the same machine

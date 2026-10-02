@@ -10,9 +10,9 @@ signatures:
   sha256: 02f0bb9685727990462e2523e6934ed5eb3094c715140f4a5edda46df73bdd94
 ---
 #### Summary
-- Upcoming support for SD685 platform, which will be shown as "M785"
+- Upcoming support for SD685 platform, which will be shown as "M785" (detection only runs on M700 builds, so it never triggers on M600)
 
 #### Changes
 - Zlink: Updated to `5.4.34`
 - Ksw360Camera: Updated to `1.0.1_240314`, new feature to automatically start/stop recording when external storage is mounted/ejected
-- KswPLauncher: Updated to `1.20_240314`, no longer set to `testOnly` mode, introduced logic to show `M785` in the version string on SD685 platform
+- KswPLauncher: Updated to `1.20_240314`, no longer set to `testOnly` mode, introduced logic to show `M785` in the version string on SD685 platform (the detection itself is in the Android framework, and Android settings show it too)

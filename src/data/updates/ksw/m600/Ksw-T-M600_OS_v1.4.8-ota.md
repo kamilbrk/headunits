@@ -24,4 +24,4 @@ signatures:
   - Fixed detection for TXZ support
 - KswBt (`com.wits.ksw.bt`) app updated from `1.0.22_231215` to `1.0.22_240109`
   - Refactored sorting of the contact list
-  - Call screen is now full screen, without the action bar 
+  - Call screen theme now inherits `Theme.AppCompat.NoActionBar` (no visible change, the action bar was already off)

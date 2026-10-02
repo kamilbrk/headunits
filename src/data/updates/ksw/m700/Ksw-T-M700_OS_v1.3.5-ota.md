@@ -10,4 +10,4 @@ signatures:
   sha256: 985fe950e0859644e625475ab4dda595b6f63cfba42c9fa1ab90f8fa3e89146a
 ---
 #### Changes
-- Same as in [M600 1.6.5](/updates/ksw/m600/ksw-t-m600_os_v165-ota), since both platforms are built from the same source and most diffs look exactly the same.
+- Same as in [M600 1.6.5](/updates/ksw/m600/ksw-t-m600_os_v165-ota), since both platforms are built from the same source and most diffs look exactly the same. Except that the `FLAG_SECURE` override, APKInstaller update, 360 camera fixes and `UI_NTG6_FY_V3` editor were already in [M700 1.3.1](/updates/ksw/m700/ksw-t-m700_os_v131-ota), and the M606 CPU detection only applies to M600.

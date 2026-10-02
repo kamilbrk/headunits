@@ -16,8 +16,8 @@ signatures:
 
 #### Changes
 - Zlink app updated from `5.4.34` to `5.4.53`: there's a `Free_version` file inside with a value of `0` and app manifest has a new `AAOrCPEnable` flag set to `false`
-- APKInstaller app updated: new functionality to receive app updates (?)
+- APKInstaller app updated: new functionality to reinstall newer bundled apps from `/system/PreInstall` after an OTA, on M610 units only (no network access)
 - KswPLauncher app updated: added CPU information text on most themes to show one of M600, M606, M700 or M785. The `M606` label is new and it's for the Qualcomm Snapdragon 460 (SM4250 SM_KAMORTA) platform.
 - The `UI_NTG6_FY_V3` theme should be now supported in more apps like Bluetooth, Music, Video and Equalizer
-- CenterService app updated: seems like M785 platform can get their own OTA updates after all, since the filenames can contain `M785_OS_v` string. There's also potential support for automatically toggling dark mode and further improvements for Huawei HiCar integration
-- Updated the red and yellow skins across all media apps (bluetooth, music, video, equalizer, etc)
+- CenterService app updated: seems like M785 platform can get their own OTA updates after all, since the filenames can contain `M785_OS_v` string. There's also support for automatically toggling dark mode in the phone-projection apps, apparently driven by the car's lights, and further improvements for Huawei HiCar integration
+- Added images for the new `UI_NTG6_FY_V3` screens to the red and yellow skins of the bluetooth, music and video apps
