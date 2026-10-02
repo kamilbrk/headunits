@@ -1,7 +1,7 @@
 # Firmware tools
 
-`fw.py` unpacks KSW / ZXW OTA zips and reports what changed between two of
-them. It replaces `public/script.sh`: no `sudo`, no macFUSE, no compiled
+`fw.py` unpacks KSW / ZXW OTA zips (and, with less detail, other makers'
+Android OTAs) and reports what changed between two of them. It replaces `public/script.sh`: no `sudo`, no macFUSE, no compiled
 `ext4fuse`, and it decompiles only the apps that actually changed.
 
 ## Install
@@ -9,14 +9,14 @@ them. It replaces `public/script.sh`: no `sudo`, no macFUSE, no compiled
 macOS (Homebrew):
 
 ```sh
-brew install uv payload-dumper-go e2fsprogs jadx ripgrep
+brew install uv payload-dumper-go e2fsprogs jadx ripgrep lz4
 brew install erofs-utils   # only for firmwares that ship EROFS partitions
 ```
 
 Debian / Ubuntu / WSL:
 
 ```sh
-sudo apt install e2fsprogs erofs-utils openjdk-21-jre git ripgrep
+sudo apt install e2fsprogs erofs-utils openjdk-21-jre git ripgrep lz4
 # plus uv (https://docs.astral.sh/uv/), payload-dumper-go and jadx from their GitHub releases
 ```
 
@@ -54,9 +54,51 @@ tools/firmware/fw.py batch ~/Dev/firmwares/zxw\ gt7 ~/Dev/firmwares/ksw   # ever
 ```
 
 `extract` writes `<id>/fs/<partition>/`, `<id>/manifest.tsv` (every file's
-hash or symlink target) and `<id>/meta.json` (vendor, platform, Android
-version, build date, zip hashes). About a minute per firmware and ~5 GB of
-disk each.
+hash or symlink target), `<id>/meta.json` (vendor, platform, Android
+version, build date, zip hashes) and `<id>/images.json` (see below). About a
+minute per firmware and ~5 GB of disk each.
+
+It takes OTA zips with `payload.bin`, block OTAs (`*.new.dat(.br)` +
+`*.transfer.list`) and flash kits with `super.img` or plain `*.img`
+partitions. Partitions are picked out of the zip by name, then typed by
+their magic bytes: Android sparse images are expanded and `super.img` is split
+into its partitions in plain Python (`formats.py`), then ext4 and EROFS are
+unpacked as before. `batch` still skips `super.img` flash kits, since a KSW
+kit would slot into its OTA line and change every pair after it; run
+`extract` and `diff` on them by hand.
+
+**Other makers.** KSW and ZXW are recognised from the display id. For any
+other firmware the vendor and platform come from build properties
+(`vendors.py`): the vendor is the app namespace that matches
+`ro.build.user`, `ro.build.host`, the manufacturer, the brand or a word of the
+zip name; failing that, the first of `ro.build.user`, manufacturer and brand
+that is not a chip maker or a generic name (`sprd`, `alps`, `root`...). The
+platform is `ro.board.platform`. The fingerprint is never used, since cheap units copy
+another device's. `meta.json` then also carries `vendor_namespaces`: the
+maker's app namespaces, computed from the firmware. A namespace qualifies
+when, outside the AOSP, Google and chip-maker prefixes in
+`platform_packages.json` and `THIRD_PARTY_PACKAGES`, it owns two or more apps
+and one of them is signed with the platform key (or no platform key was
+found), or when it matches the build identity. A namespace is the package's
+first two labels, three under a registry label (`cn.com.maker`). On the Unisoc s9863a OTA that is `com.george` (10 apps, matches
+`ro.build.user`). `diff` uses those namespaces in place of
+`VENDOR_NAMESPACES` unless both firmwares are KSW or ZXW, and names them at
+the top of "Vendor apps".
+
+**Images outside the filesystems** (boot, dtb/dtbo, vbmeta, bootloaders,
+trusted firmware, modems: every top-level `*.img`/`*.bin`/`*.mbn`/`*.elf`/`*.fv` in a block
+OTA or flash kit, every non-filesystem partition in `payload.bin`) are hashed
+into `images.json` with their format and version strings: the kernel's
+`Linux version` (without the builder's `user@host`; gzip and xz kernels
+decompressed in Python, lz4 through the `lz4` binary when installed), Android
+version and patch level from the boot header,
+`U-Boot 20xx.xx`, Arm trusted firmware and `Built:` stamps, Qualcomm
+`QC_IMAGE_VERSION_STRING`, Unisoc modem `Platform Version`, per-partition
+security patch from vbmeta, the device tree's `model`. `images.json` stays
+when the tree is freed. `diff` lists every image in "Images outside the
+filesystems" as added, removed, changed or unchanged, with old -> new for any
+version string that moved; a firmware extracted before this existed says
+"not recorded".
 
 `diff` writes `diffs/<old>..<new>/`:
 
@@ -93,8 +135,9 @@ unrecognised apps, in the report's app line:
 - **stock**: AOSP and chip-maker packages (`com.android.`, `com.qualcomm.`,
   `com.mediatek.`...). AOSP signs its apps with several keys, so the
   certificate is not checked for these either.
-- **unrecognised**: everything else, decompiled. A new maker's namespace
-  shows up here first; add it to `VENDOR_NAMESPACES`.
+- **unrecognised**: everything else, decompiled. On KSW and ZXW a new
+  maker's namespace shows up here first; add it to `VENDOR_NAMESPACES`.
+  Other makers' namespaces are computed (see above).
 
 The string highlights (system properties, paths, URLs, package names, intent
 actions) come from the apps' dex string tables. A string that only classes
@@ -123,7 +166,7 @@ every build against the one before it:
   without unpacking (`post-timestamp`; the line from KSW's id, such as
   `R-M600`, or else `pre-device`, such as `GT7-CAR`). A zip without that date
   is extracted to read it. Zips without a system partition fw.py can read
-  (persist backups, `super.img` flash kits) are skipped.
+  (persist backups) and `super.img` flash kits are skipped.
 - A letter suffix on the version starts a line of its own (`R-M600 NEXAI`),
   whose first build is compared with the latest earlier build of the base line.
 - A pair whose `diffs/<old>..<new>/frontmatter.md` exists is skipped, so a
@@ -150,7 +193,9 @@ fixed order (sorted, or in app and file order).
 
 | Key | Contents |
 |---|---|
-| `old`, `new` | `meta.json` of each side without signatures: `id`, `vendor`, `platform`, `android`, `date`, `display_id` |
+| `old`, `new` | `meta.json` of each side without signatures: `id`, `vendor`, `platform`, `android`, `date`, `display_id`, and `vendor_namespaces` for makers other than KSW/ZXW |
+| `vendor_namespaces` | `source` (`VENDOR_NAMESPACES` or `computed`) and the `namespaces` the diff treated as vendor |
+| `images` | per image outside the filesystems: `name`, `action`, `format`, `sha256_old`, `sha256_new`, `versions_old`, `versions_new` |
 | `apps` | one object per added, removed or changed app: `key`, `package`, `action`, `name`, `path`, `old_path` (moved from, or the removed app it was diffed against), `version_old`, `version_new`, `kinds`, `group`, `is_vendor`, `decompiled` (false for third-party apps and when jadx failed) |
 | `build_props` | changed build properties: `file`, `key`, `old`, `new` |
 | `decompiled` | per decompiled app or JAR: `code_files`, `code_lines`, `resources_files`, `resources_lines`, `diff_file`, `large_files`, or `failed` |

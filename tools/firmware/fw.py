@@ -34,6 +34,10 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
+import formats
+import images
+import vendors
+
 WORK = Path(os.environ.get("FW_WORK", Path.home() / "Dev/firmwares/_work"))
 FS_PARTITIONS = ["system", "system_ext", "product", "vendor", "odm", "system_dlkm", "vendor_dlkm", "odm_dlkm", "oem"]
 EXT4_MAGIC = b"\x53\xef"  # at offset 1080
@@ -133,8 +137,11 @@ def images_from_zip(zip_path: Path, img_dir: Path) -> None:
             elif f"{part}.img" in names:
                 found = True
                 zf.extract(f"{part}.img", img_dir)
+        if "super.img" in names:
+            found = True
+            zf.extract("super.img", img_dir)
         if not found:
-            sys.exit(f"error: {zip_path.name} has no payload.bin, *.new.dat(.br) or *.img partitions")
+            sys.exit(f"error: {zip_path.name} has no payload.bin, *.new.dat(.br), super.img or *.img partitions")
 
 
 def unpack_image(img: Path, dest: Path) -> None:
@@ -193,11 +200,12 @@ def prop(props: dict[str, dict[str, str]], *keys: str) -> str:
 
 
 def vendor_platform(display_id: str) -> tuple[str, str]:
-    if m := re.match(r"GT(\d)", display_id):
+    # Anchored on the vendors' own id shapes, so another maker's "-m100" or "GT5x" is not taken for them.
+    if m := re.match(r"GT(\d)-", display_id):
         return "zxw", f"gt{m[1]}"
-    if m := re.search(r"-(M\d{3})", display_id, re.I):
+    if m := re.match(r"(?:Ksw|Witstek)-[A-Z]-(M\d{3})_OS", display_id):
         return "ksw", m[1].lower()
-    if "Userdebug" in display_id:
+    if re.match(r"(?:Ksw|Witstek)-Q-Userdebug_OS", display_id):
         return "ksw", "m501"
     return "", ""
 
@@ -236,6 +244,9 @@ def extract(zip_path: Path, keep_images: bool = False) -> None:
     with cf.ThreadPoolExecutor(1) as pool:
         signatures = pool.submit(hash_file, zip_path)
         images_from_zip(zip_path, img_dir)
+        formats.normalise(img_dir, FS_PARTITIONS)
+        images.extract(zip_path, img_dir / "raw", FS_PARTITIONS, functools.partial(tool, "payload-dumper-go"))
+        images.write(img_dir / "raw", dest)
         for img in sorted(img_dir.glob("*.img")):
             print(f"  unpacking {img.stem}")
             unpack_image(img, dest / "fs" / img.stem)
@@ -244,6 +255,12 @@ def extract(zip_path: Path, keep_images: bool = False) -> None:
         props = all_props(dest / "fs")
         display_id = prop(props, "ro.build.display.id")
         vendor, platform = vendor_platform(display_id or fw_id)
+        namespaces = None
+        if not vendor:
+            apps, platform_cert = vendors.scan(dest / "fs", apk_info, signing_cert)
+            get = functools.partial(prop, props)
+            namespaces = vendors.vendor_namespaces(apps, platform_cert, get, fw_id, THIRD_PARTY_PACKAGES)
+            vendor, platform = vendors.identity(get, namespaces)
         meta = {
             "id": fw_id,
             "vendor": vendor,
@@ -253,6 +270,8 @@ def extract(zip_path: Path, keep_images: bool = False) -> None:
             "display_id": display_id,
             "signatures": signatures.result(),
         }
+        if namespaces is not None:
+            meta["vendor_namespaces"] = namespaces
     write_manifest(dest / "fs", dest / "manifest.tsv")
     (dest / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(f"  done: {meta['vendor']} {meta['platform']} android {meta['android']}")
@@ -613,7 +632,7 @@ THIRD_PARTY_PACKAGES = (
 )
 # AOSP and the chip makers' own apps.
 STOCK_PACKAGES = ("com.android.", "android", "com.qualcomm.", "com.qti.", "org.codeaurora.", "vendor.qti.",
-                  "com.quicinc.", "com.mediatek.", "com.sprd.", "com.unisoc.")
+                  "com.quicinc.", "com.mediatek.", "com.sprd.", "com.unisoc.") + vendors.SOC_PREFIXES
 
 
 def app_group(package: str | None, cert: str | None, platform_cert: str | None) -> str:
@@ -626,7 +645,7 @@ def app_group(package: str | None, cert: str | None, platform_cert: str | None) 
     package = package or ""
     if package.startswith(THIRD_PARTY_PACKAGES):
         return "third-party"
-    if package.startswith(tuple(ns.replace("/", ".") for ns in VENDOR_NAMESPACES)):
+    if package.startswith(tuple(ns.replace("/", ".") for ns in _namespaces)):
         return "vendor"
     if package.startswith(STOCK_PACKAGES):
         return "stock"
@@ -661,6 +680,8 @@ def git_diff(a: Path, b: Path, *extra: str, roots: tuple[Path, Path] | None = No
 
 # Code outside these namespaces (or the app's own package) is bundled libraries: androidx, Kotlin, Material...
 VENDOR_NAMESPACES = ("com/szchoiceway", "com/zjinnova", "com/ksw", "com/wits", "com/ivicar", "com/txznet", "com/sykj")
+# The namespaces of the diff in progress: VENDOR_NAMESPACES for KSW and ZXW, computed from the firmware otherwise.
+_namespaces = VENDOR_NAMESPACES
 MAX_FILE_DIFF_LINES = 1500
 MAX_TIER_DIFF_LINES = 20000
 
@@ -712,7 +733,7 @@ def tier(path: str, own_prefixes: tuple[str, ...]) -> str:
 
 def own_prefixes(name: str, package: str | None) -> tuple[str, ...]:
     """Source roots that are the vendor's or the app's own code; everything else under sources/ is libraries."""
-    own = VENDOR_NAMESPACES + ((package.replace(".", "/"),) if package else ())
+    own = _namespaces + ((package.replace(".", "/"),) if package else ())
     # SystemUI carries com.android.wm.shell and com.android.keyguard, Launcher3 com.android.quickstep:
     # platform code the vendor patches, not libraries.
     if package and package.startswith(("com.android.", "android")):
@@ -1484,6 +1505,19 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     return rows
 
 
+def vendor_namespaces_of(a_id: str, b_id: str, pa: dict, pb: dict, *sides) -> list[dict] | None:
+    """None when both firmwares are KSW or ZXW (VENDOR_NAMESPACES applies), else the maker's namespaces found in either."""
+    metas = [json.loads((WORK / i / "meta.json").read_text()) for i in (a_id, b_id)]
+    if all(vendor_platform(m["display_id"] or m["id"])[0] for m in metas):
+        return None
+    found: dict[str, dict] = {}
+    for fw_id, props, (apks, platform_cert) in zip((a_id, b_id), (pa, pb), sides):
+        apps = [(info.get("package"), info.get("cert")) for _, info in apks.values()]
+        for n in vendors.vendor_namespaces(apps, platform_cert, functools.partial(prop, props), fw_id, THIRD_PARTY_PACKAGES):
+            found[n["namespace"]] = n  # the new side's counts win
+    return [found[k] for k in sorted(found)]
+
+
 def cmd_diff(args) -> None:
     tool("rg", "/opt/homebrew/bin/rg")  # needed by the highlights, after all the decompiling
     a_id, b_id = args.old, args.new
@@ -1518,6 +1552,8 @@ def cmd_diff(args) -> None:
             prop_lines.append(f"- `{file}` `{k}`: `{a.get(k, '(none)')}` -> `{b.get(k, '(none)')}`")
             prop_facts.append({"file": file, "key": k, "old": a.get(k), "new": b.get(k)})
     lines += ["## Build properties", "", *(prop_lines or ["- no changes besides build dates/fingerprints"]), ""]
+    image_lines, image_facts = images.report(images.load(WORK / a_id), images.load(WORK / b_id))
+    lines += image_lines
 
     # Apps: inventory by package so a moved/renamed APK still pairs up.
     def apks(fs: Path, manifest: dict[str, Entry]) -> dict[str, tuple[str, dict]]:
@@ -1535,6 +1571,10 @@ def cmd_diff(args) -> None:
         fa_apks, fb_apks = pool.map(apks, (fa, fb), (ma, mb))
     platform_a, platform_b = (next((i["cert"] for _, i in side.values() if i.get("package") == "android"), None)
                               for side in (fa_apks, fb_apks))
+    global _namespaces
+    computed = vendor_namespaces_of(a_id, b_id, pa, pb, (fa_apks, platform_a), (fb_apks, platform_b))
+    # Computed ones end in "/" so com.car never takes in com.carrot.
+    _namespaces = VENDOR_NAMESPACES if computed is None else tuple(n["namespace"].replace(".", "/") + "/" for n in computed)
     app_rows, to_decompile, app_facts = [], [], []
 
     # A vendor app split or renamed (com.wits.ksw.media -> .music and .video) is diffed against the app
@@ -1584,7 +1624,8 @@ def cmd_diff(args) -> None:
         app_facts.append(fact)
     vendor_rows = [r for g, r in app_rows if g == "vendor"]
     android_rows = [r for g, r in app_rows if g != "vendor"]
-    lines += ["## Vendor apps", "", *(vendor_rows or ["- none"]), "",
+    found = [] if computed is None else [f"Namespaces computed from the firmware: {vendors.describe(computed)}.", ""]
+    lines += ["## Vendor apps", "", *found, *(vendor_rows or ["- none"]), "",
               "## Android apps", "", *(android_rows or ["- none"]), ""]
 
     # JARs (framework, services): code changes only.
@@ -1660,7 +1701,9 @@ def cmd_diff(args) -> None:
         if fact["decompiled"] and not next(srcs for n, _, srcs, _ in stats if n == fact["key"]):
             fact["decompiled"] = False
     facts = {"old": identity[0], "new": identity[1], "apps": app_facts, "build_props": prop_facts,
-             "decompiled": {n: info for n, (_, info), _, _ in stats}}
+             "decompiled": {n: info for n, (_, info), _, _ in stats}, "images": image_facts,
+             "vendor_namespaces": {"source": "VENDOR_NAMESPACES" if computed is None else "computed",
+                                   "namespaces": list(_namespaces)}}
     highlights = collect_highlights(out, pa, pb, fa, fb, [(n, srcs) for n, _, srcs, _ in stats if srcs],
                                     [lits for *_, lits in stats], added, removed, facts)
     shutil.rmtree(out / ".empty", ignore_errors=True)
@@ -1760,7 +1803,8 @@ def cmd_score(args) -> None:
 
 def zip_build(zip_path: Path) -> tuple[int, str] | None:
     """Build date (UTC seconds, 0 if unknown) and product line, from the OTA metadata without unpacking.
-    None for a zip without a system partition fw.py can read (a persist backup, a super.img flash kit)."""
+    None for a zip without a system partition fw.py can read (a persist backup) or a super.img flash kit: `extract`
+    reads those, but a kit would otherwise slot into its OTA line and change every pair after it."""
     try:
         with zipfile.ZipFile(zip_path) as zf:
             names = set(zf.namelist())
