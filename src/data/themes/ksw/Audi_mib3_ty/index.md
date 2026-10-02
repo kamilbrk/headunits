@@ -8,5 +8,4 @@ images:
   - ./home.png
   - ./settings.png
 since: "Ksw-Q-Userdebug_OS_v3.5.3-ota"
-client: ALS_6208
 ---
