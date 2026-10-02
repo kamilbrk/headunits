@@ -9,6 +9,10 @@ signatures:
   sha1: 19b3f558cea40be4bcbb06c9574f48ceabd7d8f2
   sha256: 71ce0dba5d59fa294fcbc407431518f1d1f298c6ed1bd638d99c85904b6da3ed
 ---
+:::warning
+Android bug reports taken on the unit are emailed to the vendor with the unit's IMEI in the subject and its Bluetooth log attached, through a mail account whose password is built into the firmware.
+:::
+
 #### Summary
 - Builds between `1.4.5` and `1.8.6` are not on this site, so some of these changes may have first appeared in one of them
 - New theme `ALS_ID7_UI` with blue, yellow and red colour skins

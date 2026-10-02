@@ -9,6 +9,10 @@ signatures:
   sha1: fd98944197dd7b3bf2fbf4b06f15429b80f64f1b
   sha256: da90042237e3776611a27e5ffb531f6576e53107f9fcb78b91530e0b04331096
 ---
+:::warning
+Adds `witssudo`, a root service. By `Witstek-T-M700_OS_v1.6.5-ota` it runs any command it is given, and Android uses it to erase all apps and data if its list of installed apps cannot be read.
+:::
+
 #### Summary
 - Mostly internal changes, nothing to see here
 - Due to `Witstek-` file name prefix, you need to either upgrade from at least [M700 1.4.2](/updates/ksw/m700/ksw-t-m700_os_v142-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.

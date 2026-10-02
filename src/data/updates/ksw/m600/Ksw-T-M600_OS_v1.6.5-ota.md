@@ -9,6 +9,10 @@ signatures:
   sha1: 79e79d53e8f2a4c4c7dc04543bf009605603c95b
   sha256: 5311a54971f39366d452948e10c6f1631d9ed3b6c6709753e0071aff6cd6735e
 ---
+:::warning
+Apps that block screenshots and screen recording the common way (`addFlags(FLAG_SECURE)`) no longer can, and this stays in later T builds. Any app with `ms2160` in its package name can record the screen without asking, and Android's install-time package verification is switched off.
+:::
+
 #### Summary
 - Zlink updated to `5.4.53`
 - CPU information now shown in settings with "M606" label for SD460/SM4250

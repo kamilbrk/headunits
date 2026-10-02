@@ -9,6 +9,10 @@ signatures:
   sha1: 826aa6eef3d7b01a961a035b912bc4be6f3e278f
   sha256: e5909cbbf7a0f4b94f85f130d6a6748cbebe37229558b4ffffb2c0cbf92f7b27
 ---
+:::warning
+A system update file with `reset-data` in its name now factory-resets the unit after installing. Check the file name before copying an update to USB; later R builds keep this behaviour.
+:::
+
 #### Summary
 - `PEMP_ID7_UI` gets assignable home-screen shortcuts, working "Select Music App" / "Select Video App" and a speedometer
 - `Audi_mib3` gets its own music and video player screens

@@ -9,6 +9,10 @@ signatures:
   sha1: 4673184c80db29fdd9c937afb5cd4a82257e2cdd
   sha256: b32e17053607e523ba403cff72d8733de7542120a345bcec38dde4b95ed3dbb9
 ---
+:::warning
+Adds `witssudo`, a root service. By `Witstek-T-M600_OS_v1.8.6-ota` it runs any command it is given, and Android uses it to erase all apps and data if its list of installed apps cannot be read.
+:::
+
 #### Summary
 - Mostly internal changes, nothing to see here
 - Due to `Witstek-` file name prefix, you need to either upgrade from at least [M600 1.6.9](/updates/ksw/m600/ksw-t-m600_os_v169-ota) where support for these filenames was introduced or rename the file to start with `Ksw-`.

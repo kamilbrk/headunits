@@ -9,6 +9,10 @@ signatures:
   sha1: b1e0fdd03a5529eb6806ca703fe9772ad1551047
   sha256: 3206458e6e1c7b10eba1bd0fd6853f64e2c0937b288a91505af5c5b88a3336bd
 ---
+:::warning
+The NEXAI assistant checks its activation over unencrypted HTTP, and its Device Info screen has "Upload Log" and "Upload Voice" buttons that, after a confirmation, upload the assistant's log and voice folders to TXZ's servers.
+:::
+
 #### Summary
 - NEXAI build based on `Ksw-R-M600_OS_v2.0.3-ota`; the 1.7.2 number does not mean it is older than 2.0.3
 - The Chinese TXZ voice assistant is replaced by TXZ's overseas assistant, NEXAI ("Hey Nex")
