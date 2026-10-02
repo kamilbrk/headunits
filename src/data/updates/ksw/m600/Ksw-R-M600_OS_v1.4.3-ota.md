@@ -9,6 +9,10 @@ signatures:
   sha1: 15476ae9604898c6467f1e2a0cbba209cb5c3417
   sha256: b1dbd17e96f87d3fb13b6088594e80f2150339ab831e90c17a5801bdb5c66b92
 ---
+:::warning
+Encryption of the `/data` partition is removed, so apps and settings on the unit are no longer stored encrypted; on a unit whose data is already encrypted the effect is not known. Update files with `force-update` in their name now install without asking, and a file named `Ksw-R-M600_OS_v-ota-only-reset-data_factory.zip` on a USB stick reboots the unit into recovery to wipe it.
+:::
+
 #### Summary
 - "Select Music App" and "Select Video App" for most themes, followed by the home-screen music and video tiles
 - Encryption options removed from the `/data` mount settings

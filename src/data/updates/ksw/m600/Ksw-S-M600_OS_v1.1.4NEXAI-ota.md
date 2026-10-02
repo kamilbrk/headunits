@@ -11,6 +11,10 @@ signatures:
   sha1: 2ea48d3f8bcea20691abe8d1624dc8f96fbaa54e
   sha256: eb63b45ccc5ae76fd61c0f4e5d55d4c8588087649e9d91d06ebe6df396a836c2
 ---
+:::warning
+As on the Android 11 NEXAI builds, the assistant checks its activation over unencrypted HTTP, and its Device Info screen has "Upload Log" and "Upload Voice" buttons that, after a confirmation, upload the assistant's log and voice folders to TXZ's servers.
+:::
+
 #### Summary
 - First Android 12 NEXAI build: the Chinese TXZ voice assistant is replaced by NEXAI ("Hey Nex")
 - The 1.1.4 number does not mean it is older than 1.2.0

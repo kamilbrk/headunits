@@ -9,6 +9,10 @@ signatures:
   sha1: 61858b6955e034f478fa43b383c85581c5c1db13
   sha256: 23ac4d725bcabd442cc4e24eb98176509bf4f0e7f7e8fcf11fe74e59ac100d1c
 ---
+:::warning
+Zlink now sets up Baidu Mobile Statistics with GPS, mobile-network and Wi-Fi location reporting switched on. Whether it actually sends anything was not verified.
+:::
+
 #### Summary
 - New "Front view mirror setting" factory option
 - Zlink updated to `5.2.49`, with call volume settings and DLNA "TV projection"
