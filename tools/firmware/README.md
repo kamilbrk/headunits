@@ -167,16 +167,27 @@ call) anywhere in that app does, so code that moved between classes cancels
 out. They catch a known key or theme newly tested in
 one more place, which the whole-tree rows cannot. Files added or removed
 whole are skipped (every line in them is new), and so are generated classes,
-obfuscated ones (`a.java`), logging calls, and literals that are a single
-plain word (`"status"`). A term the report already names elsewhere is not
-repeated, and each app shows at most 40 added and 40 removed; all are in
-`facts.json`. Intent and key terms come from the call's own arguments, and a
-theme check from a static call on a `...Theme...` / `...UI...` class. Native
+obfuscated ones (`a.java`), logging calls, literals that are a single
+plain word (`"status"`), names any Java code has (member fields such as
+`mPageIndex`, `data1`, `keyCode`, charset names) and Java's own constants
+(`Integer.MIN_VALUE`, `Build.VERSION.SDK_INT`). A term the report already
+names elsewhere is not repeated, and each app shows at most 40 added and
+40 removed; all are in `facts.json`. Intent and key terms come from the call's own arguments, and a
+theme check from a static call on a `...Theme...` / `...UI...` class. A
+script line whose only change is a checksum (the recovery image hash in
+`install-recovery.sh`) is left out. Native
 binaries are compared by their name-like strings (symbols, snake_case or
 camelCase names, dotted keys, paths, `%s` formats; no spaces), with dates,
-build stamps and hashes left out; those with the fewest changes come first,
-since a handful of new symbols is a feature and thousands are an upstream
-rebuild.
+build stamps and hashes left out, and so are names the toolchain links in
+(`__cxa_*`, fortified `__*_chk`, `pthread_*`, stdio `*_unlocked`, symbol
+version tags, C++ standard library and Chromium `base` symbols, mangled or
+as typeinfo); the vendor's own mangled names stay. Those with the fewest
+changes come first, since a handful of new symbols is a feature and
+thousands are an upstream rebuild.
+Manifest rows leave out what the build merges in from Jetpack
+(`androidx.profileinstaller`, `androidx.startup`,
+`*.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`); any other SDK's components
+(Firebase, Play services, blankj) stay.
 
 Two runs over the same trees give byte-identical output: every list is
 sorted, and jadx runs single-threaded with `--no-finally`, since jadx 1.5.6
@@ -249,7 +260,7 @@ fixed order (sorted, or in app and file order).
 | `factory_settings` | per factory config XML: `file`, `file_added`, `added`, `removed`, `changed` (`key`, `old`, `new`) |
 | `script_changes` | per changed `.sh` / `.rc` file both sides carry: `path`, `added`, `removed` lines |
 | `native_strings` | per changed ELF file both sides carry whose name-like strings changed: `added`, `removed`, or `added_count`, `removed_count` past 300 changes |
-| `native_rebuilt` | changed ELF files whose name-like strings did not change: paths |
+| `native_rebuilt` | changed ELF files whose name-like strings did not change, or only in toolchain symbols: `count`, and the first 100 `paths` |
 | `code_terms` | `conditions`, `intents`, `keys`, each per app: `added`, `removed` terms on changed lines of its own code |
 
 `score` checks a hand-written changelog against the report: the share of its
