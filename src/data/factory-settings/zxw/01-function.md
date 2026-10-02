@@ -76,6 +76,17 @@ settings:
     control: checkbox
     onValue: 1
     offValue: 0
+  - name: "External mic output"
+    configKey: externalMicOutput
+    unverified: true
+    description: "Switches the audio output device (`output_device=2` for I2S, `8` for AUX)."
+    children:
+      - name: "I2S"
+        configValue: 0
+        control: radio
+      - name: "AUX"
+        configValue: 1
+        control: radio
   - name: "Amplifier Selection"
     configKey: amplifierSelection
     children:

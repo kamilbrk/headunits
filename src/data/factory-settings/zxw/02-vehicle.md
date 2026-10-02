@@ -119,9 +119,19 @@ settings:
         configValue: 1
         control: radio
   - name: "Splitting machine LVDS mode"
+    configKey: lvdsMode
     children:
       - name: "VESA"
+        configValue: 0
         control: radio
       - name: "JEIDA"
+        configValue: 1
         control: radio
+  - name: "Car without gear information"
+    configKey: withoutGearInfo
+    unverified: true
+    control: checkbox
+    onValue: 1
+    offValue: 0
+    description: "Only shown with the `KSW_BMW_ID9` theme."
 ---

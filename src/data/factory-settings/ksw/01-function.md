@@ -50,6 +50,12 @@ settings:
     offValue: 0
     editable: false
     description: "Which Bluetooth the unit uses is set by \"Bluetooth Selection\" below, which owns the `BT_Type` key. What this box does on its own is not known."
+  - name: "Screen cast - MS9120"
+    configKey: Screen_cast
+    control: checkbox
+    onValue: 1
+    offValue: 0
+    description: "Enables the `com.ms.ms2160` screen-capture app."
   - name: "Touch data continuously sent"
     configKey: touch_continuous_send
     control: checkbox
