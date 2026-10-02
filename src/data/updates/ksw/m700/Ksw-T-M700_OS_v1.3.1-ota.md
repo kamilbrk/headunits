@@ -3,7 +3,7 @@ id: "Ksw-T-M700_OS_v1.3.1-ota"
 vendor: ksw
 platform: m700
 android: 13
-date: 2024-05-16T03:27:59Z
+date: 2024-05-16T03:17:23Z
 signatures:
   md5: afff5f225da521b0cf697d9cd02e8b57
   sha1: e295e6c81e055efa802aafb852083cac1c47abea

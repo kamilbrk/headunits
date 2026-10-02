@@ -8,6 +8,8 @@ tags:
 images:
   - ./home.png
   - ./settings.png
-since: ksw/m501/ksw-q-userdebug_os_v391-ota
+since:
+  - ksw/m501/ksw-q-userdebug_os_v391-ota
+  - ksw/m600/ksw-r-m600_os_v242-ota
 client: ALS_6208
 ---

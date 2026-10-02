@@ -7,5 +7,7 @@ tags:
 images:
   - ./home.png
   - ./settings.png
-since: "Ksw-Q-Userdebug_OS_v3.0.8-ota"
+since:
+  - "Ksw-Q-Userdebug_OS_v3.0.8-ota"
+  - ksw/m600/ksw-r-m600_os_v135-ota
 ---
