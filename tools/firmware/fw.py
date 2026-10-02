@@ -812,9 +812,15 @@ MANIFEST_FLAG = re.compile(r'android:(testOnly|persistent|sharedUserId|directBoo
 SCREEN_TYPE = re.compile(r"^\d{3,4}x\d{3,4}(_\w+)?$")
 MEDIA_EXT = re.compile(r"^(\.[a-z0-9]{2,4}){3,}\.?$")  # ".mp3.wma.flac." style extension lists
 THEME_CONST = re.compile(r"\b(UI_NUM_\w+|UI_\w+_ID\w*)\s*=\s*(\d+);")
-MANIFEST_ITEM = re.compile(r'<(uses-permission|activity|service|receiver|provider|action)\b[^>]*?android:name="([^"]+)"')
+MANIFEST_ITEM = re.compile(r'<(uses-permission|activity|service|receiver|provider|action|meta-data)\b[^>]*?android:name="([^"]+)"')
 CONFIG_VALUE = re.compile(r'<(bool|integer|string|dimen|integer-array|string-array) name="(config_\w+)"[^>]*>(.*?)</\1>', re.S)
 XML_LEAF = re.compile(r"<(\w+)>([^<>]*)</\1>")
+
+
+def manifest_items(text: str) -> set[str]:
+    # androidx.startup and Google libraries declare their initializers as meta-data: not the vendor's.
+    return {n for kind, n in MANIFEST_ITEM.findall(text)
+            if kind != "meta-data" or not (n.replace(".", "/") + "/").startswith(LIBRARY_PACKAGES)}
 
 
 def read_strings(src: Path) -> dict[str, str]:
@@ -1151,9 +1157,178 @@ def usage_highlights(apps: list[tuple[str, tuple[Path, Path]]], facts: dict) -> 
     return rows
 
 
+# Terms on changed lines of the apps' own code: what a condition now tests, which intents a class sends or
+# listens for, which settings and property keys a call now passes. Added and removed are compared across the
+# whole app, so code that only moved cancels out. New files are left out, since every line in them is new,
+# and so are generated classes and obfuscated ones (a.java), whose contents shift with every build.
+CODE_TERMS = (
+    ("conditions", "Terms newly tested in conditions",
+     re.compile(r"\b(?:if|while) \(|\bcase .+:$| \? .+ : |\breturn .*(?:&&|\|\|)")),
+    ("intents", "Intent actions, extras and components newly used",
+     re.compile(r"\b(?:addAction|setAction|new Intent|putExtra|get\w*Extra|setClassName|new ComponentName|sendBroadcast\w*)\(")),
+    ("keys", "Settings and property keys newly passed on changed lines",
+     re.compile(r"\b(?:get|put|set)Settings?\w*\(|\bgetRecord\w*\(|\bupdateRecord\(|\bSystemProperties\w*\.\w+\(|"
+                r"\bSettings\.(?:System|Global|Secure)\.\w+\(")),
+)
+# UiThemeUtils.isBMW_ID9_UI(ctx), KswThemeUtils.isAudi(this), Util.getUITheme(Constants.BMW_ID8_UI)
+THEME_CHECK = re.compile(r"\b[A-Z]\w*(?:Theme|UI|Ui)\w*(?:Utils?|Helps?)\.(is\w+)\(|\bgetUITheme\((?:\w+\.)?(\w+)\)")
+JAVA_STRING = re.compile(r'"((?:[^"\\]|\\.)*)"')
+CONST_REF = re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b")
+LOG_CALL = re.compile(r"\b(?:Log|Slog|LogUtil\w*|KLog|L)\.[dviwe]\(|println|printStackTrace|\.append\(")
+PLAIN_WORD = re.compile(r"[a-z]+|[A-Z]+|[\d.]+\w{0,3}")  # "status", "TYPE", "0s": a JSON field or a value, not a name
+
+
+def line_terms(kind: str, pattern: re.Pattern, text: str) -> set[str]:
+    if LOG_CALL.search(text):
+        return set()
+    if kind == "conditions":
+        if not pattern.search(text):
+            return set()
+        segments = [text]
+        # The theme a check names: isBMW_ID9_UI -> BMW_ID9_UI, isBenz_MBUX_2021 -> Benz_MBUX_2021, and
+        # isBenzUI_NTG6_FY_V3 -> UI_NTG6_FY_V3, a brand glued to the theme's own name.
+        terms = {re.sub(r"^[A-Z][a-z]+(?=[A-Z][A-Z0-9]*_)", "", m[1][2:]) if m[1] else m[2] for m in THEME_CHECK.finditer(text)}
+    else:
+        # The call's own arguments only: not the value it is compared with (`.equals("true")`). A key call's key
+        # is its first string or constant argument; what follows is the value written ("yellow").
+        segments = [", ".join(args if kind == "intents" else
+                              [a for a in args if re.fullmatch(r'"[^"]*"|(?:\w+\.)*[A-Z][A-Z0-9_]+', a)][:1])
+                    for m in pattern.finditer(text) for args in [call_args(text, m.end())]]
+        terms = set()
+    for seg in segments:
+        terms |= {s for s in JAVA_STRING.findall(seg) if 3 <= len(s) <= 80 and not re.search(r"\s", s)
+                  and not (PLAIN_WORD.fullmatch(s) and not (kind == "keys" and re.fullmatch(r"[a-z]{4,}", s)))
+                  and s not in ("true", "false", "null")}
+        terms |= {c for c in CONST_REF.findall(seg) if len(c) >= 5 and c != "SDK_INT"}
+    return terms
+
+
+def code_term_highlights(out: Path, names: dict[str, str], known: set[str]) -> tuple[list[str], dict]:
+    """Rows for CODE_TERMS from the app diffs under out/apps (`names`: file slug -> app key). Terms already
+    named elsewhere in the report (`known`) are left out of the rows, not out of the facts."""
+    plus: dict[tuple[str, str], set[str]] = {}
+    minus: dict[tuple[str, str], set[str]] = {}
+    for f in sorted((out / "apps").rglob("*.diff")):
+        rel = f.relative_to(out / "apps").as_posix()
+        if ".resources." in rel:
+            continue
+        slug = rel.split("/", 1)[0] if "/" in rel else re.sub(r"\.code(\.large)?\.diff$", "", rel)
+        app = names.get(slug, slug)
+        for path, chunk in split_diff(f.read_text(errors="replace")):
+            cls = path.rsplit("/", 1)[-1].removesuffix(".java")
+            head = chunk[:chunk.find("\n@@")]
+            if (not path.startswith("sources/") or not path.endswith(".java") or len(cls) <= 2 or "/dev/null" in head
+                    or GENERATED_CLASS.search(path) or cls.endswith("BindingImpl")):
+                continue
+            for line in chunk[len(head):].splitlines():
+                if line[:1] not in "+-":
+                    continue
+                for kind, _, pattern in CODE_TERMS:
+                    if terms := line_terms(kind, pattern, line[1:]):
+                        (plus if line[0] == "+" else minus).setdefault((kind, app), set()).update(terms)
+    rows: list[str] = []
+    facts: dict = {kind: {} for kind, _, _ in CODE_TERMS}
+    for kind, title, _ in CODE_TERMS:
+        block = []
+        for app in sorted({a for k, a in plus.keys() | minus.keys() if k == kind}):
+            p, m = plus.get((kind, app), set()), minus.get((kind, app), set())
+            if not p - m and not m - p:
+                continue
+            facts[kind][app] = {"added": sorted(p - m), "removed": sorted(m - p)}
+            add, rem = (p - m) - known, (m - p) - known
+            # Only what a row shows counts as named: a term past one app's cap can still show for another.
+            known |= set(sorted(add)[:40]) | set(sorted(rem)[:40])
+            if add or rem:
+                block.append(f"  - `{app}`: {fmt_list(add, 40) or '-'}" + (f"; no longer: {fmt_list(rem, 40)}" if rem else ""))
+        if block:
+            rows += [f"- {title} (own code, per app; all in facts.json):", *block]
+    return rows, facts
+
+
+def script_highlights(text_diff: str) -> tuple[list[str], list[dict]]:
+    """Changed lines of shell scripts and init .rc files that both firmwares carry: a new chmod on a sysfs node,
+    a service moved to another class, a line commented out. Added files are listed whole elsewhere."""
+    rows, facts = [], []
+    for path, chunk in split_diff(text_diff):
+        head = chunk[:chunk.find("\n@@")]
+        if not path.endswith((".sh", ".rc")) or "/dev/null" in head:
+            continue
+        lines = [line[0] + " " + line[1:].strip() for line in chunk[len(head):].splitlines()
+                 if line[:1] in "+-" and len(re.findall(r"\w", line)) >= 3
+                 and line[1:].strip().rstrip(";") not in ("then", "else", "done", "esac")]
+        if lines:
+            facts.append({"path": path, "added": [x[2:] for x in lines if x[0] == "+"],
+                          "removed": [x[2:] for x in lines if x[0] == "-"]})
+            rows.append(f"  - `{path}`: " + "; ".join(f"`{x[:120].replace('`', chr(39))}`" for x in lines[:15])
+                        + (f" +{len(lines) - 15} more" if len(lines) > 15 else ""))
+    return (["- Shell and init scripts changed (changed lines):", *rows] if rows else []), facts
+
+
+ELF_STRING = re.compile(rb"[\x20-\x7e]{6,}")
+PRINTABLE = bytes(range(0x20, 0x7f))
+# Symbols, keys, paths and formats, by shape: most short runs of printable bytes in a binary are code or data
+# that happen to decode, and change with every rebuild (`Lv2v%-`). A string with a space is a log message.
+BINARY_NAME = re.compile(r"_Z\w{6,}|_*[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+|[a-z]{2,}(?:[A-Z][a-z]{2,})+\w*|"
+                         r"[A-Z][a-z]{2,}(?:[A-Z][a-z]{2,})+\w*|[\w-]+(?:\.[\w-]+){2,}|(?:/|%s/)(?:[\w.%-]+/)*[\w.%-]+|[\w./-]*%[sd][\w.%/-]*")
+BINARY_WORD = re.compile(r"[a-z]{3,}|(?<![A-Za-z])[A-Z]{4,}(?![A-Za-z])")
+# What changes on every rebuild: dates, times, build stamps, hashes, compiler-generated names.
+BUILD_STAMP = re.compile(r"\d{4}-\d\d-\d\d|\d\d:\d\d|\d{6,}|[0-9a-fA-F]{10,}|^\.L|\.(?:c|cc|cpp|h)$|^/(?:home|tmp|proc/self)/")
+
+
+def binary_strings(path: Path) -> set[str] | None:
+    """The name-like strings of an ELF file (native library, executable, kernel module); None for anything else."""
+    if path.is_symlink() or not path.is_file():
+        return None
+    def names(data: bytes, end: int) -> set[str]:
+        return {s for b in ELF_STRING.findall(data, 0, end) if 8 <= len(b) <= 80 and BINARY_NAME.fullmatch(s := b.decode())
+                and BINARY_WORD.search(s) and not BUILD_STAMP.search(s)}
+
+    found, carry = set(), b""
+    with path.open("rb") as fh:
+        if fh.read(4) != b"\x7fELF":
+            return None
+        # In blocks: a Wi-Fi driver module runs to 400 MB. A string cut by a block end is carried into the next.
+        while block := fh.read(16 << 20):
+            data = carry + block
+            cut = len(data.rstrip(PRINTABLE))
+            found |= names(data, cut)
+            carry = data[cut:]
+    return found | names(carry, len(carry))
+
+
+def binary_highlights(fa: Path, fb: Path, changed: list[str]) -> tuple[list[str], dict]:
+    """Native binaries both firmwares carry that changed: the strings they gained and lost (a new symbol, property
+    or path), or, when only build stamps moved, just their names."""
+    detail, rebuilt, facts = [], [], {"changed": {}, "rebuilt": []}
+    for p in changed:
+        if p.endswith((".apk", ".jar")) or (old := binary_strings(fa / p)) is None or (new := binary_strings(fb / p)) is None:
+            continue
+        add, rem = new - old, old - new
+        if add or rem:
+            # An upstream rebuild changes thousands of strings: counts only, or facts.json runs to megabytes.
+            facts["changed"][p] = ({"added": sorted(add), "removed": sorted(rem)} if len(add) + len(rem) <= 300
+                                   else {"added_count": len(add), "removed_count": len(rem)})
+            detail.append((len(add) + len(rem), p, add, rem))
+        else:
+            facts["rebuilt"].append(p)
+            rebuilt.append(Path(p).name)
+    rows = []
+    if detail:
+        rows.append(f"- Native binaries with new or removed strings ({len(detail)}; fewest changes first, 25 shown; strings in facts.json up to 300 changes):")
+        # Fewest first: a handful of new symbols is a feature, thousands are an upstream rebuild.
+        for n, p, add, rem in sorted(detail)[:25]:
+            if n <= 300:
+                rows.append(f"  - `{p}`: {fmt_list(add, 15) or '-'}" + (f"; removed {fmt_list(rem, 15)}" if rem else ""))
+            else:
+                rows.append(f"  - `{p}`: {len(add)} strings added, {len(rem)} removed")
+    if rebuilt:
+        rows.append(f"- Native binaries rebuilt, only build dates or hashes changed ({len(set(rebuilt))} names): {fmt_list(set(rebuilt), 40)}")
+    return rows, facts
+
+
 def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: list[tuple[str, tuple[Path, Path]]],
                        lits: list[tuple[str, str | None, set[str], set[str]]], added_files: list[str],
-                       removed_files: list[str], facts: dict) -> list[str]:
+                       removed_files: list[str], changed_files: list[str], facts: dict) -> list[str]:
     """The Highlights rows; writes them, with `facts` from cmd_diff, to facts.json."""
     rows: list[str] = []
     facts["build"] = {}
@@ -1414,7 +1589,7 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     facts["manifest"], facts["android_config"] = {}, []
     for name, (a_src, b_src) in apps:
         ma_, mb_ = read(a_src / "resources/AndroidManifest.xml"), read(b_src / "resources/AndroidManifest.xml")
-        ia, ib = {m[1] for m in MANIFEST_ITEM.findall(ma_)}, {m[1] for m in MANIFEST_ITEM.findall(mb_)}
+        ia, ib = manifest_items(ma_), manifest_items(mb_)
         entry = {"added": sorted(ib - ia), "removed": sorted(ia - ib) if mb_ else [], "flags_added": [], "flags_removed": []}
         if ib - ia:
             item_rows.append(f"  - `{name}` added: {fmt_list(ib - ia, 30)}")
@@ -1438,7 +1613,7 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     if flag_rows:
         rows += ["- Manifest flags changed:", *flag_rows]
     if item_rows:
-        rows += ["- Manifest entries (permissions, activities, services, receivers, actions), per app:", *item_rows]
+        rows += ["- Manifest entries (permissions, activities, services, receivers, actions, meta-data), per app:", *item_rows]
     rows += cfg_rows
 
     # key=value config files (Wi-Fi driver .ini, .conf, .prop): which keys changed.
@@ -1479,6 +1654,15 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
             facts["factory_settings"].append({"file": rel, "file_added": not a_file.is_file(), "added": sorted(added),
                                               "removed": sorted(old.keys() - new.keys()),
                                               "changed": changed})
+
+    script_rows, facts["script_changes"] = script_highlights((out / "files" / "text.diff").read_text(errors="replace"))
+    rows += script_rows
+    native_rows, native = binary_highlights(fa, fb, changed_files)
+    facts["native_strings"], facts["native_rebuilt"] = native["changed"], native["rebuilt"]
+    rows += native_rows
+    code_rows, facts["code_terms"] = code_term_highlights(out, {slugify(n): n for n, _ in apps},
+                                                          set(re.findall(r"`([^`\n]+)`", "\n".join(rows))))
+    rows += code_rows
 
     (out / "facts.json").write_text(json.dumps(facts, indent=2, ensure_ascii=False) + "\n")
     return rows
@@ -1662,7 +1846,7 @@ def cmd_diff(args) -> None:
     facts = {"old": identity[0], "new": identity[1], "apps": app_facts, "build_props": prop_facts,
              "decompiled": {n: info for n, (_, info), _, _ in stats}}
     highlights = collect_highlights(out, pa, pb, fa, fb, [(n, srcs) for n, _, srcs, _ in stats if srcs],
-                                    [lits for *_, lits in stats], added, removed, facts)
+                                    [lits for *_, lits in stats], added, removed, changed, facts)
     shutil.rmtree(out / ".empty", ignore_errors=True)
     lines[2:2] = ["## Highlights", "", *(highlights or ["- nothing matched the known patterns"]), ""]
     (out / "REPORT.md").write_text("\n".join(lines))
