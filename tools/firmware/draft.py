@@ -446,7 +446,7 @@ def draft(diff: Path, frontmatter_file: str | None, site: Path) -> str:
     strings_by_app: dict[str, list[dict]] = {}
     for s in strings:
         strings_by_app.setdefault(s["apps"][0], []).append(s)
-    manifest_row, manifest_children = highlight(hl, "Manifest entries (permissions, activities, services, receivers, actions), per app")
+    manifest_row, manifest_children = highlight(hl, "Manifest entries (permissions, activities, services, receivers, actions")
     perms_by_app: dict[str, list[str]] = {}
     if "manifest" in facts:
         for name, entry in facts["manifest"].items():
@@ -614,7 +614,7 @@ def draft(diff: Path, frontmatter_file: str | None, site: Path) -> str:
 
     # Everything else the report found, for a person to read and phrase.
     skip = phrased | {"Build ", "New UI strings", "New layouts", "New resource folders",
-                      "Manifest entries (permissions, activities, services, receivers, actions), per app"}
+                      "Manifest entries (permissions, activities, services, receivers, actions"}
     def shorten(text: str) -> str:
         return text if len(text) <= 400 else text[:400].rsplit(",", 1)[0] + ", ..."
 

@@ -31,6 +31,7 @@ import sys
 import tempfile
 import threading
 import zipfile
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -836,12 +837,16 @@ THEME_CONST = re.compile(r"\b(UI_NUM_\w+|UI_\w+_ID\w*)\s*=\s*(\d+);")
 MANIFEST_ITEM = re.compile(r'<(uses-permission|activity|service|receiver|provider|action|meta-data)\b[^>]*?android:name="([^"]+)"')
 CONFIG_VALUE = re.compile(r'<(bool|integer|string|dimen|integer-array|string-array) name="(config_\w+)"[^>]*>(.*?)</\1>', re.S)
 XML_LEAF = re.compile(r"<(\w+)>([^<>]*)</\1>")
+# Entries the build merges in from Jetpack (androidx.profileinstaller's receiver and actions, androidx.startup's
+# provider, androidx.core's <app>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION): they follow a dependency bump. Any
+# other SDK's components stay (Firebase, Play services, blankj), since one appearing means the app took it on.
+MANIFEST_MERGED = re.compile(r"(?:androidx|android\.support)\..*|.*\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION")
 
 
 def manifest_items(text: str) -> set[str]:
     # androidx.startup and Google libraries declare their initializers as meta-data: not the vendor's.
-    return {n for kind, n in MANIFEST_ITEM.findall(text)
-            if kind != "meta-data" or not (n.replace(".", "/") + "/").startswith(LIBRARY_PACKAGES)}
+    return {n for kind, n in MANIFEST_ITEM.findall(text) if not MANIFEST_MERGED.fullmatch(n)
+            and (kind != "meta-data" or not (n.replace(".", "/") + "/").startswith(LIBRARY_PACKAGES))}
 
 
 def read_strings(src: Path) -> dict[str, str]:
@@ -1197,6 +1202,12 @@ JAVA_STRING = re.compile(r'"((?:[^"\\]|\\.)*)"')
 CONST_REF = re.compile(r"\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b")
 LOG_CALL = re.compile(r"\b(?:Log|Slog|LogUtil\w*|KLog|L)\.[dviwe]\(|println|printStackTrace|\.append\(")
 PLAIN_WORD = re.compile(r"[a-z]+|[A-Z]+|[\d.]+\w{0,3}")  # "status", "TYPE", "0s": a JSON field or a value, not a name
+# Names any Java code has: member fields (mPageIndex), numbered placeholders (data1), the framework's callback
+# parameters. Card and page tags (BLUETOOTH_TAG) stay: log tags never get here, since log calls are skipped.
+GENERIC_TERM = re.compile(r"m[A-Z][A-Za-z0-9]*|(?:data|arg|param|obj)\d+|keyCode|requestCode|resultCode|(?i:utf-?8|gbk|gb2312|iso-8859-1)")
+# Java's and Kotlin's own constants (Integer.MIN_VALUE, ByteCompanionObject.MIN_VALUE, Build.VERSION.SDK_INT); a
+# framework constant a vendor key or event goes through (KeyEvent.KEYCODE_HOME) is kept.
+JAVA_CONST = re.compile(r"\b(?:Integer|Long|Short|Byte|Float|Double|Character|Math|[A-Z][a-z]+CompanionObject|Build\.VERSION(?:_CODES)?)\.[A-Z][A-Z0-9_]*\b")
 
 
 def line_terms(kind: str, pattern: re.Pattern, text: str) -> set[str]:
@@ -1220,8 +1231,8 @@ def line_terms(kind: str, pattern: re.Pattern, text: str) -> set[str]:
         terms |= {s for s in JAVA_STRING.findall(seg) if 3 <= len(s) <= 80 and not re.search(r"\s", s)
                   and not (PLAIN_WORD.fullmatch(s) and not (kind == "keys" and re.fullmatch(r"[a-z]{4,}", s)))
                   and s not in ("true", "false", "null")}
-        terms |= {c for c in CONST_REF.findall(seg) if len(c) >= 5 and c != "SDK_INT"}
-    return terms
+        terms |= {c for c in CONST_REF.findall(JAVA_CONST.sub("", seg)) if len(c) >= 5 and c != "SDK_INT"}
+    return {t for t in terms if not GENERIC_TERM.fullmatch(t)}
 
 
 def code_term_highlights(out: Path, names: dict[str, str], known: set[str]) -> tuple[list[str], dict]:
@@ -1266,6 +1277,9 @@ def code_term_highlights(out: Path, names: dict[str, str], known: set[str]) -> t
     return rows, facts
 
 
+CHECKSUM = re.compile(r"\b[0-9a-fA-F]{32,}\b")  # md5, sha1, sha256
+
+
 def script_highlights(text_diff: str) -> tuple[list[str], list[dict]]:
     """Changed lines of shell scripts and init .rc files that both firmwares carry: a new chmod on a sysfs node,
     a service moved to another class, a line commented out. Added files are listed whole elsewhere."""
@@ -1277,6 +1291,20 @@ def script_highlights(text_diff: str) -> tuple[list[str], list[dict]]:
         lines = [line[0] + " " + line[1:].strip() for line in chunk[len(head):].splitlines()
                  if line[:1] in "+-" and len(re.findall(r"\w", line)) >= 3
                  and line[1:].strip().rstrip(";") not in ("then", "else", "done", "esac")]
+        # A line whose only change is a checksum (install-recovery.sh's recovery image hash) is removed and added
+        # in the same file: the pair cancels out. A line that only moved stays, since in a script it can move into
+        # or out of a branch, and so does a changed number (a buffer size, a timeout).
+        keys = [CHECKSUM.sub("#", x[2:]) if CHECKSUM.search(x[2:]) else None for x in lines]
+        both = (Counter(k for x, k in zip(lines, keys) if k and x[0] == "+")
+                & Counter(k for x, k in zip(lines, keys) if k and x[0] == "-"))
+        left = {"+": both.copy(), "-": both}
+        kept = []
+        for x, k in zip(lines, keys):
+            if k and left[x[0]][k]:
+                left[x[0]][k] -= 1
+            else:
+                kept.append(x)
+        lines = kept
         if lines:
             facts.append({"path": path, "added": [x[2:] for x in lines if x[0] == "+"],
                           "removed": [x[2:] for x in lines if x[0] == "-"]})
@@ -1294,6 +1322,15 @@ BINARY_NAME = re.compile(r"_Z\w{6,}|_*[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+|[a-
 BINARY_WORD = re.compile(r"[a-z]{3,}|(?<![A-Za-z])[A-Z]{4,}(?![A-Za-z])")
 # What changes on every rebuild: dates, times, build stamps, hashes, compiler-generated names.
 BUILD_STAMP = re.compile(r"\d{4}-\d\d-\d\d|\d\d:\d\d|\d{6,}|[0-9a-fA-F]{10,}|^\.L|\.(?:c|cc|cpp|h)$|^/(?:home|tmp|proc/self)/")
+# What the toolchain links in rather than what the vendor wrote: the C and C++ runtime's reserved names
+# (__cxa_guard_acquire, the fortified __fgets_chk), libc imports, symbol version tags, and C++ names in the
+# standard library or Chromium's base and logging, mangled (_ZNSt6__ndk15mutex4lockEv) or as typeinfo
+# (St12length_error). They come and go with the compiler and libc, not with a feature. The vendor's own names
+# stay, mangled (_ZL18cmdZlinkDisconnectPKhtt) or not (__mcu_send_cmd, door_unlocked).
+RUNTIME_SYMBOL = re.compile(r"__(?:cxa|gxx|aeabi|stack_chk|sF|errno|libc|system_property|android_log|register_atfork|\w+_chk)\w*|"
+                            r"pthread_\w+|posix_\w+|f?(?:get|put)\w*_unlocked|f(?:read|write|flush|eof|error|ileno)_unlocked|"
+                            r"(?:G?LIBC|GLIBCXX|CXXABI)_[\w.]+|"
+                            r"_Z(?:T[VIS])?N?K?(?:S[tabdios]|4base|7logging|9__gnu_cxx)\w*|_Z(?:nw|na|dl|da)\w+|N?St\d+\w+")
 
 
 def binary_strings(path: Path) -> set[str] | None:
@@ -1302,7 +1339,7 @@ def binary_strings(path: Path) -> set[str] | None:
         return None
     def names(data: bytes, end: int) -> set[str]:
         return {s for b in ELF_STRING.findall(data, 0, end) if 8 <= len(b) <= 80 and BINARY_NAME.fullmatch(s := b.decode())
-                and BINARY_WORD.search(s) and not BUILD_STAMP.search(s)}
+                and BINARY_WORD.search(s) and not BUILD_STAMP.search(s) and not RUNTIME_SYMBOL.fullmatch(s)}
 
     found, carry = set(), b""
     with path.open("rb") as fh:
@@ -1343,7 +1380,7 @@ def binary_highlights(fa: Path, fb: Path, changed: list[str]) -> tuple[list[str]
             else:
                 rows.append(f"  - `{p}`: {len(add)} strings added, {len(rem)} removed")
     if rebuilt:
-        rows.append(f"- Native binaries rebuilt, only build dates or hashes changed ({len(set(rebuilt))} names): {fmt_list(set(rebuilt), 40)}")
+        rows.append(f"- Native binaries rebuilt, only build stamps or toolchain symbols changed ({len(set(rebuilt))} names): {fmt_list(set(rebuilt), 40)}")
     return rows, facts
 
 
@@ -1679,7 +1716,9 @@ def collect_highlights(out: Path, pa: dict, pb: dict, fa: Path, fb: Path, apps: 
     script_rows, facts["script_changes"] = script_highlights((out / "files" / "text.diff").read_text(errors="replace"))
     rows += script_rows
     native_rows, native = binary_highlights(fa, fb, changed_files)
-    facts["native_strings"], facts["native_rebuilt"] = native["changed"], native["rebuilt"]
+    # A platform update rebuilds a thousand libraries: their number, and the first 100 paths.
+    facts["native_strings"] = native["changed"]
+    facts["native_rebuilt"] = {"count": len(native["rebuilt"]), "paths": sorted(native["rebuilt"])[:100]}
     rows += native_rows
     code_rows, facts["code_terms"] = code_term_highlights(out, {slugify(n): n for n, _ in apps},
                                                           set(re.findall(r"`([^`\n]+)`", "\n".join(rows))))
