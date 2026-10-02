@@ -67,8 +67,14 @@ disk each.
   defaults. Per app, from its own code and layouts: settings, SharedPreferences
   and system property keys it starts or stops using, new constants and enum
   values, view ids added to existing layouts, views shown, hidden or
-  relabelled, and changed string arrays. All of it is pattern matching over
-  the decompiled trees and the apps' dex string tables, so it needs no model. After that come build properties,
+  relabelled, and changed string arrays. From the changed lines of its own
+  code: the literals, constants and theme checks its conditions start or stop
+  testing, the intent actions, extras and components it starts or stops
+  using, and the settings and property keys passed on changed lines. Then the
+  changed lines of shell scripts and init `.rc` files, and native binaries
+  whose strings changed (or that were only rebuilt). All of it is pattern
+  matching over the decompiled trees, the apps' dex string tables, the diffs
+  and the ELF string tables, so it needs no model. After that come build properties,
   vendor and Android apps with versions and *what* changed inside each, JARs,
   and files. Files rebuilt on every build (`.odex`, `.vdex`, `build.prop`) and
   APKs that were only re-signed are left out.
@@ -110,6 +116,24 @@ tags, AIDL transaction codes, inlined resource ids, and apps added without a
 predecessor. A key passed as a constant is resolved through the app's own
 declarations. The strings of a stock app added whole (an AOSP app the
 vendor started shipping) are counted in one line instead of listed.
+
+The rows from changed code lines work the other way round: they read
+`apps/*.diff`, and a term counts as added when a `+` line of the app's own
+code carries it and no `-` line of the same kind (condition, intent call, key
+call) anywhere in that app does, so code that moved between classes cancels
+out. They catch a known key or theme newly tested in
+one more place, which the whole-tree rows cannot. Files added or removed
+whole are skipped (every line in them is new), and so are generated classes,
+obfuscated ones (`a.java`), logging calls, and literals that are a single
+plain word (`"status"`). A term the report already names elsewhere is not
+repeated, and each app shows at most 40 added and 40 removed; all are in
+`facts.json`. Intent and key terms come from the call's own arguments, and a
+theme check from a static call on a `...Theme...` / `...UI...` class. Native
+binaries are compared by their name-like strings (symbols, snake_case or
+camelCase names, dotted keys, paths, `%s` formats; no spaces), with dates,
+build stamps and hashes left out; those with the fewest changes come first,
+since a handful of new symbols is a feature and thousands are an upstream
+rebuild.
 
 Two runs over the same trees give byte-identical output: every list is
 sorted, and jadx runs single-threaded with `--no-finally`, since jadx 1.5.6
@@ -174,10 +198,14 @@ fixed order (sorted, or in app and file order).
 | `strings_changed` | UI strings whose text changed: `app`, `name`, `old`, `new` |
 | `resource_dirs`, `resource_dirs_removed`, `layouts`, `layouts_removed` | per app: resource folders and layouts |
 | `languages`, `languages_removed` | per locale: apps |
-| `manifest` | per app: `added`, `removed` (permissions, components, actions), `flags_added`, `flags_removed` |
+| `manifest` | per app: `added`, `removed` (permissions, components, actions, meta-data names), `flags_added`, `flags_removed` |
 | `android_config` | Android `config_*` values: `app`, `key`, `old`, `new` |
 | `config_files` | key=value config files: `path`, `key`, `old`, `new` |
 | `factory_settings` | per factory config XML: `file`, `file_added`, `added`, `removed`, `changed` (`key`, `old`, `new`) |
+| `script_changes` | per changed `.sh` / `.rc` file both sides carry: `path`, `added`, `removed` lines |
+| `native_strings` | per changed ELF file both sides carry whose name-like strings changed: `added`, `removed`, or `added_count`, `removed_count` past 300 changes |
+| `native_rebuilt` | changed ELF files whose name-like strings did not change: paths |
+| `code_terms` | `conditions`, `intents`, `keys`, each per app: `added`, `removed` terms on changed lines of its own code |
 
 `score` checks a hand-written changelog against the report: the share of its
 `identifiers`, "labels" and version numbers that the report finds, which ones
