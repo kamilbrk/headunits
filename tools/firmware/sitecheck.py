@@ -31,6 +31,8 @@ WORK = Path(os.environ.get("FW_WORK", Path.home() / "Dev/firmwares/_work"))
 SITE = Path(os.environ["HEADUNITS_SITE"]) if os.environ.get("HEADUNITS_SITE") else Path(__file__).resolve().parents[2]
 # The example factory file each vendor's settings page is written against. Data, not logic.
 EXAMPLE_XML = {"ksw": "factory_config.xml", "zxw": "zxw_factory_config.xml"}
+# The block of a factory file that holds user-settings defaults (the vendor's spelling).
+USER_BLOCK = "setings"
 # Numbered themes far above the site's highest number belong to other customers' builds.
 NUMBER_SLACK = 20
 
@@ -87,6 +89,8 @@ class Site:
     themes: dict[str, list[dict]]  # by vendor
     keys: dict[str, dict[str, str]]  # vendor -> key -> "documented" | "commented out" | "unverified"
     example_keys: dict[str, set[str]]
+    example_leaves: dict[str, set[str]]  # tags that hold a value, not a list
+    user_keys: dict[str, set[str]]  # leaves of the example's <setings> block: the reader's own settings, not factory ones
 
 
 def load_site(root: Path) -> Site:
@@ -111,12 +115,16 @@ def load_site(root: Path) -> Site:
                 status = "commented out" if m[1] else \
                     "unverified" if any("unverified: true" in x for x in lines[i + 1:end]) else "documented"
                 keys.setdefault(vendor, {}).setdefault(m[2], status)
-    example = {}
+    example, leaves, user = {}, {}, {}
     for vendor, name in EXAMPLE_XML.items():
         f = root / "public" / name
         if f.is_file():
-            example[vendor] = set(re.findall(r"<(\w+)[\s>/]", f.read_text(errors="replace")))
-    return Site(releases, themes, keys, example)
+            text = f.read_text(errors="replace")
+            example[vendor] = set(re.findall(r"<(\w+)[\s>/]", text))
+            leaves[vendor] = set(re.findall(r"<(\w+)>[^<]*</\1>", text))
+            user[vendor] = {k for block in re.findall(rf"<{USER_BLOCK}>(.*?)</{USER_BLOCK}>", text, re.S)
+                            for k in re.findall(r"<(\w+)>[^<]*</\1>", block)}
+    return Site(releases, themes, keys, example, leaves, user)
 
 
 # --------------------------------------------------------------------------- diff
@@ -166,6 +174,10 @@ THEME_FILE = re.compile(r"theme", re.I)
 STR_CONST = re.compile(r'static final String \w+ = "([A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+)";')
 # The same constants as fw.py's THEME_CONST: UI_NUM_KSW_BMW_ID9 = 56 and UI_INDEX_KSW_BWM_ID6 = 9.
 # The name is group 1 or 2 (UI_NUM_ dropped, as the site names these themes), the number group 3.
+# Words in theme ids that say nothing about which theme it is: makers, the vendor and version tags.
+THEME_WORDS = {"ui", "ksw", "num", "v1", "v2", "v3", "bmw", "benz", "audi", "lexus", "landrover", "ford", "toyota"}
+# A home screen of its own ships more images than this; fewer is an id or a stub.
+STUB_IMAGES = 10
 NUM_THEME = re.compile(r"\bUI_(?:NUM_(\w+?)|(\w+_ID\w*?))\s*=\s*(\d+);")
 
 
@@ -197,9 +209,15 @@ def new_themes(lines: list[DiffLine], facts: dict, report: str) \
             elif usable(m[1]):
                 per_app.setdefault(app_of(ln.file), {}).setdefault(m[1], []).append(cite(ln))
     if "theme_strings_before" in facts:
-        # fw.py compared every app's whole theme class, old against new, so no vote is needed.
-        named = {n: [ev for names in per_app.values() for ev in names.get(n, [])][:2] + ["facts.json theme_strings"]
-                 for n in facts.get("theme_strings", []) if usable(n)}
+        # fw.py compared every app's whole theme class, old against new, so no vote is needed. A theme
+        # exists once the launcher dispatches on it; Bluetooth or media apps gaining the name first is not it.
+        by_app = facts.get("theme_strings_by_app") or {}
+        launchers = launcher_apps(facts, lines) if "theme_strings_by_app" in facts else set()
+        new_names = sorted({n for app in launchers for n in by_app.get(app, [])}) if launchers else facts.get("theme_strings", [])
+        named = {n: list(dict.fromkeys([ev for app in sorted(launchers) for ev in per_app.get(app, {}).get(n, [])]
+                                       + [ev for names in per_app.values() for ev in names.get(n, [])]))[:2]
+                 + ["facts.json theme_strings" + (f" ({', '.join(sorted(launchers))})" if launchers else "")]
+                 for n in new_names if usable(n)}
     else:
         # Every app carries its own copy of the theme-name class, and one copy catching up with names the
         # launcher has had for years is not a new theme. A name counts when no copy shows it as old and at
@@ -262,6 +280,39 @@ def new_themes(lines: list[DiffLine], facts: dict, report: str) \
     return named, numbered, notes
 
 
+def launcher_apps(facts: dict, lines: list[DiffLine]) -> set[str]:
+    """Apps that are the home screen: named so by their package or APK, or keeping their theme class under a
+    launcher package. Empty when the build gives no sign of which one it is."""
+    named = {a["key"] for a in facts.get("apps") or [] if "launcher" in f"{a.get('key', '')} {a.get('name', '')}".lower()}
+    return named | {app_of(ln.file) for ln in lines if THEME_FILE.search(ln.inner) and "/launcher/" in ln.inner}
+
+
+def theme_footprint(name: str, lines: list[DiffLine]) -> tuple[int, int, int]:
+    """(layouts, images, uses) this diff adds for a theme: layouts and images whose names carry the theme's
+    own words (`BMW_ID8_UI` -> `id8`), and lines outside the theme classes that name it or its constant.
+    A theme with a home screen ships its own artwork; an id or a stub screen ships next to none."""
+    words = {w for w in name.lower().split("_") if w not in THEME_WORDS} or set(name.lower().split("_"))
+    fields = {m[1] for ln in lines for m in re.finditer(rf'static final String (\w+) = "{re.escape(name)}";', ln.text)}
+    fields |= {re.match(r"\w+", m[0])[0] for ln in lines for m in NUM_THEME.finditer(ln.text) if num_theme(m)[0] == name}
+    named = re.compile(r"\b(?:is)?(?:" + "|".join(map(re.escape, sorted(fields | {name}))) + r")\b")
+    declared = re.compile(r"static final \w+ (?:" + "|".join(map(re.escape, sorted(fields))) + r") =") if fields else re.compile(r"(?!)")
+
+    def ours(res: str) -> bool:
+        return words <= set(res.lower().split("_"))
+    layouts, images, uses = set(), set(), 0
+    for ln in lines:
+        if ln.sign != "+":
+            continue
+        if ".resources" in ln.file:
+            if (layout := re.search(r"res/layout[\w-]*/(\w+)\.xml$", ln.inner)) and ours(layout[1]):
+                layouts.add(layout[1])
+            images.update(r for r in re.findall(r"@(?:drawable|mipmap)/(\w+)", ln.text) if ours(r))
+        elif not THEME_FILE.search(ln.inner):
+            images.update(r for r in re.findall(r"\bR\.(?:drawable|mipmap)\.(\w+)", ln.text) if ours(r))
+            uses += bool(named.search(ln.text)) and not declared.search(ln.text)
+    return len(layouts), len(images), uses
+
+
 def facts_list(facts: dict, key: str, part: str = "added") -> list:
     """facts[key][part], or facts[key] itself when an older facts.json stored a flat list of additions."""
     v = facts.get(key)
@@ -279,6 +330,14 @@ def release_order(site: Site, vendor: str, platform: str) -> list[str]:
 def line_of(fw_id: str) -> str:
     """The release line a build belongs to: its id with the version number and brand prefix taken out."""
     return re.sub(r"^[a-z]+-", "", re.sub(r"v\d+\w*?(?=-ota$)|^\d{8}", "#", slug(fw_id)))
+
+
+def same_branch(a: str, b: str) -> bool:
+    """Whether two builds of one line are on the same branch: `v1.7.2NEXAI` branches off the plain `v2.0.3` line."""
+    def branch(fw_id: str) -> str:
+        m = re.search(r"v[\d.]+([a-z]*)-ota$", slug(fw_id))
+        return m[1] if m else ""
+    return branch(a) == branch(b)
 
 
 def line_key(site: Site, ref: str) -> tuple[str, str]:
@@ -300,6 +359,12 @@ def check_themes(site: Site, vendor: str, platform: str, old_id: str, new_id: st
     order = release_order(site, vendor, platform)
     new_slug, old_slug = slug(new_id), slug(old_id)
     here = f"{vendor}/{platform}/{new_slug}"
+    # The pair may skip site releases; then the theme first appears in one of them or in this build.
+    skipped_releases = [r for r in order[order.index(old_slug) + 1:order.index(new_slug)]
+                        if line_of(r) == line_of(new_id) and same_branch(r, new_id)] \
+        if old_slug in order and new_slug in order else []
+    adds = f"it first appears after `{old_id}`, in `{here}` or one of the {len(skipped_releases)} site release(s) " \
+           f"this comparison skips: {', '.join(f'`{r}`' for r in skipped_releases[:6])}" if skipped_releases else f"this build adds it: `{here}`"
     skipped = 0
     candidates = [(n, None, ev) for n, ev in named.items()] + [(n, num, ev) for n, (num, ev) in numbered.items()]
     for name, num, ev in candidates:
@@ -316,11 +381,13 @@ def check_themes(site: Site, vendor: str, platform: str, old_id: str, new_id: st
             out.append(Finding("themes", "missing", name, f"{label} is new in {new_id} but has no page in src/data/themes/{vendor}", ev[:3]))
             continue
         same_line = [s for s in theme["since"] if line_key(site, s)[1] == line_of(new_id) and line_key(site, s)[0] in ("", platform)]
+        layouts, images, uses = theme_footprint(name, lines)
+        id_only = " (id only in this build: nothing uses it yet)" if not (layouts or images or uses) else ""
         if not theme["since"]:
-            out.append(Finding("themes", "since-blank", name, f"{label}: `since` is blank; this build adds it: `{here}`", ev[:2]))
+            out.append(Finding("themes", "since-blank", name, f"{label}: `since` is blank; {adds}{id_only}", ev[:2]))
         elif not same_line:
             out.append(Finding("themes", "since-missing-line", name,
-                               f"{label}: `since` names no {line_of(new_id).replace('#', '*')} release; this build adds it: `{here}`", ev[:2]))
+                               f"{label}: `since` names no {line_of(new_id).replace('#', '*')} release; {adds}{id_only}", ev[:2]))
         else:
             for s in same_line:
                 ss = slug(s.split("/")[-1])
@@ -328,70 +395,122 @@ def check_themes(site: Site, vendor: str, platform: str, old_id: str, new_id: st
                     continue
                 i_s, i_new = order.index(ss), order.index(new_slug)
                 i_old = order.index(old_slug) if old_slug in order else i_new - 1
-                if i_s > i_new:
+                if i_s > i_new and images < STUB_IMAGES and layouts < STUB_IMAGES:
+                    # An id, or a screen without artwork of its own: the site dates the theme from when it works.
+                    out.append(Finding("themes", "note", name, f"{label}: site says `{s}`; `{here}` already has "
+                                       f"{'only its id' if id_only else f'a stub ({layouts} layouts, {images} images)'}, so that stands"))
+                elif i_s > i_new:
                     out.append(Finding("themes", "since-too-late", name,
                                        f"{label}: site says `{s}`, but it is already added in `{here}`", ev[:2]))
                 elif i_s <= i_old:
                     out.append(Finding("themes", "since-too-early", name,
                                        f"{label}: site says `{s}`, but the code first adds it in `{here}` (compared with {old_id})", ev[:2]))
     if skipped:
-        out.append(Finding("themes", "other-range", "", f"{skipped} numbered theme id(s) outside the site's numbering ({bottom} to {top}) were skipped"))
+        out.append(Finding("themes", "note", "", f"{skipped} numbered theme id(s) outside the site's numbering ({bottom} to {top}) were skipped"))
     return out
 
 
-def factory_keys(lines: list[DiffLine], facts: dict, report: str, known: set[str], example_only: set[str],
-                 not_keys: set[str]) -> dict[str, tuple[bool, list[str]]]:
-    """Factory-config keys this build reads or ships: {key: (only in a file new to this diff, evidence)}."""
+# Tag names the factory parser compares, and the plain fields of the class it fills.
+COMPARED = re.compile(r'case "([A-Za-z]\w*)":|\.equals(?:IgnoreCase)?\("([A-Za-z]\w*)"\)')
+FIELD = re.compile(r'^\s*public (?:int|long|boolean|String) ([A-Za-z]\w*)(?: = [^;]+)?;')
+CONSTANT = re.compile(r'static final String \w+ = "([A-Za-z]\w*)";')
+# A method of a top-level class, as jadx indents it.
+METHOD = re.compile(r'^ {4}[\w<>\[\],. ]*?\b(\w+)\([^;]*\)\s*(?:throws [\w., ]+)?\{\s*$')
+
+
+def scoped_names(lines: list[DiffLine]) -> dict[tuple[str, str, str], list[tuple[str, DiffLine]]]:
+    """Compared tag names per method, and plain fields per class: {(diff file, source file, scope): [(name, line)]}.
+    A line's method is the last declaration the diff shows above it in the same file."""
+    out: dict[tuple[str, str, str], list[tuple[str, DiffLine]]] = {}
+    where, method, closed, prev = ("", ""), "", False, 0
+    for ln in lines:
+        if (ln.file, ln.inner) != where:
+            where, method, closed = (ln.file, ln.inner), "", False
+        elif ln.no != prev + 1 and closed:
+            # A new hunk after the method ended in view: whatever method it is in, it is not that one.
+            method, closed = "", False
+        prev = ln.no
+        if m := METHOD.match(ln.text):
+            method, closed = m[1], False
+        elif re.fullmatch(r" {4}\}\s*", ln.text):
+            closed = True
+        for m in COMPARED.finditer(ln.text):
+            out.setdefault((ln.file, ln.inner, method), []).append((m[1] or m[2], ln))
+        if m := FIELD.match(ln.text):
+            out.setdefault((ln.file, ln.inner, "<fields>"), []).append((m[1], ln))
+    return out
+
+
+def factory_keys(lines: list[DiffLine], facts: dict, report: str, known: set[str], factory_tags: set[str],
+                 user_keys: set[str], site_keys: set[str], not_keys: set[str]) -> dict[str, tuple[bool, list[str]]]:
+    """Factory-config keys this build reads or ships: {key: (only in a file new to this diff, evidence)}.
+    A key counts when the factory parser reads it, when it is a factory-section tag of a factory XML, or when
+    the code names a tag the example XML has in its factory section."""
     keys: dict[str, tuple[bool, list[str]]] = {}
 
     def add(k: str, fresh_file: bool, ev: str) -> None:
         if k in not_keys or re.fullmatch(r"[A-Z0-9_]+", k):
             return
         old_fresh, evs = keys.get(k, (True, []))
-        keys[k] = (old_fresh and fresh_file, evs + [ev])
+        keys[k] = (old_fresh and fresh_file, evs if ev in evs else evs + [ev])
 
     # Files that are wholly new in this diff: every key in them looks added, whether or not it is.
     has_old = {ln.inner for ln in lines if ln.sign != "+"}
     added_text = set(re.findall(r"^- `([^`]+)`$", report.split("## Added text files", 1)[1].split("\n## ", 1)[0], re.M)) \
         if "## Added text files" in report else set()
-    for k in facts_list(facts, "config_keys"):
-        add(k, False, "facts.json config_keys")
+    # fw.py's config keys are new strings compared anywhere in an app that names the factory file, which
+    # also catches preference names and intent extras; they count only with one of the signals below.
+    claimed: list[tuple[str, str]] = [(k, "facts.json config_keys") for k in facts_list(facts, "config_keys")]
     # facts.json has the full lists; REPORT.md stops at 30 names with "+N more".
     for entry in facts.get("factory_settings") or []:
         for k in entry.get("added", []):
-            add(k, bool(entry.get("file_added")), f"facts.json factory_settings: {entry.get('file')}")
+            if k not in user_keys:
+                add(k, bool(entry.get("file_added")), f"facts.json factory_settings: {entry.get('file')}")
     rows = r"^- Factory config keys added.*$" if "factory_settings" in facts else r"^- Factory (?:config keys|settings) added.*$"
     for row in re.findall(rows, report, re.M):
         rel = re.search(r"added in `([^`]+)`", row)
         for k in re.findall(r"`<?(\w+)>?`", row.split(":", 1)[1]):
-            add(k, bool(rel and rel[1] in added_text), "REPORT.md: " + row[:120])
+            if not rel:
+                claimed.append((k, "REPORT.md: " + row[:120]))
+            elif k not in user_keys:
+                add(k, rel[1] in added_text, "REPORT.md: " + row[:120])
     xml_old = {m[1] for ln in lines if ln.sign != "+" and "factory" in ln.inner.lower() for m in [re.match(r"\s*<(\w+)>", ln.text)] if m}
+    where, in_user, prev = "", None, 0
     for ln in lines:
-        if ln.sign == "+" and "factory" in ln.inner.lower() and ln.inner.endswith(".xml") and (m := re.match(r"\s*<(\w+)>[^<]*</\1>", ln.text)):
-            if m[1] not in xml_old:
-                add(m[1], ln.inner not in has_old, cite(ln))
-    # Code that names the factory keys, as constants, switch cases or tag comparisons while parsing the
-    # XML. A file counts once it already names several keys the site knows, so no class or vendor name
-    # is needed.
-    literal = re.compile(r'static final String (\w+) = "([A-Za-z][\w]*)";|case "([A-Za-z][\w]*)":|'
-                         r'\.equals(?:IgnoreCase)?\("([A-Za-z][\w]*)"\)')
-    names: dict[str, list[tuple[str, str, DiffLine]]] = {}
-    for ln in lines:
-        for m in literal.finditer(ln.text):
-            names.setdefault(ln.inner, []).append((m[1] or "", m[2] or m[3] or m[4], ln))
-    # Outside such files, a literal still counts when the example XML has the tag and the old code never named it.
-    old_literals = {v for found in names.values() for _, v, ln in found if ln.sign != "+"}
-    for inner, found in names.items():
-        for _, v, ln in found:
-            if ln.sign == "+" and v in example_only and v not in old_literals:
-                add(v, inner not in has_old, cite(ln))
-    for inner, found in names.items():
-        if len({v for _, v, _ in found if v in known}) < 3:
+        if not ("factory" in ln.inner.lower() and ln.inner.endswith(".xml")):
             continue
-        gone = {v for _, v, ln in found if ln.sign != "+"}
-        for field_name, v, ln in found:
-            if ln.sign == "+" and v not in gone and not re.search(r"(^|_)(TAG|CLASS|ACTION|PKG|PATH|URL|CLS|NAME)$", field_name):
+        if ln.inner != where or ln.no != prev + 1:
+            where, in_user = ln.inner, None
+        prev = ln.no
+        if block := re.match(r"\s*<(/?)(\w+)>\s*$", ln.text):
+            if block[2] == USER_BLOCK:
+                in_user = not block[1]
+        elif ln.sign == "+" and (m := re.match(r"\s*<(\w+)>[^<]*</\1>", ln.text)) and m[1] not in xml_old:
+            # The diff may not show which block a tag sits in; the example's own layout decides then.
+            if not (in_user or (in_user is None and m[1] in user_keys)):
+                add(m[1], ln.inner not in has_old, cite(ln))
+    # Code naming, for the first time, a tag the example has in its factory section or a key the site
+    # already lists: the question for those is only whether this build carries them.
+    literals = [(m[1], ln) for ln in lines for m in CONSTANT.finditer(ln.text)] + \
+               [(m[1] or m[2], ln) for ln in lines for m in COMPARED.finditer(ln.text)]
+    old_literals = {v for v, ln in literals if ln.sign != "+"}
+    for v, ln in literals:
+        if ln.sign == "+" and (v in factory_tags or v in site_keys) and v not in old_literals:
+            add(v, ln.inner not in has_old, cite(ln))
+    # The parser itself: a method that compares tag names, or a class whose plain fields are the keys, once
+    # several of its names are keys the site or the example already knows. No class or vendor name is needed,
+    # and a constant declared beside such code is not a read.
+    for (_, inner, _), found in scoped_names(lines).items():
+        if len({v for v, _ in found if v in known}) < 3:
+            continue
+        gone = {v for v, ln in found if ln.sign != "+"}
+        for v, ln in found:
+            if ln.sign == "+" and v not in gone:
                 add(v, inner not in has_old, cite(ln))
+    for k, ev in claimed:
+        if k in keys or k in site_keys or k in factory_tags:
+            _, evs = keys.get(k, (False, []))
+            keys[k] = (False, evs if ev in evs else evs + [ev])
     return keys
 
 
@@ -401,8 +520,10 @@ def check_factory(site: Site, vendor: str, lines: list[DiffLine], facts: dict, r
     out = []
     themes = {t.get(f) for ts in site.themes.values() for t in ts for f in ("id", "client")} - {None}
     fresh: list[str] = []
-    for key, (in_new_file, ev) in sorted(factory_keys(lines, facts, report, set(documented) | example,
-                                                              example - set(documented), themes).items()):
+    user = site.user_keys.get(vendor, set())
+    leaves = site.example_leaves.get(vendor, set())
+    for key, (in_new_file, ev) in sorted(factory_keys(lines, facts, report, set(documented) | leaves, leaves - user - set(documented),
+                                                      user, set(documented), themes).items()):
         status = documented.get(key)
         if status == "documented":
             continue
@@ -469,7 +590,8 @@ def check_frontmatter(site: Site, diff_dir: Path, old_id: str, new_id: str) -> l
     for c in compared:
         cs = slug(c.split("/")[-1])
         if cs in order and slug(new_id) in order:
-            between = [s for s in order[order.index(cs) + 1:order.index(slug(new_id))] if line_of(s) == line_of(new_id)]
+            between = [s for s in order[order.index(cs) + 1:order.index(slug(new_id))]
+                       if line_of(s) == line_of(new_id) and same_branch(s, new_id)]
             if between:
                 out.append(Finding("frontmatter", "comparedTo", where, f"`comparedTo` is `{c}`; {len(between)} release(s) of this line lie in between: "
                                    + ", ".join(between[:6]), []))
@@ -504,14 +626,15 @@ def markdown(old_id: str, new_id: str, findings: list[Finding]) -> str:
     out = [f"# Site check: {old_id} -> {new_id}", ""]
     titles = {"themes": "Themes", "factory": "Factory settings", "frontmatter": "Frontmatter"}
     for check, title in titles.items():
-        rows = [f for f in findings if f.check == check]
+        rows = [f for f in findings if f.check == check and f.kind != "note"]
         out += [f"## {title}", ""]
         if not rows:
-            out += ["- nothing to report", ""]
-            continue
+            out.append("- nothing to report")
         for f in rows:
             out.append(f"- **{f.kind}**: {f.detail}")
             out += [f"  - `{e.replace('`', chr(39))}`" for e in f.evidence]
+        notes = [f.detail for f in findings if f.check == check and f.kind == "note"]
+        out += ["", *(f"Note: {n}" for n in notes)] if notes else []
         out.append("")
     return "\n".join(out)
 
@@ -529,7 +652,8 @@ def main() -> None:
     old_id, new_id, findings = run(args.diff_dir, args.site)
     print(markdown(old_id, new_id, findings))
     if args.json:
-        args.json.write_text(json.dumps({"old": old_id, "new": new_id, "findings": [f.__dict__ for f in findings]},
+        args.json.write_text(json.dumps({"old": old_id, "new": new_id, "findings": [f.__dict__ for f in findings if f.kind != "note"],
+                                         "notes": [f.__dict__ for f in findings if f.kind == "note"]},
                                         indent=2, ensure_ascii=False) + "\n")
 
 
