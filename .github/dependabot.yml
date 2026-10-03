@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    # Majors are upgraded by hand; see AGENTS.md for the ones held back.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     groups:
       astro:
         patterns:
