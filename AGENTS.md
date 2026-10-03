@@ -158,6 +158,10 @@ check. All must pass before deploy. Don't merge if any is red.
   can silently reuse the old HTML. Editing `astro.config.ts` or the content
   itself does invalidate it. Delete that file before trusting a local build of
   a plugin change; CI starts from a clean checkout and is unaffected.
+- **Dependabot never proposes a semver-major npm bump.** `.github/dependabot.yml`
+  ignores them for every package; majors are upgraded by hand on a branch with
+  the full verification run. The rule also blocks security PRs that need a
+  major, so check `npm audit` and the Dependabot alerts tab when bumping.
 - **Two upgrades are held back on purpose. Don't re-propose them.**
   - `prettier-plugin-astro` stays on 0.14.x. 1.0.0 silently disables
     `prettier-plugin-tailwindcss` class sorting
