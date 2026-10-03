@@ -100,7 +100,10 @@ double quotes. Follow the site conventions in `AGENTS.md`:
 
 ## Unrecognised maker
 
-REPORT marks apps whose package fw.py does not know as "unrecognised maker".
+For makers other than KSW and ZXW, `diff` computes the maker's namespaces
+from the firmware (named at the top of "Vendor apps") and ignores
+`VENDOR_NAMESPACES`, so editing that list changes nothing there. On KSW and
+ZXW, REPORT marks apps whose package fw.py does not know as "unrecognised maker".
 If several share one namespace and it matches `ro.build.user`,
 `ro.product.manufacturer` or the zip name, it is the maker. Add it in slash form
 (for example `"com/george"`) to `VENDOR_NAMESPACES` in `fw.py` and run `fw.py diff`
@@ -114,8 +117,10 @@ proposed diff.
 For non-KSW/ZXW Android units, block OTAs, Unisoc/Rockchip/MediaTek/Allwinner
 images or embedded Linux, read `tools/firmware/GENERALISING.md` first: it lists
 formats by magic bytes, how to tell OEM from platform code without
-`VENDOR_NAMESPACES`, and what `fw.py` currently misses (blank vendor/platform,
-nothing outside the filesystem partitions, such as kernel, U-Boot or modem).
+`VENDOR_NAMESPACES`, and what `fw.py` currently misses (section 5: no
+ramdisk unpacking, no unpacker for Rockchip, Allwinner or embedded Linux
+images). Images outside the filesystems (kernel, U-Boot, modem) are only
+hashed with their version strings, under "Images outside the filesystems".
 Say in the evidence file which parts of the image were not examined.
 
 ## Token budget

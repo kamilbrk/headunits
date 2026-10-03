@@ -1,7 +1,7 @@
 # Firmware tools
 
 `fw.py` unpacks KSW / ZXW OTA zips (and, with less detail, other makers'
-Android OTAs) and reports what changed between two of them. It replaces `public/script.sh`: no `sudo`, no macFUSE, no compiled
+Android OTAs) and reports what changed between two of them. It replaced the old `public/script.sh`: no `sudo`, no macFUSE, no compiled
 `ext4fuse`, and it decompiles only the apps that actually changed.
 
 ## Install
@@ -30,7 +30,9 @@ alias fw='docker run --rm --user "$(id -u):$(id -g)" -v ~/Dev/firmwares:/fw -e F
 The image has no checkout of the site or analysis tree, so mount them and name
 them: `fw sitecheck <diff> --site /site` with `-v "$PWD":/site`, and
 `fw evaluate --analysis /fw/_analysis run`. Both stop with an error when the
-folder is missing rather than checking against nothing.
+folder is missing rather than checking against nothing. `fw draft` takes
+`--site-data /site/src/data` the same way, but without it runs on silently
+with no known theme names.
 
 `uv` fetches the two Python dependencies (`brotli`, `pyaxmlparser`) on first
 run; nothing is installed globally.
@@ -51,9 +53,18 @@ tools/firmware/fw.py frontmatter 20250718GT_KSW        # paste into src/data/upd
 tools/firmware/fw.py diff 20250325GT_KSW 20250718GT_KSW
 tools/firmware/fw.py score 20250325GT_KSW 20250718GT_KSW  # vs src/data/updates/.../20250718GT_KSW.md
 tools/firmware/fw.py batch ~/Dev/firmwares/zxw\ gt7 ~/Dev/firmwares/ksw   # everything, pair by pair
+tools/firmware/fw.py rules <diff-dir> --min-severity medium   # security and privacy findings
+tools/firmware/fw.py sitecheck <diff-dir>                     # vs the site's themes, factory settings, frontmatter
+tools/firmware/fw.py draft <diff-dir> -o draft.md             # site-format changelog draft
+tools/firmware/fw.py evaluate run                             # recall against the analysed evidence files
 ```
 
-`extract` writes `<id>/fs/<partition>/`, `<id>/manifest.tsv` (every file's
+`rules`, `sitecheck`, `draft` and `evaluate` read a finished diff folder and
+take their own flags; `fw.py <subcommand> -h` lists them.
+
+`extract` skips a firmware that is already extracted unless given `--force`,
+and deletes the raw partition images once unpacked unless given
+`--keep-images`. It writes `<id>/fs/<partition>/`, `<id>/manifest.tsv` (every file's
 hash or symlink target), `<id>/meta.json` (vendor, platform, Android
 version, build date, zip hashes) and `<id>/images.json` (see below). About a
 minute per firmware and ~5 GB of disk each.
@@ -237,7 +248,7 @@ fixed order (sorted, or in app and file order).
 | `build` | `ro.build.display.id`, `.type`, `.user`, `.version.security_patch`, `.version.sdk`: `old`, `new` |
 | `themes`, `themes_removed` | theme id constants (`UI_NUM_KSW_X = 41`) |
 | `theme_sources` | per added theme id: the `app: source file` lines that define it |
-| `theme_strings`, `theme_strings_by_app`, `theme_strings_removed` | theme names from `UiThemeUtils.java` |
+| `theme_strings`, `theme_strings_by_app`, `theme_strings_removed`, `theme_strings_before` | theme names from `UiThemeUtils.java`; `_before` is every name the old build had |
 | `props`, `settings_keys`, `theme_names`, `models`, `files`, `packages`, `intents`, `urls`, `config_keys`, `screens` | dex string highlights: `added`, `removed` |
 | `jar_props` | per JAR: system properties it reads for the first time |
 | `native_libs`, `native_libs_removed` | `.so` files added to or removed from app folders |

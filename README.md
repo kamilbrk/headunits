@@ -196,15 +196,31 @@ Pull requests run the verify job only.
 
 ---
 
-## Helper scripts in `public/`
+## Example files in `public/`
 
-- `script.sh` — utility for unpacking OTA updates locally on macOS/Linux,
-  served at `/script.sh`. It expects `ext4fuse` and `sdat2img.py` in a `bin/`
-  folder next to it; neither is committed (only `public/bin/.gitkeep` is), so
-  they are **not** served by the deployed site. The comments inside
-  `script.sh` explain how to obtain and build both.
 - `factory_config.xml`, `zxw_factory_config.xml` — example factory
   configs surfaced inside the factory-settings pages.
+
+---
+
+## Firmware tools
+
+`tools/firmware/` holds the tools used to work out what changed between two
+firmware updates, without `sudo` or FUSE, on macOS, Linux or Docker:
+
+- `fw.py extract` / `diff` — unpack OTA zips and report what changed,
+  highlights first, with decompiled code diffs for the apps that changed.
+- `fw.py batch <folders>` — order every zip by build date per product line
+  and diff each build against the one before it.
+- `fw.py rules`, `sitecheck`, `draft` — security and privacy checks, a
+  comparison with this site's themes and factory settings, and a changelog
+  draft in this site's format.
+- `fw.py evaluate` — regression check against analysed firmware pairs.
+
+Install and usage are in [`tools/firmware/README.md`](tools/firmware/README.md).
+Two Claude Code skills build on them: `firmware-diff` (analyse new firmware)
+and `firmware-site-update` (turn the results into site edits), in
+`.claude/skills/`; any other agent can follow the same `SKILL.md` files.
 
 ---
 

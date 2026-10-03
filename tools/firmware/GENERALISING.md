@@ -239,7 +239,9 @@ January 2022 build.
    v0-v4 parsing (kernel, os version, patch level; gzip and xz kernels in Python, lz4 through the `lz4`
    binary). Not done: ramdisk unpacking, and `batch` still skips `super.img` flash kits.
 6. Generic signals pass: rc/init services, accounts, certs, hosts, setuid, SELinux, kernel version (1 day).
-7. ELF export and library-version diff via `nm -D` and a regex table (half a day).
+   Done so far: kernel version (`images.py`) and changed `.rc` / `.sh` lines (`script_changes`).
+7. ELF export and library-version diff via `nm -D` and a regex table (half a day). Done in part: changed ELF
+   files are compared by their name-like strings, symbols included (`native_strings`); no `nm`, no version table.
 8. Embedded Linux: squashfs, UBI/UBIFS, JFFS2, cpio, uImage/FIT via pinned tools in the Dockerfile (1 day).
 9. opkg/dpkg ownership and BusyBox applet split for non-Android vendor detection (half a day).
 10. Unisoc PAC, Rockchip RKFW/RKAF, Allwinner IMAGEWTY, MTK header, Amlogic unpackers, each only when a real sample arrives (2 h each).
