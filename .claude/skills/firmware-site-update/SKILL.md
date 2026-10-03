@@ -64,7 +64,13 @@ evidence contradicts them. Do not use them to fill gaps in the evidence.
   (`zxw/gt6/20250331gt_ksw`, `ksw/m501/ksw-q-userdebug_os_v391-ota`). A theme on
   several lines takes a list.
 - A theme that is only an id or a placeholder is not "since" that build; use the
-  first build where it is usable, as the evidence says.
+  first build where it is usable, as the evidence says. sitecheck marks these
+  "(id only in this build: nothing uses it yet)".
+- When the diff skipped site releases, sitecheck gives a range ("first appears
+  after X, in Y or one of N site release(s) this comparison skips"). Pick a
+  release in that range only if the evidence names it; otherwise name the range
+  in your reply rather than guess. Its `Note:` lines are
+  context, not findings to act on.
 - A missing theme: add a folder with `index.md` (`id`, `number` for ZXW,
   `display`, `tags`, `client` when locked to one vendor, `since`). Leave
   `images` out rather than invent them; say in your reply that screenshots are needed.
@@ -115,6 +121,6 @@ edits also run `npm test`, and `npm run test:e2e` after the build.
   a go before committing. Never push without being asked.
 - One release per commit, or a small batch of related ones (one theme `since`
   sweep, one factory section). Message style from `git log`, for example
-  `docs(updates): fill ZXW GT6 20241129 from firmware diff`.
+  `content: fill ZXW GT6 20241129 from firmware diff`.
 - In the reply, list any claim you left out because the evidence was too weak,
   and anything that needs the owner (screenshots, a judgement call).

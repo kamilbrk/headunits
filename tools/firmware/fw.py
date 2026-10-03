@@ -10,6 +10,10 @@
   fw.py diff <old-id> <new-id>          write WORK/diffs/<old>..<new>/ (report + source diffs)
   fw.py score <old-id> <new-id>         how much of the hand-written changelog the report finds
   fw.py batch <zip-folder>...           diff every zip against its predecessor; write WORK/diffs/INDEX.md
+  fw.py rules <diff-dir>                security and privacy checks over a diff folder
+  fw.py sitecheck <diff-dir>            compare a diff folder with the site's themes, factory settings and frontmatter
+  fw.py draft <diff-dir>                write a site-format changelog draft from a diff folder
+  fw.py evaluate run|snapshot|compare   score reports against the analysed evidence; regression snapshots
 
 WORK defaults to ~/Dev/firmwares/_work and can be changed with FW_WORK.
 Nothing here needs root, FUSE or a mounted filesystem: ext4 images are read by
@@ -2199,15 +2203,15 @@ SCRIPTS = {
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(required=True)
-    p = sub.add_parser("extract")
+    p = sub.add_parser("extract", help="unpack OTA zips into WORK/<id>/")
     p.add_argument("zips", nargs="+")
     p.add_argument("--force", action="store_true")
     p.add_argument("--keep-images", action="store_true")
     p.set_defaults(func=cmd_extract)
-    p = sub.add_parser("frontmatter")
+    p = sub.add_parser("frontmatter", help="print the YAML frontmatter for src/data/updates")
     p.add_argument("id")
     p.set_defaults(func=cmd_frontmatter)
-    p = sub.add_parser("diff")
+    p = sub.add_parser("diff", help="diff two extracted firmwares into WORK/diffs/<old>..<new>/")
     p.add_argument("old")
     p.add_argument("new")
     p.add_argument("--jobs", type=int, default=3)
