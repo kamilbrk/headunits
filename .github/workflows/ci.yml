@@ -91,7 +91,7 @@ jobs:
     # `@playwright/test` version in package.json: a mismatch means the package
     # looks for a browser build the image does not carry.
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --user 1001 --ipc=host
     steps:
       - name: Checkout
@@ -122,7 +122,7 @@ jobs:
         run: |
           node -e "
             const wanted = require('./package.json').devDependencies['@playwright/test'];
-            const image = 'mcr.microsoft.com/playwright:v1.63.0-noble';
+            const image = 'mcr.microsoft.com/playwright:v1.64.1-noble';
             if (!image.includes('v' + wanted + '-')) {
               console.error('Image ' + image + ' does not match @playwright/test ' + wanted);
               process.exit(1);

@@ -24,13 +24,13 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "0.9.10",
-    "@astrojs/markdown-satteri": "0.4.2",
-    "@astrojs/mdx": "8.0.2",
+    "@astrojs/check": "0.9.12",
+    "@astrojs/markdown-satteri": "0.4.5",
+    "@astrojs/mdx": "8.1.1",
     "@astrojs/rss": "4.0.19",
     "@astrojs/sitemap": "3.7.4",
     "@tailwindcss/vite": "4.3.3",
-    "astro": "7.3.5",
+    "astro": "7.4.2",
     "astro-heroicons": "2.1.5-1",
     "astro-pagefind": "2.0.1",
     "satteri": "0.10.5",
@@ -44,22 +44,22 @@
     "esbuild": "^0.28.1"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.13.0",
+    "@axe-core/playwright": "4.14.0",
     "@ianvs/prettier-plugin-sort-imports": "4.7.1",
-    "@playwright/test": "1.63.0",
+    "@playwright/test": "1.64.1",
     "@tailwindcss/typography": "0.5.20",
-    "eslint": "10.12.0",
+    "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-astro": "3.2.1",
-    "eslint-plugin-prettier": "5.5.6",
+    "eslint-plugin-prettier": "5.5.7",
     "eslint-plugin-sonarjs": "4.2.2",
-    "eslint-plugin-unicorn": "76.0.0",
+    "eslint-plugin-unicorn": "78.0.0",
     "github-slugger": "2.0.0",
-    "html-validate": "11.16.1",
-    "prettier": "3.9.9",
+    "html-validate": "11.17.0",
+    "prettier": "3.9.10",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.3",
-    "typescript-eslint": "8.71.0"
+    "typescript-eslint": "8.72.0"
   }
 }

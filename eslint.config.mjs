@@ -61,6 +61,14 @@ export default [
       // unicorn 76 also flags a trailing `if (…) return a; return b;`, which
       // would break up the guard-clause chains used throughout.
       'unicorn/prefer-ternary': 'off',
+      // unicorn 78: merging guards drops the comment each one carries.
+      'unicorn/prefer-combined-guards': 'off',
+      // unicorn 78 flags `export default defineCollection(…)` and
+      // `defineHastPlugin(…)`, the shape Astro and Sätteri require.
+      'unicorn/no-top-level-side-effects': 'off',
+      // unicorn 78 wants `/**` bodies without the ` * ` prefix, against the
+      // JSDoc style used throughout.
+      'unicorn/no-asterisk-prefix-in-documentation-comments': 'off',
       // `exactOptionalPropertyTypes` makes `?` + `| undefined` meaningful,
       // not redundant — required for zod `.optional()` output types.
       'sonarjs/no-redundant-optional': 'off',
