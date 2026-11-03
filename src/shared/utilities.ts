@@ -20,10 +20,6 @@ export type EntryStaticPath<C extends CollectionKey> = {
   props: { entry: CollectionEntry<C> };
 };
 
-type CollectionTree<C extends CollectionKey> = {
-  [key: string]: CollectionTree<C> | CollectionEntry<C>;
-};
-
 type CollectionEntryWithEntries<
   P extends CollectionKey,
   C extends CollectionKey
@@ -36,11 +32,15 @@ export type ReferenceOrString = Array<{ collection: string; id: string } | strin
 export type LinkOrText = { href: string; text: string } | string;
 
 export function getTreeFromCollection<C extends CollectionKey>(collection: CollectionEntry<C>[]) {
-  const tree: CollectionTree<C> = {};
+  type CollectionTree = {
+    [key: string]: CollectionTree | CollectionEntry<C>;
+  };
+
+  const tree: CollectionTree = {};
 
   for (const entry of collection) {
     const path = entry.id.split('/');
-    let currentNode: CollectionTree<C> = tree;
+    let currentNode: CollectionTree = tree;
 
     for (let i = 0; i < path.length - 1; i++) {
       const part = path[i] as string;
@@ -49,7 +49,7 @@ export function getTreeFromCollection<C extends CollectionKey>(collection: Colle
         currentNode[part] = {};
       }
 
-      currentNode = currentNode[part] as CollectionTree<C>;
+      currentNode = currentNode[part] as CollectionTree;
     }
 
     const leaf = path.at(-1) as string;
